@@ -1,0 +1,152 @@
+<resources>
+    <string name="app_name">Finly</string>
+    <string name="menu_resumo">Resumo Mensal</string>
+    <string name="menu_planilha">Ver Listagem</string>
+    <string name="menu_perfil">O meu Perfil</string>
+    <string name="menu_guia">Guia do Utilizador</string>
+    <string name="menu_evolucao">Evolução Anual</string>
+    <string name="menu_exportar">Exportar PDF</string>
+
+    <string name="menu_sair">Terminar sessão</string>
+    <string name="accoes">Ações</string>
+
+    <!-- Guia do Utilizador -->
+    <string name="guia_titulo">GUIA DO UTILIZADOR</string>
+    <string name="guia_sec1_titulo">1. Resumo Mensal</string>
+    <string name="guia_sec1_desc">Neste ecrã, tem uma visão geral das finanças do mês selecionado. O gráfico circular mostra a distribuição dos gastos por categoria.</string>
+    <string name="guia_sec2_titulo">2. Meta de Poupança</string>
+    <string name="guia_sec2_desc">Defina quanto deseja poupar mensalmente. A barra de progresso será preenchida automaticamente conforme adicionar transações na categoria \'Poupança\'.</string>
+    <string name="guia_sec3_titulo">3. Listagem Detalhada</string>
+    <string name="guia_sec3_desc">Aceda à lista completa de transações. Pode pesquisar por itens, filtrar por tipo (Renda ou Despesa) e navegar entre os meses.</string>
+    <string name="guia_sec4_titulo">4. Adicionar Itens</string>
+    <string name="guia_sec4_desc">Prima o botão \'+\' na Listagem para registar um novo item. Escolha o tipo (Renda/Despesa) e a categoria correta para manter os gráficos precisos.</string>
+    <string name="guia_sec5_titulo">5. Recorrência</string>
+    <string name="guia_sec5_desc">Ao registar um item, pode marcar para que este se repita automaticamente nos meses seguintes, ideal para contas fixas como Aluguer ou Internet.</string>
+    <string name="guia_sec6_titulo">6. Exportar Relatórios</string>
+    <string name="guia_sec6_desc">Gere um relatório PDF profissional com o logótipo da aplicação e todos os dados consolidados do mês diretamente do ecrã de Resumo.</string>
+    <string name="guia_sec7_titulo">7. Sincronização e Nuvem</string>
+    <string name="guia_sec7_desc">Ao criar uma conta, os seus dados são salvos na nuvem (Firebase) e sincronizados em tempo real. Se usar o modo Convidado, os dados ficam apenas no seu telemóvel e podem ser perdidos se desinstalar a aplicação.</string>
+    <string name="guia_sec8_titulo">8. Segurança</string>
+    <string name="guia_sec8_desc">A sua privacidade é a nossa prioridade. O Finly utiliza encriptação de ponta fornecida pelo Google Firebase para garantir que apenas você tem acesso aos seus dados financeiros.</string>
+    <string name="guia_sec9_titulo">9. Eliminação Rápida (Swipe)</string>
+    <string name="guia_sec9_desc">Pode apagar qualquer item da listagem rapidamente deslizando-o para a esquerda ou direita. Se o item for recorrente, apenas a instância do mês selecionado será removida.</string>
+    <string name="guia_sec10_titulo">10. Evolução Anual</string>
+    <string name="guia_sec10_desc">Aceda ao menu lateral para ver o gráfico de barras anual. Ele permite comparar os seus ganhos e gastos reais mês a mês durante todo o ano.</string>
+    <string name="snackbar_item_removido">Item removido: %1$s</string>
+    <string name="btn_desfazer">DESFAZER</string>
+
+
+
+    <!-- Login -->
+    <string name="lembrar_email">Lembrar o meu e-mail</string>
+    <string name="entrar">ENTRAR</string>
+    <string name="entrar_convidado">ENTRAR COMO CONVIDADO</string>
+    <string name="bem_vindo_finly">Bem-vindo ao Finly</string>
+    <string name="criar_conta_link">Não tem conta? Crie aqui</string>
+    <string name="esqueceu_senha">Esqueceu-se da palavra-passe?</string>
+    <string name="email_recuperacao_enviado">E-mail de recuperação enviado!</string>
+    <string name="erro_recuperacao">Erro ao enviar e-mail de recuperação.</string>
+    <string name="introduza_email_recuperacao">Introduza o seu e-mail para recuperar a palavra-passe.</string>
+    <string name="hint_email">E-mail</string>
+    <string name="hint_palavra_passe">Palavra-passe</string>
+
+    <!-- Registo / Novo Item -->
+    <string name="nova_transacao">Nova Transação</string>
+    <string name="editar_item">Editar Item</string>
+    <string name="criar_nova_conta">Criar Nova Conta</string>
+    <string name="editar_perfil">Editar Perfil</string>
+    <string name="guardar_na_listagem">GUARDAR NA LISTAGEM</string>
+    <string name="atualizar_item">ATUALIZAR ITEM</string>
+    <string name="btn_criar_conta">CRIAR CONTA</string>
+    <string name="btn_atualizar_perfil">ATUALIZAR PERFIL</string>
+    <string name="hint_descricao">Descrição (ex: EDP, Gás)</string>
+    <string name="hint_valor">Valor (€)</string>
+    <string name="hint_vencimento">Vencimento (Calendário)</string>
+    <string name="label_categoria">Categoria:</string>
+    <string name="label_mes_referencia">Mês de Referência:</string>
+    <string name="rb_despesa">DESPESA</string>
+    <string name="rb_renda">RENDA</string>
+    <string name="cb_repetir_sempre">Repetir todos os meses (Fixo)</string>
+    <string name="cb_repetir_vezes">Repetir quantidade de vezes</string>
+    <string name="hint_parcelas">Quantos meses?</string>
+
+    <!-- Resumo -->
+    <string name="percentagem_renda_gasta">PERCENTAGEM DA RENDA GASTA</string>
+    <string name="ver_listagem_detalhada">VER LISTAGEM DETALHADA</string>
+    <string name="label_periodo">Período:</string>
+    <string name="label_resumo_categoria">RESUMO POR CATEGORIA</string>
+    <string name="label_meta_poupanca">Meta de Poupança</string>
+    <string name="btn_definir_meta">DEFINIR META</string>
+    <string name="label_total_renda">Total mensal de renda: </string>
+    <string name="label_total_despesas">Total mensal de despesas: </string>
+    <string name="label_total_poupanca">Total poupança: </string>
+    <string name="label_total_exterior">Total exterior: </string>
+    <string name="label_saldo">SALDO: </string>
+    <string name="btn_exportar_pdf">EXPORTAR RELATÓRIO PDF</string>
+
+    <!-- Listagem (Home) -->
+    <string name="hint_pesquisar">Pesquisar...</string>
+    <string name="tab_todas">TODAS</string>
+    <string name="tab_despesas">DESPESAS</string>
+    <string name="tab_rendas">RENDAS</string>
+    <string name="col_item">Item</string>
+    <string name="col_valor">Valor</string>
+    <string name="col_vencimento">Vencimento</string>
+    <string name="col_pago">Pago</string>
+    <string name="col_ver">Ver</string>
+
+    <!-- Perfil -->
+    <string name="btn_minha_listagem">A MINHA LISTAGEM</string>
+    <string name="btn_editar_dados">EDITAR DADOS DA CONTA</string>
+    <string name="btn_terminar_sessao">TERMINAR SESSÃO</string>
+    <string name="btn_eliminar_registo">ELIMINAR REGISTO</string>
+    <string name="dialog_eliminar_titulo">Eliminar Registo</string>
+    <string name="dialog_eliminar_msg">Tem a certeza que deseja apagar a sua conta? Todas as suas transações serão eliminadas permanentemente.</string>
+    <string name="toast_conta_eliminada">Conta eliminada com sucesso</string>
+
+    <!-- Transação -->
+    <string name="btn_editar_este_item">EDITAR ESTE ITEM</string>
+    <string name="btn_eliminar_este_item">ELIMINAR ESTE ITEM</string>
+    <string name="btn_voltar_listagem">VOLTAR À LISTAGEM</string>
+    <string name="utilizador_convidado">Utilizador Convidado</string>
+    <string name="dados_apenas_locais">Dados apenas locais (Offline)</string>
+
+
+    <string name="toast_convidado_perfil">Convidado: Sem perfil para editar</string>
+    <string name="meta_atingida">Meta Atingida! Parabéns! 🎉</string>
+    <string name="valor_label">Valor: %1$.2f € (%2$s)</string>
+    <string name="data_label">Data: %1$s</string>
+    <string name="categoria_mes_label">Categoria: %1$s | Mês: %2$s</string>
+    <string name="poupado_label">Poupado: %1$.2f € (%2$d%%)</string>
+    <string name="meta_definir_aviso">Defina uma meta para este mês.</string>
+    <string name="userName">UserReplace</string>
+    <string name="txtTelemovel">Telemóvel</string>
+    <string name="txtEmail">E-mail</string>
+    <string name="txtPalavraPasse">Palavra-passe</string>
+    <string name="txtNome">Nome</string>
+
+    <!-- Labels Listagem/Resumo -->
+    <string name="total_despesas">Total Despesas: </string>
+    <string name="total_rendas">Total Rendas: </string>
+    <string name="saldo_final_label">Saldo Final: </string>
+
+    <!-- PDF -->
+    <string name="pdf_titulo">Relatório Financeiro Finly</string>
+    <string name="pdf_periodo">Período: %1$s / %2$s</string>
+    <string name="pdf_renda_total">Renda Total: %1$s</string>
+    <string name="pdf_despesa_total">Despesa Total: %1$s</string>
+    <string name="pdf_poupanca_total">Total Poupança Real: %1$s</string>
+    <string name="pdf_meta_definida">Meta de Poupança Definida: %1$.2f €</string>
+    <string name="pdf_saldo_final">Saldo Final: %1$s</string>
+    <string name="empty_list_message">Nenhuma transação encontrada</string>
+    <string name="dialog_eliminar_recorrencia_titulo">Eliminar Recorrência</string>
+    <string name="dialog_eliminar_recorrencia_msg">Deseja apagar \'%1$s\' apenas este mês ou todos os meses futuros?</string>
+    <string name="btn_apagar_apenas_este">Apagar apenas este mês</string>
+    <string name="btn_apagar_todos_futuros">Apagar todos os futuros</string>
+    <string name="dialog_eliminar_item_titulo">Eliminar Item</string>
+    <string name="dialog_eliminar_item_msg">Deseja apagar \'%1$s\' permanentemente?</string>
+    <string name="btn_sim_eliminar">Sim, eliminar item</string>
+    <string name="btn_nao_manter">NÃO, MANTER ITEM</string>
+    <string name="toast_recorrencia_removida">Recorrência removida!</string>
+    <string name="toast_item_removido">Item removido com sucesso!</string>
+</resources>

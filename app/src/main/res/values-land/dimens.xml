@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Landscape -->
+    <dimen name="header_height_resumo">60dp</dimen>
+    <dimen name="header_height_home">60dp</dimen>
+    <dimen name="header_height_detalhes">100dp</dimen>
+
+    <dimen name="margin_top_title_resumo">12dp</dimen>
+    <dimen name="margin_top_title_home">8dp</dimen>
+    <dimen name="margin_top_logo_login">12dp</dimen>
+    <dimen name="margin_top_avatar">12dp</dimen>
+
+    <dimen name="text_size_large_title">24sp</dimen>
+    <dimen name="text_size_medium_title">20sp</dimen>
+    <dimen name="text_size_small_title">18sp</dimen>
+
+    <dimen name="scroll_padding_bottom">48dp</dimen>
+    <dimen name="card_margin_horizontal">32dp</dimen>
+    <dimen name="pie_chart_height">180dp</dimen>
+</resources>

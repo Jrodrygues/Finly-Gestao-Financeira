@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "808659327947",
+    "project_id": "finly-f6018",
+    "storage_bucket": "finly-f6018.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:808659327947:android:07aa83046bf8b0f039b44e",
+        "android_client_info": {
+          "package_name": "com.jesse.finly"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8mYmiPksn-s-jUEowDb50kdIRC4IQO8c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

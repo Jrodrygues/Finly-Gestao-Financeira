@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Cores da Aplicação - Base -->
+    <color name="colorPrimary">#009688</color>
+    <color name="colorPrimaryDark">#00796B</color>
+    <color name="colorAccent">#5F9EA0</color>
+
+    <color name="backgroundColor">#FFFFFF</color>
+    <color name="surfaceColor">#F5F5F5</color>
+    <color name="headerColor">#E0F2F1</color>
+
+    <color name="textColorPrimary">#333333</color>
+    <color name="textColorSecondary">#666666</color>
+
+    <color name="colorNegative">#F44336</color>
+    <color name="colorPositive">#4CAF50</color>
+</resources>

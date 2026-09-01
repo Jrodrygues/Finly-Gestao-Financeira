@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_resumo"
+            android:icon="@drawable/ic_dashboard"
+            android:title="@string/menu_resumo" />
+        <item
+            android:id="@+id/nav_planilha"
+            android:icon="@drawable/ic_list"
+            android:title="@string/menu_planilha" />
+        <item
+            android:id="@+id/nav_perfil"
+            android:icon="@drawable/ic_person"
+            android:title="@string/menu_perfil" />
+        <item
+            android:id="@+id/nav_guia"
+            android:icon="@drawable/ic_help"
+            android:title="@string/menu_guia" />
+        <item
+            android:id="@+id/nav_evolucao"
+            android:icon="@drawable/ic_dashboard"
+            android:title="@string/menu_evolucao" />
+    </group>
+
+
+    <item android:title="@string/accoes">
+        <menu>
+            <item
+                android:id="@+id/nav_exportar"
+                android:icon="@drawable/ic_pdf"
+                android:title="@string/menu_exportar" />
+            <item
+                android:id="@+id/nav_sair"
+                android:icon="@drawable/ic_logout"
+                android:title="@string/menu_sair" />
+        </menu>
+    </item>
+</menu>

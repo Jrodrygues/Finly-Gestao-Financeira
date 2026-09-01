@@ -1,0 +1,273 @@
+package com.jesse.finly
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import android.graphics.Color
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
+import androidx.lifecycle.lifecycleScope
+import com.google.firebase.auth.FirebaseAuth
+import com.jesse.finly.database.FirebaseManager
+import kotlinx.coroutines.tasks.await
+import com.jesse.finly.database.MinhaBaseDados
+import com.jesse.finly.databinding.LoginBinding
+import com.jesse.finly.utils.showToast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+class LoginActivity : AppCompatActivity() {
+    private lateinit var binding: LoginBinding
+
+    companion object {
+        private const val PREFS_NAME = "FinlyAppPrefs"
+        private const val KEY_NAME = "NAME"
+        private const val KEY_EMAIL = "EMAIL"
+        private const val KEY_LAST_LOGIN = "LAST_LOGIN_TIMESTAMP"
+        private const val SESSION_TIMEOUT = 15L * 24 * 60 * 60 * 1000 // 15 Dias
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // 1. Forçar modo Light para o design "Soft"
+        delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
+        
+        super.onCreate(savedInstanceState)
+        
+        // 2. Ativar visual uniforme (Edge-to-Edge)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+        
+        // 3. Garantir que os ícones do sistema (hora, botões) sejam visíveis (escuros) no fundo claro
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        controller.isAppearanceLightStatusBars = true
+        controller.isAppearanceLightNavigationBars = true
+
+        binding = LoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+
+        verificarSessaoAtiva()
+
+        binding.loginbtn.setOnClickListener {
+            fazerLogin()
+        }
+
+        binding.btnRegistar.setOnClickListener {
+            val intent = Intent(this, RegistoActivity::class.java)
+            intent.putExtra("isNewUser", true)
+            startActivity(intent)
+        }
+
+        binding.btnEsqueciSenha.setOnClickListener {
+            mostrarDialogRecuperarSenha()
+        }
+
+        binding.btnConvidado.setOnClickListener {
+            entrarComoConvidado()
+        }
+
+        // Carregar e-mail lembrado se existir
+        carregarEmailLembrado()
+    }
+
+    private fun carregarEmailLembrado() {
+        val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val emailLembrado = sharedPref.getString("EMAIL_LEMBRADO", "")
+        if (!emailLembrado.isNullOrEmpty()) {
+            binding.emailText.setText(emailLembrado)
+            binding.cbLembrarEmail.isChecked = true
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Verificar se há um e-mail acabado de registar para preencher
+        val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val tempEmail = sharedPref.getString("TEMP_EMAIL", "")
+        if (!tempEmail.isNullOrEmpty()) {
+            binding.emailText.setText(tempEmail)
+            // Limpar para não preencher sempre
+            sharedPref.edit { remove("TEMP_EMAIL") }
+        }
+    }
+
+    private fun verificarSessaoAtiva() {
+        val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val lastLogin = sharedPref.getLong(KEY_LAST_LOGIN, 0L)
+        val currentTime = System.currentTimeMillis()
+        val email = sharedPref.getString(KEY_EMAIL, "") ?: ""
+
+        if (lastLogin != 0L && (currentTime - lastLogin < SESSION_TIMEOUT) && email.isNotEmpty() && email != "CONVIDADO") {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val db = MinhaBaseDados.getDatabase(applicationContext)
+                val user = db.utilizadorDao().buscarPorEmail(email)
+                withContext(Dispatchers.Main) {
+                    if (user != null) {
+                        prosseguirParaApp()
+                    } else {
+                        sharedPref.edit { clear() }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun fazerLogin() {
+        val emailInput = binding.emailText.text.toString().trim()
+        val senha = binding.senhaText.text.toString().trim()
+
+        if (emailInput.isEmpty() || senha.isEmpty()) {
+            showToast("Introduza o e-mail e a palavra-passe")
+            return
+        }
+
+        val email = emailInput.lowercase()
+        setLoading(isLoading = true)
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                // 1. Tentar Login no Firebase primeiro
+                val auth = FirebaseAuth.getInstance()
+                val result = auth.signInWithEmailAndPassword(email, senha).await()
+                
+                if (result.user != null) {
+                    // Login Firebase Sucesso
+                    val db = MinhaBaseDados.getDatabase(this@LoginActivity)
+                    var utilizador = db.utilizadorDao().buscarPorEmail(email)
+                    
+                    // Se não existe localmente (ex: mudou de telemóvel), descarregar do Firestore
+                    if (utilizador == null) {
+                        utilizador = FirebaseManager.obterPerfilDoFirestore(email)
+                        utilizador?.let { db.utilizadorDao().insertUtilizador(it) }
+                    }
+
+                    withContext(Dispatchers.Main) {
+                        setLoading(false)
+                        // APLICAR PREFERÊNCIAS BAIXADAS (TEMA E NOTIFICAÇÕES)
+                        utilizador?.let { u ->
+                            getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
+                                putBoolean("DARK_MODE", u.darkMode)
+                                putBoolean("NOTIFICATIONS", u.notifications)
+                            }
+                            // Aplicar tema imediatamente
+                            AppCompatDelegate.setDefaultNightMode(
+                                if (u.darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO,
+                            )
+                        }
+
+                        finalizarSessaoLogin(email, utilizador?.nome ?: "Utilizador")
+                    }
+                }
+            } catch (e: Exception) {
+                val db = MinhaBaseDados.getDatabase(this@LoginActivity)
+                val utilizadorLocal = db.utilizadorDao().validarLogin(email, senha)
+                
+                withContext(Dispatchers.Main) {
+                    setLoading(false)
+                    if (utilizadorLocal != null) {
+                        finalizarSessaoLogin(email, utilizadorLocal.nome)
+                    } else {
+                        // Se não encontrou nem localmente nem na nuvem, dar erro original
+                        showToast("E-mail ou palavra-passe incorretos!")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setLoading(isLoading: Boolean) {
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        binding.loginbtn.isEnabled = !isLoading
+        binding.btnConvidado.isEnabled = !isLoading
+        binding.btnRegistar.isEnabled = !isLoading
+    }
+
+    private fun mostrarDialogRecuperarSenha() {
+        val emailAtual = binding.emailText.text.toString().trim()
+        val view = layoutInflater.inflate(R.layout.dialog_recuperar_senha, null)
+        val input = view.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.recoverEmailText)
+        input.setText(emailAtual)
+
+        // Criar o ícone com a cor verde manualmente para garantir visibilidade no tema claro
+        val icon = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_help)?.mutate()
+        icon?.setTint(androidx.core.content.ContextCompat.getColor(this, R.color.colorPrimary))
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Recuperar Palavra-passe")
+            .setIcon(icon)
+            .setMessage(getString(R.string.introduza_email_recuperacao))
+            .setView(view)
+            .setPositiveButton("Enviar") { _, _ ->
+                val email = input.text.toString().trim()
+                if (email.isNotEmpty()) {
+                    enviarEmailRecuperacao(email)
+                } else {
+                    showToast("Introduza um e-mail válido")
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun enviarEmailRecuperacao(email: String) {
+        val auth = FirebaseAuth.getInstance()
+        auth.useAppLanguage() // Configura o idioma do e-mail para o idioma do telemóvel do utilizador
+        
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                auth.sendPasswordResetEmail(email).await()
+                withContext(Dispatchers.Main) {
+                    showToast(getString(R.string.email_recuperacao_enviado))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    showToast(getString(R.string.erro_recuperacao))
+                }
+            }
+        }
+    }
+
+    private fun finalizarSessaoLogin(email: String, nome: String) {
+        val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        sharedPref.edit {
+            putString(KEY_NAME, nome)
+            putString(KEY_EMAIL, email)
+            putLong(KEY_LAST_LOGIN, System.currentTimeMillis())
+            
+            if (binding.cbLembrarEmail.isChecked) {
+                putString("EMAIL_LEMBRADO", email)
+            } else {
+                remove("EMAIL_LEMBRADO")
+            }
+        }
+        prosseguirParaApp()
+    }
+
+    private fun entrarComoConvidado() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Aviso de Convidado")
+            .setMessage("Como convidado, os seus dados são locais. Deseja continuar?")
+            .setPositiveButton("Sim") { _, _ ->
+                getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().apply {
+                    putString(KEY_EMAIL, "CONVIDADO")
+                    putLong(KEY_LAST_LOGIN, System.currentTimeMillis())
+                    apply()
+                }
+                prosseguirParaApp()
+            }
+            .setNegativeButton("Voltar", null)
+            .show()
+    }
+
+    private fun prosseguirParaApp() {
+        // Agora vamos diretamente para o Resumo Mensal (ResumoActivity)
+        startActivity(Intent(this, ResumoActivity::class.java))
+        finish()
+    }
+}

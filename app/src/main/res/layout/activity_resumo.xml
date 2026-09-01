@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:openDrawer="start">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundColor"
+            android:fillViewport="true">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/scroll_padding_bottom">
+
+                <!-- Cabeçalho Principal -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/viewHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/header_min_height"
+                    android:background="@color/colorAccent"
+                    android:paddingBottom="8dp"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <!-- Botão Menu Hamburguer -->
+                    <ImageButton
+                        android:id="@+id/btnMenu"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_menu"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/white" />
+
+                    <!-- Título Centralizado -->
+                    <TextView
+                        android:id="@+id/tvTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/menu_resumo"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_small_title"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Seletor de Mês e Ano -->
+                <LinearLayout
+                    android:id="@+id/llMesSelector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/surfaceColor"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    app:layout_constraintTop_toBottomOf="@+id/viewHeader">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_periodo"
+                        android:textStyle="bold"
+                        android:textColor="@color/textColorPrimary" />
+
+                    <Spinner
+                        android:id="@+id/spinnerMes"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/colorPrimary" />
+
+                    <Spinner
+                        android:id="@+id/spinnerAno"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/colorPrimary" />
+                </LinearLayout>
+
+                <!-- Barra de Percentagem -->
+                <TextView
+                    android:id="@+id/tvLabelPercent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/headerColor"
+                    android:padding="8dp"
+                    android:text="@string/percentagem_renda_gasta"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toBottomOf="@+id/llMesSelector" />
+
+                <TextView
+                    android:id="@+id/tvPercentValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginTop="16dp"
+                    android:text="0%"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="@dimen/text_size_large_title"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvLabelPercent" />
+
+                <TextView
+                    android:id="@+id/tvSpentValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="0,00"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/tvPercentValue"
+                    app:layout_constraintEnd_toStartOf="@+id/tvPercentValue"
+                    app:layout_constraintTop_toTopOf="@+id/tvPercentValue" />
+
+                <!-- Secção Resumo -->
+                <TextView
+                    android:id="@+id/tvLabelResumo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/surfaceColor"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/label_resumo_categoria"
+                    android:textColor="@color/textColorPrimary"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toBottomOf="@+id/tvPercentValue" />
+
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/pieChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/pie_chart_height"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintTop_toBottomOf="@+id/tvLabelResumo" />
+
+                <!-- Container para Legenda Detalhada -->
+                <LinearLayout
+                    android:id="@+id/llCategoryDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="24dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintTop_toBottomOf="@+id/pieChart" />
+
+                <Button
+                    android:id="@+id/btnVerMaisCategorias"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ver mais categorias"
+                    android:textAllCaps="false"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorAccent"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/llCategoryDetails" />
+
+
+                <!-- Card Meta de Poupança -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardMetaPoupanca"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="24dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:layout_constraintTop_toBottomOf="@+id/btnVerMaisCategorias">
+
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/label_meta_poupanca"
+                                android:textColor="@color/textColorPrimary"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvMetaValor"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0,00 €"
+                                android:textColor="@color/colorAccent"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <ProgressBar
+                            android:id="@+id/pbMetaPoupanca"
+                            style="@android:style/Widget.ProgressBar.Horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="12dp"
+                            android:layout_marginTop="12dp"
+                            android:progress="0"
+                            android:progressDrawable="@drawable/custom_progress_bar" />
+
+                        <TextView
+                            android:id="@+id/tvMetaStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/meta_definir_aviso"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="12sp" />
+
+                        <Button
+                            android:id="@+id/btnDefinirMeta"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:text="@string/btn_definir_meta"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TableLayout
+                    android:id="@+id/tableResumo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    app:layout_constraintTop_toBottomOf="@+id/cardMetaPoupanca">
+
+                    <TableRow android:paddingVertical="8dp">
+                        <TextView android:text="@string/label_total_renda" android:layout_weight="1" android:textColor="@color/textColorPrimary" />
+                        <TextView android:id="@+id/tvTotalRenda" android:text="0,00 €" android:textStyle="bold" android:textColor="@color/textColorPrimary" />
+                    </TableRow>
+                    <TableRow android:paddingVertical="8dp">
+                        <TextView android:text="@string/label_total_despesas" android:layout_weight="1" android:textColor="@color/textColorPrimary" />
+                        <TextView android:id="@+id/tvTotalDespesas" android:text="0,00 €" android:textStyle="bold" android:textColor="@color/textColorPrimary" />
+                    </TableRow>
+                    <TableRow android:paddingVertical="8dp">
+                        <TextView android:text="@string/label_total_poupanca" android:layout_weight="1" android:textColor="@color/textColorPrimary" />
+                        <TextView android:id="@+id/tvTotalPoupanca" android:text="0,00 €" android:textStyle="bold" android:textColor="@color/textColorPrimary" />
+                    </TableRow>
+                    <TableRow android:paddingVertical="8dp">
+                        <TextView android:text="@string/label_total_exterior" android:layout_weight="1" android:textColor="@color/textColorPrimary" />
+                        <TextView android:id="@+id/tvTotalBrasil" android:text="0,00 €" android:textStyle="bold" android:textColor="@color/textColorPrimary" />
+                    </TableRow>
+                </TableLayout>
+
+                <!-- Saldo Final -->
+                <LinearLayout
+                    android:id="@+id/llSaldo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/headerColor"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:layout_marginTop="0dp"
+                    app:layout_constraintTop_toBottomOf="@+id/tableResumo">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_saldo"
+                        android:textColor="@color/textColorPrimary"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvSaldoFinal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0,00 €"
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnVerDetalhes"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginTop="32dp"
+                    android:text="@string/ver_listagem_detalhada"
+                    android:backgroundTint="@color/colorAccent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/llSaldo" />
+
+                <Button
+                    android:id="@+id/btnExportarPDF"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/btn_exportar_pdf"
+                    app:icon="@drawable/ic_pdf"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btnVerDetalhes" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+
+    </FrameLayout>
+
+    <!-- Menu Lateral (NavigationView) -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigationView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/backgroundColor"
+        app:insetForeground="@android:color/transparent"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/drawer_menu"
+        app:itemIconTint="@color/colorAccent"
+        app:itemTextColor="@color/textColorPrimary" />
+
+
+</androidx.drawerlayout.widget.DrawerLayout>
