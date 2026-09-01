@@ -2,6 +2,7 @@ package com.jesse.finly
 
 import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -10,19 +11,28 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
-import androidx.core.graphics.scale
-import androidx.core.net.toUri
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.ActivityResumoBinding
@@ -30,11 +40,6 @@ import com.jesse.finly.models.MetaPoupanca
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.showToast
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.utils.ColorTemplate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -42,17 +47,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Locale
-
-import android.graphics.Bitmap
-import java.io.File
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.res.ResourcesCompat
-import coil.load
-import coil.transform.CircleCropTransformation
-
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 
 class ResumoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityResumoBinding
@@ -90,9 +84,8 @@ class ResumoActivity : AppCompatActivity() {
         setupBackNavigation()
         sincronizarDadosIniciais()
 
-        // Garantir que a barra de navegação acompanhe o tema
-        window.navigationBarColor = android.graphics.Color.TRANSPARENT
-        androidx.core.view.WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = 
+        // Garantir que os ícones do sistema acompanhem o tema (Modo Edge-to-Edge)
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = 
             AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_YES
 
         // Ajustar Insets para o cabeçalho e rodapé respeitarem as barras do sistema
@@ -108,7 +101,7 @@ class ResumoActivity : AppCompatActivity() {
                 header.updatePadding(top = systemBars.top)
             }
             
-            // Garante que o conteúdo no fundo suba para não ficar atrás dos botões nativos
+            // Garante que o conteúdo no fundo, suba para não ficar atrás dos botões nativos
             v.updatePadding(bottom = systemBars.bottom)
             insets
         }
@@ -144,11 +137,11 @@ class ResumoActivity : AppCompatActivity() {
 
 
     private fun mostrarDialogDefinirMeta() {
-        val view = layoutInflater.inflate(R.layout.dialog_definir_meta, null)
+        val view = layoutInflater.inflate(R.layout.dialog_definir_meta, binding.root as? android.view.ViewGroup, false)
         val input = view.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.metaEditText)
         input.setText(metaAtual.toString())
         
-        // Criar o ícone com a cor verde manualmente para garantir visibilidade
+        // Criar o ícone com verde manualmente para garantir visibilidade
         val icon = ContextCompat.getDrawable(this, R.drawable.ic_dashboard)?.mutate()
         icon?.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
 
@@ -194,7 +187,7 @@ class ResumoActivity : AppCompatActivity() {
         val emailClean = email.trim().lowercase()
 
         lifecycleScope.launch(Dispatchers.IO) {
-            // 1. SINCRONIZAR PERFIL (TEMA E NOTIFICAÇÕES APENAS)
+            // 1. sincronizar PERFIL (TEMA E NOTIFICAÇÕES Apenas)
             val perfilNuvem = FirebaseManager.obterPerfilDoFirestore(emailClean)
             if (perfilNuvem != null) {
                 val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
@@ -214,7 +207,7 @@ class ResumoActivity : AppCompatActivity() {
                 }
             }
 
-            // 2. SINCRONIZAR TRANSAÇÕES
+            // 2. sincronizar TRANSAÇÕES
             val transacoesNuvem = FirebaseManager.descarregarTransacoesDoFirestore(email)
             if (transacoesNuvem.isNotEmpty()) {
                 val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
@@ -324,7 +317,7 @@ class ResumoActivity : AppCompatActivity() {
 
 
     private fun mostrarDialogSair() {
-        // Criar o ícone com a cor verde manualmente para garantir visibilidade
+        // Criar o ícone com verde manualmente para garantir visibilidade
         val icon = ContextCompat.getDrawable(this, R.drawable.ic_logout)?.mutate()
         icon?.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
 
@@ -360,7 +353,7 @@ class ResumoActivity : AppCompatActivity() {
         val page = pdfDocument.startPage(pageInfo)
         val canvas: Canvas = page.canvas
 
-        val logoBitmap = vectorToBitmap(R.drawable.ic_logo_full, 100, 100)
+        val logoBitmap = vectorToBitmap(R.drawable.ic_logo_full)
         logoBitmap?.let {
             canvas.drawBitmap(it, 450f, 20f, null)
         }
@@ -552,7 +545,7 @@ class ResumoActivity : AppCompatActivity() {
             val transacoes = db.utilizadorDao().obterTransacoesPorMes(email, mesSelecionado, anoSelecionado)
             
             // Totais Absolutos (Para os cards de categoria)
-            // BUG FIX: Poupanca e Exterior nao somam mais no card de Renda Geral
+            // ‘BUG’ FIX: Poupança e Exterior não somam mais no card de Renda Geral
             val totalRenda = transacoes.asSequence()
                 .filter { it.tipo == "RENDA" && it.categoria != "Poupança" && it.categoria != "Exterior" }
                 .sumOf { it.valor }
@@ -660,9 +653,9 @@ class ResumoActivity : AppCompatActivity() {
             invalidate()
         }
 
-        // PREENCHER A LISTA DE LEGENDA DETALHADA ABAIXO DO GRÁFICO
+        // PREENCHER A Lista DE LEGENDA DETALHADA ABAIXO DO GRÁFICO
         binding.llCategoryDetails.removeAllViews()
-        itensParaMostrar.forEachIndexed { index, pair ->
+        itensParaMostrar.forEach { pair ->
             // Encontrar a cor original correta baseada no index do gráfico completo
             val corOriginalIndex = gastosPorCategoria.indexOf(pair)
             val color = colors[corOriginalIndex % colors.size]
@@ -733,13 +726,8 @@ class ResumoActivity : AppCompatActivity() {
         }
     }
 
-    private fun vectorToBitmap(drawableId: Int, width: Int, height: Int): Bitmap? {
-        val drawable = ContextCompat.getDrawable(this, drawableId) ?: return null
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-        return bitmap
+    private fun vectorToBitmap(drawableId: Int): Bitmap? {
+        return ContextCompat.getDrawable(this, drawableId)?.toBitmap(100, 100)
     }
 
     private fun setupBackNavigation() {
@@ -750,7 +738,7 @@ class ResumoActivity : AppCompatActivity() {
                     if (binding.drawerLayout.isDrawerOpen(androidx.core.view.GravityCompat.START)) {
                         binding.drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
                     } else {
-                        // Fecha a aplicação completamente em vez de voltar para o login
+                        // Fecha a aplicação completamente em vez de voltar para o ‘login’
                         finishAffinity()
                     }
                 }

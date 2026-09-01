@@ -7,8 +7,16 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.DetalhesBinding
@@ -17,14 +25,6 @@ import com.jesse.finly.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
-import androidx.core.content.edit
-import androidx.appcompat.app.AppCompatDelegate
-
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class DetalhesPageActivity : AppCompatActivity() {
 
@@ -81,15 +81,14 @@ class DetalhesPageActivity : AppCompatActivity() {
             insets
         }
         
-        // Garantir transparência e visibilidade dos ícones da barra de navegação
-        window.navigationBarColor = android.graphics.Color.TRANSPARENT
-        androidx.core.view.WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = 
+        // Garantir transparência e visibilidade dos ícones da barra de navegação (Modo Edge-to-Edge)
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = 
             AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_YES
 
-        // VERIFICAR SE PRECISA MOSTRAR TOAST DE TEMA APÓS RECREAÇÃO
+        // VERIFICAR SE PRECISA MOSTRAR TOSTE DE TEMA APÓS RECREAÇÃO
         verificarToastTemaPendente()
 
-        // CARREGAR E-MAIL LOGO NO INÍCIO (Crucial para as funções de apagar)
+        // CARREGAR ENDEREÇO ELETRÓNICO LOGO NO INÍCIO (Crucial para as funções de apagar)
         emailStr = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "") ?: ""
 
         isTransacaoMode = intent.getBooleanExtra("isTransactionDetail", false)
@@ -110,6 +109,8 @@ class DetalhesPageActivity : AppCompatActivity() {
         
         // Garante que o círculo de iniciais da transação use o Teal correto
         binding.tvUserInitial.setBackgroundResource(R.drawable.circle_background_teal)
+        val tealColor = ContextCompat.getColor(this, R.color.colorPrimary)
+        binding.tvUserInitial.background.mutate().setTint(tealColor)
 
         transId = intent.getIntExtra("id", -1)
         transItem = intent.getStringExtra("item") ?: ""
@@ -136,10 +137,10 @@ class DetalhesPageActivity : AppCompatActivity() {
         binding.tvExtraDetail.text = getString(R.string.categoria_mes_label, transCat, transMes)
         binding.tvExtraDetail.visibility = View.VISIBLE
         
-        // MOSTRAR RECORRÊNCIA EM LINHA SEPARADA
+        // Mostrar RECORRÊNCIA EM LINHA separada
         if (transIsRecorrente) {
             val parcelasInfo = if (transParcelasTotais == -1) "Repetir Sempre" else "Repetir por $transParcelasTotais meses"
-            binding.tvRecurrenceDetail.text = "Recorrência: $parcelasInfo"
+            binding.tvRecurrenceDetail.text = getString(R.string.recorrencia_label, parcelasInfo)
             binding.tvRecurrenceDetail.visibility = View.VISIBLE
         } else {
             binding.tvRecurrenceDetail.visibility = View.GONE
@@ -166,8 +167,8 @@ class DetalhesPageActivity : AppCompatActivity() {
         userId = intent.getIntExtra("id", -1)
 
         if (emailStr == "CONVIDADO") {
-            binding.userName.text = "Utilizador Convidado"
-            binding.tvEmailDetail.text = "Sem e-mail sincronizado"
+            binding.userName.text = getString(R.string.utilizador_convidado)
+            binding.tvEmailDetail.text = getString(R.string.sem_email_sincronizado)
             binding.tvPhoneDetail.visibility = View.GONE
             binding.btnEditarPerfil.visibility = View.GONE
             binding.btnExcluirConta.visibility = View.GONE
@@ -196,7 +197,7 @@ class DetalhesPageActivity : AppCompatActivity() {
         binding.ivUserProfile.visibility = View.GONE
         binding.tvUserInitial.visibility = View.VISIBLE
         
-        // CORREÇÃO DEFINITIVA: Força a cor verde oficial e remove qualquer interferência
+        // CORREÇÃO DEFINITIVA: Força verde oficial e remove qualquer interferência
         binding.tvUserInitial.setBackgroundResource(R.drawable.circle_background_teal)
         val color = ContextCompat.getColor(this, R.color.colorPrimary)
         binding.tvUserInitial.background.mutate().setTint(color)
@@ -265,14 +266,13 @@ class DetalhesPageActivity : AppCompatActivity() {
         atualizarTextoModoEscuro(isDarkMode)
 
         binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit().apply {
+            prefs.edit {
                 putBoolean("DARK_MODE", isChecked)
                 putBoolean("SHOULD_SHOW_THEME_TOAST", true)
-                apply()
             }
             atualizarTextoModoEscuro(isChecked)
             
-            // SINCRONIZAR PREFERÊNCIA NO FIREBASE
+            // sincronizar PREFERÊNCIA NO FIREBASE
             atualizarPreferenciaUtilizador(isChecked, "DARK_MODE")
             
             // Pequeno delay para a transição ser notada
@@ -290,7 +290,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             if (isChecked) {
                 verificarPermissaoNotificacao()
             } else {
-                prefs.edit().putBoolean("NOTIFICATIONS", false).apply()
+                prefs.edit { putBoolean("NOTIFICATIONS", false) }
                 cancelarNotificacoes()
             }
         }
@@ -305,7 +305,7 @@ class DetalhesPageActivity : AppCompatActivity() {
         if (prefs.getBoolean("SHOULD_SHOW_THEME_TOAST", false)) {
             val isDark = prefs.getBoolean("DARK_MODE", false)
             showToast(if (isDark) "Modo escuro ativado" else "Modo claro ativado")
-            prefs.edit().remove("SHOULD_SHOW_THEME_TOAST").apply()
+            prefs.edit { remove("SHOULD_SHOW_THEME_TOAST") }
         }
     }
 
@@ -323,13 +323,13 @@ class DetalhesPageActivity : AppCompatActivity() {
     }
 
     private fun ativarNotificacoes() {
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().putBoolean("NOTIFICATIONS", true).apply()
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { putBoolean("NOTIFICATIONS", true) }
         atualizarPreferenciaUtilizador(valor = true, "NOTIFICATIONS")
         showToast("Notificações ativadas!")
     }
 
     private fun cancelarNotificacoes() {
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().putBoolean("NOTIFICATIONS", false).apply()
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { putBoolean("NOTIFICATIONS", false) }
         atualizarPreferenciaUtilizador(false, "NOTIFICATIONS")
         showToast("Notificações desativadas")
     }
@@ -353,7 +353,7 @@ class DetalhesPageActivity : AppCompatActivity() {
     private fun confirmarEliminacaoTransacao() {
         if (transIsRecorrente) {
             val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
-            val view = layoutInflater.inflate(R.layout.bottom_sheet_eliminar, null)
+            val view = layoutInflater.inflate(R.layout.bottom_sheet_eliminar, binding.root as? android.view.ViewGroup, false)
 
             view.findViewById<TextView>(R.id.tvMensagemRecorrente).text =
                 getString(R.string.dialog_eliminar_recorrencia_msg, transItem)
@@ -376,7 +376,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             dialog.show()
         } else {
             val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
-            val view = layoutInflater.inflate(R.layout.bottom_sheet_eliminar_simples, null)
+            val view = layoutInflater.inflate(R.layout.bottom_sheet_eliminar_simples, binding.root as? android.view.ViewGroup, false)
 
             view.findViewById<TextView>(R.id.tvMensagemSimples).text = 
                 getString(R.string.dialog_eliminar_item_msg, transItem)
@@ -435,7 +435,7 @@ class DetalhesPageActivity : AppCompatActivity() {
                         dao.apagarTransacao(t)
                         FirebaseManager.eliminarTransacaoDoFirestore(t)
                     } else {
-                        // DESATIVA a recorrência nas transações PASSADAS.
+                        // Desativa a recorrência nas transações Passadas.
                         // Isso é o que impede o sistema de gerar novos meses automaticamente.
                         if (t.recorrente) {
                             val atualizada = t.copy(recorrente = false)
@@ -456,7 +456,7 @@ class DetalhesPageActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         
-        // Atualizar o email da SharedPreferences (caso tenha mudado no RegistoActivity)
+        // Atualizar o endereço eletrónico da SharedPreferences (caso tenha mudado no RegistoActivity)
         val prefEmail = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "") ?: ""
         emailStr = if (prefEmail == "CONVIDADO") prefEmail else prefEmail.trim().lowercase()
 

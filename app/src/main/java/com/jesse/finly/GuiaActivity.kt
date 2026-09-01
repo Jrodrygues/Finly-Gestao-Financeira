@@ -1,10 +1,12 @@
 package com.jesse.finly
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import com.jesse.finly.databinding.ActivityGuiaBinding
 
@@ -32,10 +34,8 @@ class GuiaActivity : AppCompatActivity() {
             insets
         }
         
-        // Garantir transparência e visibilidade dos ícones da barra de navegação
-        window.navigationBarColor = android.graphics.Color.TRANSPARENT
-        androidx.core.view.WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = 
-            androidx.appcompat.app.AppCompatDelegate.getDefaultNightMode() != androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
-
+        // Garantir visibilidade dos ícones da barra de navegação (Modo Edge-to-Edge)
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = 
+            AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_YES
     }
 }

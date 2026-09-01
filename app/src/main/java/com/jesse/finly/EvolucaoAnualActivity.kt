@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -19,11 +20,9 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.ActivityEvolucaoAnualBinding
-import com.jesse.finly.models.Transacao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.DecimalFormat
 import java.util.Calendar
 import java.util.Locale
 
@@ -73,10 +72,10 @@ class EvolucaoAnualActivity : AppCompatActivity() {
             description.isEnabled = false
             setDrawGridBackground(false)
             setDrawBarShadow(false)
-            setDrawValueAboveBar(true)
+            setDrawValueAboveBar(false)
             setPinchZoom(false)
             setScaleEnabled(false)
-            setDoubleTapToZoomEnabled(false)
+            isDoubleTapToZoomEnabled = false
             
             val isDark = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
             val textColor = if (isDark) Color.WHITE else Color.BLACK
@@ -93,7 +92,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
 
             axisLeft.apply {
                 setDrawGridLines(true)
-                gridColor = if (isDark) Color.parseColor("#33FFFFFF") else Color.parseColor("#33000000")
+                gridColor = if (isDark) "#33FFFFFF".toColorInt() else "#33000000".toColorInt()
                 axisMinimum = 0f
                 this.textColor = textColor
                 valueFormatter = object : ValueFormatter() {
@@ -123,6 +122,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
             val transacoes = db.utilizadorDao().obterTransacoesPorDono(email)
                 .filter { it.ano == ano }
 
+
             var somaRendaAnual = 0.0
             var somaDespesaAnual = 0.0
 
@@ -133,8 +133,15 @@ class EvolucaoAnualActivity : AppCompatActivity() {
                 val mesNome = mesesNomes[i]
                 val transMes = transacoes.filter { it.mes == mesNome }
                 
-                val totalRenda = transMes.filter { it.tipo == "RENDA" && it.categoria != "Poupança" && it.categoria != "Exterior" }.sumOf { it.valor }.toFloat()
-                val totalDespesa = transMes.filter { it.tipo == "DESPESA" }.sumOf { it.valor }.toFloat()
+                val totalRenda = transMes.asSequence()
+                    .filter { it.tipo == "RENDA" && it.categoria != "Poupança" && it.categoria != "Exterior" }
+                    .sumOf { it.valor }
+                    .toFloat()
+                
+                val totalDespesa = transMes.asSequence()
+                    .filter { it.tipo == "DESPESA" }
+                    .sumOf { it.valor }
+                    .toFloat()
 
                 somaRendaAnual += totalRenda.toDouble()
                 somaDespesaAnual += totalDespesa.toDouble()
@@ -161,41 +168,27 @@ class EvolucaoAnualActivity : AppCompatActivity() {
     }
 
     private fun atualizarGrafico(rendas: List<BarEntry>, despesas: List<BarEntry>) {
-        val isDark = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
-        val labelColor = if (isDark) Color.WHITE else Color.BLACK
-
-        val currencyFormatter = object : ValueFormatter() {
-            private val mFormat = DecimalFormat("###,###,##0")
-            override fun getFormattedValue(value: Float): String {
-                return if (value > 0) mFormat.format(value) else ""
-            }
-        }
-
         val setRenda = BarDataSet(rendas, "Rendas").apply {
             color = ContextCompat.getColor(this@EvolucaoAnualActivity, R.color.colorPositive)
-            valueTextColor = labelColor
-            valueTextSize = 9f
-            valueFormatter = currencyFormatter
+            setDrawValues(false)
         }
 
         val setDespesa = BarDataSet(despesas, "Despesas").apply {
             color = ContextCompat.getColor(this@EvolucaoAnualActivity, R.color.colorNegative)
-            valueTextColor = labelColor
-            valueTextSize = 9f
-            valueFormatter = currencyFormatter
+            setDrawValues(false)
         }
 
         val data = BarData(setRenda, setDespesa)
         
-        val groupSpace = 0.26f
-        val barSpace = 0.02f
-        val barWidth = 0.35f
+        val groupSpace = 0.2f
+        val barSpace = 0.08f
+        val barWidth = 0.32f
 
         data.barWidth = barWidth
         
         binding.barChartAnual.apply {
             this.data = data
-            axisLeft.spaceTop = 20f
+            axisLeft.spaceTop = 15f
             
             groupBars(0f, groupSpace, barSpace)
             xAxis.axisMinimum = 0f

@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.jesse.finly.R
 import com.jesse.finly.models.Transacao
@@ -53,31 +54,41 @@ class TransacaoAdapter(
         holder.tvValor.text = String.format("%.2f €", item.valor)
 
         if (item.tipo == "DESPESA") {
-            holder.tvValor.setTextColor(0xFFF44336.toInt())
+            holder.tvValor.setTextColor("#F44336".toColorInt())
         } else {
-            holder.tvValor.setTextColor(0xFF4CAF50.toInt())
+            holder.tvValor.setTextColor("#4CAF50".toColorInt())
             // Removido o símbolo + conforme pedido
         }
 
         if (item.status) {
             holder.ivStatus.setImageResource(android.R.drawable.checkbox_on_background)
-            holder.ivStatus.setColorFilter(0xFF009688.toInt())
+            holder.ivStatus.setColorFilter("#009688".toColorInt())
             // Feedback Visual: Diminuir opacidade de itens pagos
             holder.itemView.alpha = 0.5f
             holder.tvItem.paintFlags = holder.tvItem.paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
         } else {
             holder.ivStatus.setImageResource(android.R.drawable.checkbox_off_background)
-            holder.ivStatus.setColorFilter(0xFFBDBDBD.toInt())
+            holder.ivStatus.setColorFilter("#BDBDBD".toColorInt())
             // Resetar visual para itens não pagos
             holder.itemView.alpha = 1.0f
             holder.tvItem.paintFlags = holder.tvItem.paintFlags and android.graphics.Paint.STRIKE_THRU_TEXT_FLAG.inv()
         }
 
         // Clique na linha inteira para ver Detalhes (Onde estará Editar/Excluir)
-        holder.itemView.setOnClickListener { onItemClick(item) }
+        holder.itemView.setOnClickListener {
+            val currentPos = holder.bindingAdapterPosition
+            if (currentPos != RecyclerView.NO_POSITION) {
+                onItemClick(lista[currentPos])
+            }
+        }
         
         // Clique no ícone de status
-        holder.ivStatus.setOnClickListener { onToggleStatus(item) }
+        holder.ivStatus.setOnClickListener {
+            val currentPos = holder.bindingAdapterPosition
+            if (currentPos != RecyclerView.NO_POSITION) {
+                onToggleStatus(lista[currentPos])
+            }
+        }
     }
 
     override fun getItemCount() = lista.size

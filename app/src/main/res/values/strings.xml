@@ -110,6 +110,8 @@
     <string name="btn_voltar_listagem">VOLTAR À LISTAGEM</string>
     <string name="utilizador_convidado">Utilizador Convidado</string>
     <string name="dados_apenas_locais">Dados apenas locais (Offline)</string>
+    <string name="sem_email_sincronizado">Sem e-mail sincronizado</string>
+
 
 
     <string name="toast_convidado_perfil">Convidado: Sem perfil para editar</string>
@@ -149,4 +151,16 @@
     <string name="btn_nao_manter">NÃO, MANTER ITEM</string>
     <string name="toast_recorrencia_removida">Recorrência removida!</string>
     <string name="toast_item_removido">Item removido com sucesso!</string>
+    <string name="recorrencia_label">Recorrência: %1$s</string>
+    <string name="hint_nome_completo">Nome Completo</string>
+    <string name="hint_email_input">E-mail</string>
+    <string name="hint_email_inalteravel">E-mail (Inalterável)</string>
+    <string name="hint_telemovel">Telemóvel</string>
+    <string name="evolucao_ano_label">Evolução em %1$d</string>
+    <string name="total_rendas_label">Total Rendas</string>
+    <string name="total_despesas_label">Total Despesas</string>
+    <string name="saldo_anual_label">Saldo Anual</string>
+    <string name="label_ano">Ano</string>
+    <string name="aviso_convidado_titulo">Aviso de Convidado</string>
+    <string name="aviso_convidado_msg">Como convidado, os seus dados são locais. Deseja continuar?</string>
 </resources>

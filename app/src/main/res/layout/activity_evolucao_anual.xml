@@ -30,7 +30,7 @@
             android:id="@+id/tvTitleEvolucao"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="EVOLUÇÃO ANUAL"
+            android:text="@string/menu_evolucao"
             android:textColor="@color/white"
             android:textSize="@dimen/text_size_small_title"
             android:textStyle="bold"
@@ -46,8 +46,9 @@
         android:layout_width="140dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:hint="Ano"
+        android:hint="@string/label_ano"
         app:boxBackgroundColor="@color/surfaceColor"
+
         app:boxCornerRadiusBottomEnd="12dp"
         app:boxCornerRadiusBottomStart="12dp"
         app:boxCornerRadiusTopEnd="12dp"
@@ -93,7 +94,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total Rendas"
+                    android:text="@string/total_rendas_label"
                     android:textSize="12sp"
                     android:textColor="@color/textColorSecondary" />
                 <TextView
@@ -121,7 +122,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total Despesas"
+                    android:text="@string/total_despesas_label"
                     android:textSize="12sp"
                     android:textColor="@color/textColorSecondary" />
                 <TextView
@@ -149,7 +150,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Saldo Anual"
+                    android:text="@string/saldo_anual_label"
                     android:textSize="12sp"
                     android:textColor="@color/textColorSecondary" />
                 <TextView
@@ -161,6 +162,7 @@
                     android:textSize="15sp"
                     android:textColor="@color/textColorPrimary" />
             </LinearLayout>
+
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

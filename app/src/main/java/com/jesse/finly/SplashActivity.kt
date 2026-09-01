@@ -27,7 +27,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Força o modo Light para combinar com a tela de login
+        // Força o modo Light para combinar com a tela de ‘login’
         delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
         
         // Instala a Splash Screen da API 31+ ANTES do super.onCreate
@@ -80,7 +80,7 @@ class SplashActivity : AppCompatActivity() {
                 }
             }
         } else {
-            // Primeira vez ou sessão expirada, vai para o "Ecrã de Login"
+            // Primeira vez ou sessão expirada, vai para o "Ecrã de ‘Login’"
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }

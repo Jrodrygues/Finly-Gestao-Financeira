@@ -3,13 +3,15 @@ package com.jesse.finly
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.jesse.finly.database.FirebaseManager
@@ -39,17 +41,22 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         
         // 2. Ativar visual uniforme (Edge-to-Edge)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.statusBarColor = Color.TRANSPARENT
-        window.navigationBarColor = Color.TRANSPARENT
+        enableEdgeToEdge()
         
-        // 3. Garantir que os ícones do sistema (hora, botões) sejam visíveis (escuros) no fundo claro
+        // 3. Garantir que os ícones do sistema (hora, botões) sejam visíveis (escuros) no fundo, claro.
         val controller = WindowInsetsControllerCompat(window, window.decorView)
         controller.isAppearanceLightStatusBars = true
         controller.isAppearanceLightNavigationBars = true
 
         binding = LoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Ajustar Insets para que o conteúdo não fique sob as barras do sistema
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = systemBars.top, bottom = systemBars.bottom)
+            insets
+        }
 
 
         verificarSessaoAtiva()
@@ -72,7 +79,7 @@ class LoginActivity : AppCompatActivity() {
             entrarComoConvidado()
         }
 
-        // Carregar e-mail lembrado se existir
+        // Carregar endereço eletrónico lembrado se existir
         carregarEmailLembrado()
     }
 
@@ -87,7 +94,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Verificar se há um e-mail acabado de registar para preencher
+        // Verificar se há um endereço eletrónico acabado de registar para preencher
         val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val tempEmail = sharedPref.getString("TEMP_EMAIL", "")
         if (!tempEmail.isNullOrEmpty()) {
@@ -132,12 +139,12 @@ class LoginActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // 1. Tentar Login no Firebase primeiro
+                // 1. Tentar ‘Login’ no Firebase primeiro
                 val auth = FirebaseAuth.getInstance()
                 val result = auth.signInWithEmailAndPassword(email, senha).await()
                 
                 if (result.user != null) {
-                    // Login Firebase Sucesso
+                    // ‘Login’ Firebase sucesso
                     val db = MinhaBaseDados.getDatabase(this@LoginActivity)
                     var utilizador = db.utilizadorDao().buscarPorEmail(email)
                     
@@ -149,7 +156,7 @@ class LoginActivity : AppCompatActivity() {
 
                     withContext(Dispatchers.Main) {
                         setLoading(false)
-                        // APLICAR PREFERÊNCIAS BAIXADAS (TEMA E NOTIFICAÇÕES)
+                        // APLICAR PREFERÊNCIAS Baixadas (TEMA E NOTIFICAÇÕES)
                         utilizador?.let { u ->
                             getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                                 putBoolean("DARK_MODE", u.darkMode)
@@ -164,7 +171,7 @@ class LoginActivity : AppCompatActivity() {
                         finalizarSessaoLogin(email, utilizador?.nome ?: "Utilizador")
                     }
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 val db = MinhaBaseDados.getDatabase(this@LoginActivity)
                 val utilizadorLocal = db.utilizadorDao().validarLogin(email, senha)
                 
@@ -173,7 +180,7 @@ class LoginActivity : AppCompatActivity() {
                     if (utilizadorLocal != null) {
                         finalizarSessaoLogin(email, utilizadorLocal.nome)
                     } else {
-                        // Se não encontrou nem localmente nem na nuvem, dar erro original
+                        // Se não encontrou nem localmente, nem na nuvem, dar erro original
                         showToast("E-mail ou palavra-passe incorretos!")
                     }
                 }
@@ -190,11 +197,11 @@ class LoginActivity : AppCompatActivity() {
 
     private fun mostrarDialogRecuperarSenha() {
         val emailAtual = binding.emailText.text.toString().trim()
-        val view = layoutInflater.inflate(R.layout.dialog_recuperar_senha, null)
+        val view = layoutInflater.inflate(R.layout.dialog_recuperar_senha, binding.root as? android.view.ViewGroup, false)
         val input = view.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.recoverEmailText)
         input.setText(emailAtual)
 
-        // Criar o ícone com a cor verde manualmente para garantir visibilidade no tema claro
+        // Criar o ícone com verde manualmente para garantir visibilidade no tema claro
         val icon = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_help)?.mutate()
         icon?.setTint(androidx.core.content.ContextCompat.getColor(this, R.color.colorPrimary))
 
@@ -217,7 +224,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun enviarEmailRecuperacao(email: String) {
         val auth = FirebaseAuth.getInstance()
-        auth.useAppLanguage() // Configura o idioma do e-mail para o idioma do telemóvel do utilizador
+        auth.useAppLanguage() // Configura o idioma do endereço eletrónico para o idioma do telemóvel do utilizador
         
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -225,7 +232,7 @@ class LoginActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     showToast(getString(R.string.email_recuperacao_enviado))
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 withContext(Dispatchers.Main) {
                     showToast(getString(R.string.erro_recuperacao))
                 }
@@ -254,10 +261,9 @@ class LoginActivity : AppCompatActivity() {
             .setTitle("Aviso de Convidado")
             .setMessage("Como convidado, os seus dados são locais. Deseja continuar?")
             .setPositiveButton("Sim") { _, _ ->
-                getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().apply {
+                getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                     putString(KEY_EMAIL, "CONVIDADO")
                     putLong(KEY_LAST_LOGIN, System.currentTimeMillis())
-                    apply()
                 }
                 prosseguirParaApp()
             }

@@ -54,7 +54,7 @@ class RegistoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val isNew = intent.getBooleanExtra("isNewUser", false)
         if (isNew) {
-            // Força o modo Light e o fundo degradê apenas para NOVOS usuários (fora do app)
+            // Força o modo Light e o fundo degradê apenas para NOVOS utilizadores (fora do ‘app’)
             delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
         }
 
@@ -90,7 +90,7 @@ class RegistoActivity : AppCompatActivity() {
                 
                 binding.root.postDelayed({
                     // Scroll para o fim absoluto do ScrollView
-                    binding.root.fullScroll(android.view.View.FOCUS_DOWN)
+                    binding.root.fullScroll(View.FOCUS_DOWN)
                     
                     binding.etParcelas.requestFocus()
                     val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
@@ -123,12 +123,13 @@ class RegistoActivity : AppCompatActivity() {
             isFocusableInTouchMode = false
             
             setOnTouchListener { _, event ->
-                if (event.action == android.view.MotionEvent.ACTION_DOWN) {
+                if (event.action == MotionEvent.ACTION_DOWN) {
                     // 1. Derrubar o teclado IMEDIATAMENTE
                     val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(window.decorView.windowToken, 0)
+
                     
-                    // 2. Limpar qualquer foco que esteja chamando o teclado
+                    // 2. Limpar qualquer foco que esteja a chamar o teclado
                     currentFocus?.clearFocus()
                     
                     // 3. Abrir a lista
@@ -181,7 +182,7 @@ class RegistoActivity : AppCompatActivity() {
 
     private fun esconderTeclado() {
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        // Forçar o fecho usando o token da janela ou do foco atual
+        // Forçar o fecho usando o ‘token’ da janela ou do foco atual
         val view = currentFocus ?: window.decorView
         imm.hideSoftInputFromWindow(view.windowToken, 0)
         
@@ -202,14 +203,14 @@ class RegistoActivity : AppCompatActivity() {
 
     private fun configurarParaNovoUtilizador() {
         binding.titleRegisto.text = getString(R.string.criar_nova_conta)
-        binding.itemLayout.hint = "Nome Completo"
+        binding.itemLayout.hint = getString(R.string.hint_nome_completo)
         binding.itemLayout.setStartIconDrawable(R.drawable.ic_person)
         
-        binding.valorLayout.hint = "E-mail"
+        binding.valorLayout.hint = getString(R.string.hint_email_input)
         binding.valorLayout.setStartIconDrawable(R.drawable.ic_email)
         binding.regEmailText.inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
         
-        binding.dataLayout.hint = "Telemóvel"
+        binding.dataLayout.hint = getString(R.string.hint_telemovel)
         binding.dataLayout.setStartIconDrawable(R.drawable.ic_phone)
         binding.regPhoneText.inputType = android.text.InputType.TYPE_CLASS_PHONE
         binding.regPhoneText.isFocusableInTouchMode = true
@@ -217,7 +218,7 @@ class RegistoActivity : AppCompatActivity() {
         binding.regPhoneText.setOnClickListener(null)
         
         binding.senhaLayout.visibility = View.VISIBLE
-        binding.senhaLayout.setStartIconDrawable(R.drawable.ic_edit)
+        binding.senhaLayout.setStartIconDrawable(R.drawable.ic_lock)
         
         binding.categoriaLayout.visibility = View.GONE
         binding.rgTipo.visibility = View.GONE
@@ -232,17 +233,17 @@ class RegistoActivity : AppCompatActivity() {
     private fun configurarParaEdicaoUtilizador() {
         userId = intent.getIntExtra("id", 0)
         binding.titleRegisto.text = getString(R.string.editar_perfil)
-        binding.itemLayout.hint = "Nome Completo"
+        binding.itemLayout.hint = getString(R.string.hint_nome_completo)
         binding.itemLayout.setStartIconDrawable(R.drawable.ic_person)
         binding.regNameText.setText(intent.getStringExtra("name"))
         
-        binding.valorLayout.hint = "E-mail (Inalterável)"
+        binding.valorLayout.hint = getString(R.string.hint_email_inalteravel)
         binding.valorLayout.setStartIconDrawable(R.drawable.ic_email)
         binding.regEmailText.setText(intent.getStringExtra("email"))
         binding.regEmailText.isEnabled = false
         binding.regEmailText.alpha = 0.6f
         
-        binding.dataLayout.hint = "Telemóvel"
+        binding.dataLayout.hint = getString(R.string.hint_telemovel)
         binding.dataLayout.setStartIconDrawable(R.drawable.ic_phone)
         binding.regPhoneText.setText(intent.getStringExtra("phone"))
         binding.regPhoneText.inputType = android.text.InputType.TYPE_CLASS_PHONE
@@ -251,7 +252,7 @@ class RegistoActivity : AppCompatActivity() {
         binding.regPhoneText.setOnClickListener(null)
 
         binding.senhaLayout.visibility = View.VISIBLE
-        binding.senhaLayout.setStartIconDrawable(R.drawable.ic_edit)
+        binding.senhaLayout.setStartIconDrawable(R.drawable.ic_lock)
         binding.regSenhaText.setText(intent.getStringExtra("senha"))
 
         binding.categoriaLayout.visibility = View.GONE

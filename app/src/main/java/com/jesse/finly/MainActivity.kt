@@ -12,9 +12,9 @@ import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -138,10 +138,10 @@ class MainActivity : AppCompatActivity() {
                 val db = MinhaBaseDados.getDatabase(this@MainActivity)
                 val dao = db.utilizadorDao()
                 
-                // 1. Obter IDs da nuvem para comparação
+                // 1. Obter ‘IDs’ da nuvem para comparação
                 val idsNuvem = listaNuvem.map { it.id }.toSet()
                 
-                // 2. Apagar localmente o que não existe mais na nuvem (Sync de Deletados)
+                // 2. Apagar localmente o que não existe mais na nuvem (Sync de Deleitados)
                 val locais = dao.obterTransacoesPorDono(currentEmail)
                 locais.forEach { transLocal ->
                     if (!idsNuvem.contains(transLocal.id)) {
@@ -182,11 +182,10 @@ class MainActivity : AppCompatActivity() {
         atualizarTituloMes()
         carregarLista()
 
-        // Sincronizar com o ecrã de resumo para quando voltar
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().apply {
+        // sincronizar com o ecrã de resumo para quando voltar
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
             putString("ULTIMO_MES_SELECIONADO", mesFiltro)
             putInt("ULTIMO_ANO_SELECIONADO", anoFiltro)
-            apply()
         }
     }
 
@@ -266,11 +265,10 @@ class MainActivity : AppCompatActivity() {
                     intent.putExtra("parcelasRestantes", transacao.parcelasRestantes)
                     intent.putExtra("parcelasTotais", transacao.parcelasTotais)
                     startActivity(intent)
-                },
-                onToggleStatus = { 
-                    toggleStatusTransacao(it)
                 }
-            )
+            ) { 
+                toggleStatusTransacao(it)
+            }
             binding.rvTransacoes.adapter = adapter
         } else {
             adapter?.updateData(lista)
@@ -282,7 +280,7 @@ class MainActivity : AppCompatActivity() {
         val saldoFinalPaga = FinanceiroUtils.calcularSaldoPago(todasTransacoes)
 
         // Cálculo para Totais Absolutos (Tudo o que foi lançado)
-        // BUG FIX: Poupanca e Exterior nao somam mais no total de Renda da Home
+        // ‘BUG’ FIX: Poupança e Exterior não somam mais no total de Renda da Home
         val rendaTotal = todasTransacoes.asSequence()
             .filter { it.tipo == "RENDA" && it.categoria != "Poupança" && it.categoria != "Exterior" }
             .sumOf { it.valor }
@@ -368,7 +366,7 @@ class MainActivity : AppCompatActivity() {
                 val novoId = db.utilizadorDao().inserirTransacao(it)
                 val transacaoComId = it.copy(id = novoId.toInt())
                 
-                // 2. Sincronizar com a Nuvem imediatamente
+                // 2. sincronizar com a Nuvem imediatamente
                 FirebaseManager.salvarTransacaoNoFirestore(transacaoComId)
             }
         }
