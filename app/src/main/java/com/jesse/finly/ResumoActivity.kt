@@ -597,12 +597,12 @@ class ResumoActivity : AppCompatActivity() {
         }
         val valueRendaPaint = Paint().apply {
             color = "#2E7D32".toColorInt()
-            textSize = 13f
+            textSize = 12f
             isFakeBoldText = true
         }
         val valueDespesaPaint = Paint().apply {
             color = "#C62828".toColorInt()
-            textSize = 13f
+            textSize = 12f
             isFakeBoldText = true
         }
         val textPaint = Paint().apply {
@@ -620,6 +620,12 @@ class ResumoActivity : AppCompatActivity() {
             textSize = 10f
             isFakeBoldText = true
         }
+        val tableHeaderCellRightPaint = Paint().apply {
+            color = Color.WHITE
+            textSize = 10f
+            isFakeBoldText = true
+            textAlign = Paint.Align.RIGHT
+        }
         val linePaint = Paint().apply {
             color = "#E0E0E0".toColorInt()
             strokeWidth = 0.8f
@@ -631,12 +637,10 @@ class ResumoActivity : AppCompatActivity() {
         var canvas = page.canvas
 
         fun drawHeaderAndFooter(c: Canvas, pNum: Int) {
-            // Header Bar
             c.drawRect(0f, 0f, pageWidth.toFloat(), 85f, headerPaint)
             c.drawText("Finly", 30f, 40f, titlePaint)
             c.drawText("Relatório Financeiro Mensal • $mes / $ano", 30f, 62f, subtitlePaint)
 
-            // Logo vetorial (SVG)
             val logoVector = ContextCompat.getDrawable(this, R.drawable.ic_logo_full_transp)
                 ?: ContextCompat.getDrawable(this, R.drawable.ic_logo_full)
             logoVector?.let {
@@ -644,14 +648,35 @@ class ResumoActivity : AppCompatActivity() {
                 it.draw(c)
             }
 
-            // Footer
             c.drawLine(30f, 810f, 565f, 810f, linePaint)
             val dataHoje = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(java.util.Date())
             c.drawText("Gerado por Finly em $dataHoje", 30f, 825f, labelPaint)
             c.drawText("Página $pNum", 525f, 825f, labelPaint)
         }
 
-        // Desenhar Header & Footer da primeira página
+        var currentY = 0f
+
+        fun checkPageBreak(requiredSpace: Float = 30f) {
+            if (currentY + requiredSpace > 780f) {
+                pdfDocument.finishPage(page)
+                pageNumber++
+                pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
+                page = pdfDocument.startPage(pageInfo)
+                canvas = page.canvas
+                drawHeaderAndFooter(canvas, pageNumber)
+                currentY = 110f
+            }
+        }
+
+        fun drawTableHeader(c: Canvas, y: Float) {
+            c.drawRoundRect(30f, y, 565f, y + 22f, 4f, 4f, tableHeaderPaint)
+            val headerY = y + 15f
+            c.drawText("Item / Descrição", 40f, headerY, tableHeaderCellPaint)
+            c.drawText("Categoria", 250f, headerY, tableHeaderCellPaint)
+            c.drawText("Data de Vencimento", 370f, headerY, tableHeaderCellPaint)
+            c.drawText("Valor", 555f, headerY, tableHeaderCellRightPaint)
+        }
+
         drawHeaderAndFooter(canvas, pageNumber)
 
         // Card de Resumo no topo
@@ -663,28 +688,24 @@ class ResumoActivity : AppCompatActivity() {
         val poupancaText = binding.tvTotalPoupanca.text.toString()
         val saldoText = binding.tvSaldoFinal.text.toString()
 
-        // Coluna 1: Rendas
         canvas.drawText("TOTAL RENDAS", 50f, 122f, labelPaint)
         canvas.drawText(rendaText, 50f, 142f, valueRendaPaint)
 
-        // Coluna 2: Despesas
         canvas.drawText("TOTAL DESPESAS", 210f, 122f, labelPaint)
         canvas.drawText(despesaText, 210f, 142f, valueDespesaPaint)
 
-        // Coluna 3: Saldo Final
         canvas.drawText("SALDO FINAL", 380f, 122f, labelPaint)
         val isSaldoNegativo = binding.tvSaldoFinal.currentTextColor == ContextCompat.getColor(this, R.color.colorNegative)
         val saldoPaint = if (isSaldoNegativo) valueDespesaPaint else valueRendaPaint
         canvas.drawText(saldoText, 380f, 142f, saldoPaint)
 
-        // Linha secundária do Card: Poupança & Meta
         canvas.drawLine(50f, 157f, 545f, 157f, linePaint)
         val metaFormatada = String.format(Locale.getDefault(), "%.2f €", metaAtual)
         canvas.drawText("Poupança Real: $poupancaText   |   Meta do Mês: $metaFormatada", 50f, 175f, textPaint)
 
-        var currentY = 210f
+        currentY = 210f
 
-        // Bloco 1: Resumo de Despesas por Categoria
+        // 1. Resumo de Despesas por Categoria
         val despesas = transacoes.filter { it.tipo == "DESPESA" }
         val totalDespesasVal = despesas.sumOf { it.valor }
         val gastosPorCategoria = despesas.groupBy { it.categoria }
@@ -704,15 +725,7 @@ class ResumoActivity : AppCompatActivity() {
             currentY += 34f
 
             for ((cat, totalCat) in gastosPorCategoria) {
-                if (currentY > 780f) {
-                    pdfDocument.finishPage(page)
-                    pageNumber++
-                    pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
-                    page = pdfDocument.startPage(pageInfo)
-                    canvas = page.canvas
-                    drawHeaderAndFooter(canvas, pageNumber)
-                    currentY = 110f
-                }
+                checkPageBreak(20f)
 
                 val catNome = if (cat.length > 28) cat.take(26) + ".." else cat
                 val valorFormatado = String.format(Locale.getDefault(), "%.2f €", totalCat)
@@ -728,33 +741,6 @@ class ResumoActivity : AppCompatActivity() {
             currentY += 15f
         }
 
-        // Bloco 2: Extrato Detalhado
-        if (currentY > 700f) {
-            pdfDocument.finishPage(page)
-            pageNumber++
-            pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
-            page = pdfDocument.startPage(pageInfo)
-            canvas = page.canvas
-            drawHeaderAndFooter(canvas, pageNumber)
-            currentY = 110f
-        }
-
-        canvas.drawText("EXTRATO DETALHADO DO MÊS", 30f, currentY, textBoldPaint)
-        currentY += 12f
-
-        fun drawTableHeader(c: Canvas, y: Float) {
-            c.drawRoundRect(30f, y, 565f, y + 22f, 4f, 4f, tableHeaderPaint)
-            val headerY = y + 15f
-            c.drawText("Item / Descrição", 40f, headerY, tableHeaderCellPaint)
-            c.drawText("Categoria", 240f, headerY, tableHeaderCellPaint)
-            c.drawText("Data", 360f, headerY, tableHeaderCellPaint)
-            c.drawText("Tipo", 440f, headerY, tableHeaderCellPaint)
-            c.drawText("Valor", 515f, headerY, tableHeaderCellPaint)
-        }
-
-        drawTableHeader(canvas, currentY)
-        currentY += 34f
-
         val paintRendaRight = Paint(valueRendaPaint).apply {
             textSize = 10f
             textAlign = Paint.Align.RIGHT
@@ -763,46 +749,76 @@ class ResumoActivity : AppCompatActivity() {
             textSize = 10f
             textAlign = Paint.Align.RIGHT
         }
-
         val rowHeight = 22f
 
-        if (transacoes.isEmpty()) {
-            canvas.drawText("Nenhuma transação registada para este período.", 40f, currentY, labelPaint)
+        // 2. Tabela de RENDAS (ENTRADAS)
+        val rendas = transacoes.filter { it.tipo == "RENDA" }
+        checkPageBreak(60f)
+
+        canvas.drawText("RENDAS (ENTRADAS)", 30f, currentY, textBoldPaint)
+        currentY += 12f
+        drawTableHeader(canvas, currentY)
+        currentY += 34f
+
+        if (rendas.isEmpty()) {
+            canvas.drawText("Nenhuma renda registada para este período.", 40f, currentY, labelPaint)
+            currentY += rowHeight
         } else {
-            for (t in transacoes) {
-                if (currentY > 780f) {
-                    pdfDocument.finishPage(page)
-                    pageNumber++
-                    pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
-                    page = pdfDocument.startPage(pageInfo)
-                    canvas = page.canvas
+            for (t in rendas) {
+                checkPageBreak(rowHeight)
 
-                    drawHeaderAndFooter(canvas, pageNumber)
-                    currentY = 110f
-                    drawTableHeader(canvas, currentY)
-                    currentY += 34f
+                val itemNomeStr = if (t.recorrente && t.parcelasTotais > 0) {
+                    val parcelaAtual = t.parcelasTotais - t.parcelasRestantes
+                    "${t.item} ($parcelaAtual/${t.parcelasTotais})"
+                } else {
+                    t.item
                 }
-
-                // Descrição
-                val itemNome = if (t.item.length > 25) t.item.take(23) + ".." else t.item
-                canvas.drawText(itemNome, 40f, currentY, textPaint)
-
-                // Categoria
+                val itemNome = if (itemNomeStr.length > 28) itemNomeStr.take(26) + ".." else itemNomeStr
                 val catNome = if (t.categoria.length > 18) t.categoria.take(16) + ".." else t.categoria
-                canvas.drawText(catNome, 240f, currentY, labelPaint)
-
-                // Data
-                canvas.drawText(t.vencimento, 360f, currentY, labelPaint)
-
-                // Tipo
-                canvas.drawText(t.tipo, 440f, currentY, labelPaint)
-
-                // Valor
                 val valorFormatado = String.format(Locale.getDefault(), "%.2f €", t.valor)
-                val valPaint = if (t.tipo == "RENDA") paintRendaRight else paintDespesaRight
-                canvas.drawText(valorFormatado, 555f, currentY, valPaint)
 
-                // Linha divisória
+                canvas.drawText(itemNome, 40f, currentY, textPaint)
+                canvas.drawText(catNome, 250f, currentY, labelPaint)
+                canvas.drawText(t.vencimento, 370f, currentY, labelPaint)
+                canvas.drawText(valorFormatado, 555f, currentY, paintRendaRight)
+
+                canvas.drawLine(30f, currentY + 6f, 565f, currentY + 6f, linePaint)
+                currentY += rowHeight
+            }
+        }
+
+        currentY += 15f
+
+        // 3. Tabela de DESPESAS (SAÍDAS)
+        checkPageBreak(60f)
+
+        canvas.drawText("DESPESAS (SAÍDAS)", 30f, currentY, textBoldPaint)
+        currentY += 12f
+        drawTableHeader(canvas, currentY)
+        currentY += 34f
+
+        if (despesas.isEmpty()) {
+            canvas.drawText("Nenhuma despesa registada para este período.", 40f, currentY, labelPaint)
+            currentY += rowHeight
+        } else {
+            for (t in despesas) {
+                checkPageBreak(rowHeight)
+
+                val itemNomeStr = if (t.recorrente && t.parcelasTotais > 0) {
+                    val parcelaAtual = t.parcelasTotais - t.parcelasRestantes
+                    "${t.item} ($parcelaAtual/${t.parcelasTotais})"
+                } else {
+                    t.item
+                }
+                val itemNome = if (itemNomeStr.length > 28) itemNomeStr.take(26) + ".." else itemNomeStr
+                val catNome = if (t.categoria.length > 18) t.categoria.take(16) + ".." else t.categoria
+                val valorFormatado = String.format(Locale.getDefault(), "%.2f €", t.valor)
+
+                canvas.drawText(itemNome, 40f, currentY, textPaint)
+                canvas.drawText(catNome, 250f, currentY, labelPaint)
+                canvas.drawText(t.vencimento, 370f, currentY, labelPaint)
+                canvas.drawText(valorFormatado, 555f, currentY, paintDespesaRight)
+
                 canvas.drawLine(30f, currentY + 6f, 565f, currentY + 6f, linePaint)
                 currentY += rowHeight
             }
