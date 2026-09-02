@@ -14,7 +14,7 @@
     <!-- Guia do Utilizador -->
     <string name="guia_titulo">GUIA DO UTILIZADOR</string>
     <string name="guia_sec1_titulo">1. Resumo Mensal</string>
-    <string name="guia_sec1_desc">Neste ecrã, tem uma visão geral das finanças do mês selecionado. O gráfico circular mostra a distribuição dos gastos por categoria.</string>
+    <string name="guia_sec1_desc">Neste ecrã, tem uma visão geral das finanças do mês selecionado (com o período destacado a verde). O gráfico circular e a lista detalham a distribuição dos gastos por categoria.</string>
     <string name="guia_sec2_titulo">2. Meta de Poupança</string>
     <string name="guia_sec2_desc">Defina quanto deseja poupar mensalmente. A barra de progresso será preenchida automaticamente conforme adicionar transações na categoria \'Poupança\'.</string>
     <string name="guia_sec3_titulo">3. Listagem Detalhada</string>
@@ -23,10 +23,10 @@
     <string name="guia_sec4_desc">Prima o botão \'+\' na Listagem para registar um novo item. Escolha o tipo (Renda/Despesa) e a categoria correta para manter os gráficos precisos.</string>
     <string name="guia_sec5_titulo">5. Recorrência</string>
     <string name="guia_sec5_desc">Ao registar um item, pode marcar para que este se repita automaticamente nos meses seguintes, ideal para contas fixas como Aluguer ou Internet.</string>
-    <string name="guia_sec6_titulo">6. Exportar Relatórios</string>
-    <string name="guia_sec6_desc">Gere um relatório PDF profissional com o logótipo da aplicação e todos os dados consolidados do mês diretamente do ecrã de Resumo.</string>
-    <string name="guia_sec7_titulo">7. Sincronização e Nuvem</string>
-    <string name="guia_sec7_desc">Ao criar uma conta, os seus dados são salvos na nuvem (Firebase) e sincronizados em tempo real. Se usar o modo Convidado, os dados ficam apenas no seu telemóvel e podem ser perdidos se desinstalar a aplicação.</string>
+    <string name="guia_sec6_titulo">6. Exportar Relatórios PDF</string>
+    <string name="guia_sec6_desc">Gere um relatório PDF profissional com o logótipo da aplicação, totais consolidados, resumo de despesas por categoria (%) e extrato completo do mês.</string>
+    <string name="guia_sec7_titulo">7. Sincronização em Tempo Real</string>
+    <string name="guia_sec7_desc">Ao criar conta, as suas transações e categorias são salvas na nuvem (Firebase) e sincronizadas instantaneamente em tempo real entre todos os seus telemóveis.</string>
     <string name="guia_sec8_titulo">8. Segurança</string>
     <string name="guia_sec8_desc">A sua privacidade é a nossa prioridade. O Finly utiliza encriptação de ponta fornecida pelo Google Firebase para garantir que apenas você tem acesso aos seus dados financeiros.</string>
     <string name="guia_sec9_titulo">9. Eliminação Rápida (Swipe)</string>
@@ -34,7 +34,7 @@
     <string name="guia_sec10_titulo">10. Evolução Anual</string>
     <string name="guia_sec10_desc">Aceda ao menu lateral para ver o gráfico de barras anual. Ele permite comparar os seus ganhos e gastos reais mês a mês durante todo o ano.</string>
     <string name="guia_sec11_titulo">11. Categorias Personalizadas</string>
-    <string name="guia_sec11_desc">Pode criar novas categorias personalizadas ao registar ou editar um item. Basta clicar no botão \'+\' ao lado do campo de categoria ou selecionar \'+ Nova Categoria\' na lista.</string>
+    <string name="guia_sec11_desc">Gira as suas categorias no menu \'Gerir Categorias\' ou ao registar itens. As categorias criadas sincronizam-se entre dispositivos e, ao eliminar uma categoria em uso, as respetivas transações são reatribuídas em segurança para \'Geral\'.</string>
     <string name="snackbar_item_removido">Item removido: %1$s</string>
     <string name="btn_desfazer">DESFAZER</string>
 
