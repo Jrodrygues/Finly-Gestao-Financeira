@@ -22,7 +22,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
+
 
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -75,9 +78,6 @@ class ResumoActivity : AppCompatActivity() {
         
         binding = ActivityResumoBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-
-
 
         configurarSpinners()
         configurarDrawer()
@@ -353,55 +353,56 @@ class ResumoActivity : AppCompatActivity() {
         val pageHeight = 842
 
         // Paints para estilo
-        val headerPaint = Paint().apply { color = Color.parseColor("#0F3D3A") }
+        val headerPaint = Paint().apply { color = "#0F3D3A".toColorInt() }
         val titlePaint = Paint().apply {
             color = Color.WHITE
             textSize = 20f
             isFakeBoldText = true
         }
         val subtitlePaint = Paint().apply {
-            color = Color.parseColor("#B2FFFFFF")
+            color = "#B2FFFFFF".toColorInt()
             textSize = 12f
         }
-        val cardBgPaint = Paint().apply { color = Color.parseColor("#F4F8F7") }
+        val cardBgPaint = Paint().apply { color = "#F4F8F7".toColorInt() }
         val cardBorderPaint = Paint().apply {
-            color = Color.parseColor("#D1E0DE")
+            color = "#D1E0DE".toColorInt()
             style = Paint.Style.STROKE
             strokeWidth = 1f
         }
         val labelPaint = Paint().apply {
-            color = Color.parseColor("#666666")
+            color = "#666666".toColorInt()
             textSize = 10f
         }
         val valueRendaPaint = Paint().apply {
-            color = Color.parseColor("#2E7D32")
+            color = "#2E7D32".toColorInt()
             textSize = 13f
             isFakeBoldText = true
         }
         val valueDespesaPaint = Paint().apply {
-            color = Color.parseColor("#C62828")
+            color = "#C62828".toColorInt()
             textSize = 13f
             isFakeBoldText = true
         }
         val textPaint = Paint().apply {
-            color = Color.parseColor("#333333")
+            color = "#333333".toColorInt()
             textSize = 10f
         }
         val textBoldPaint = Paint().apply {
-            color = Color.parseColor("#0F3D3A")
+            color = "#0F3D3A".toColorInt()
             textSize = 11f
             isFakeBoldText = true
         }
-        val tableHeaderPaint = Paint().apply { color = Color.parseColor("#0F3D3A") }
+        val tableHeaderPaint = Paint().apply { color = "#0F3D3A".toColorInt() }
         val tableHeaderCellPaint = Paint().apply {
             color = Color.WHITE
             textSize = 10f
             isFakeBoldText = true
         }
         val linePaint = Paint().apply {
-            color = Color.parseColor("#E0E0E0")
+            color = "#E0E0E0".toColorInt()
             strokeWidth = 0.8f
         }
+
 
         var pageNumber = 1
         var pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
@@ -415,11 +416,12 @@ class ResumoActivity : AppCompatActivity() {
             c.drawText("Relatório Financeiro Mensal • $mes / $ano", 30f, 62f, subtitlePaint)
 
             // Logo ajustado sem cortes
-            val logo = drawableToBitmap(R.drawable.ic_logo_full_transp, 65, 65)
-                ?: drawableToBitmap(R.drawable.ic_logo_full, 65, 65)
+            val logo = drawableToBitmap(R.drawable.ic_logo_full_transp, 65)
+                ?: drawableToBitmap(R.drawable.ic_logo_full, 65)
             logo?.let {
                 c.drawBitmap(it, 495f, 10f, null)
             }
+
 
             // Footer
             c.drawLine(30f, 810f, 565f, 810f, linePaint)
@@ -564,14 +566,16 @@ class ResumoActivity : AppCompatActivity() {
         }
     }
 
-    private fun drawableToBitmap(drawableId: Int, width: Int, height: Int): Bitmap? {
+    private fun drawableToBitmap(drawableId: Int, size: Int): Bitmap? {
         val drawable = ContextCompat.getDrawable(this, drawableId) ?: return null
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(size, size)
         val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, width, height)
+        drawable.setBounds(0, 0, size, size)
         drawable.draw(canvas)
         return bitmap
     }
+
+
 
 
     override fun onResume() {
