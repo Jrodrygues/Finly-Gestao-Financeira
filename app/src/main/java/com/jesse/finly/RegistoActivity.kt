@@ -5,6 +5,7 @@ import android.view.MotionEvent
 import android.graphics.Rect
 import android.widget.EditText
 import android.app.DatePickerDialog
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -259,9 +260,11 @@ class RegistoActivity : AppCompatActivity() {
     }
 
     private fun mostrarBottomSheetGerirCategorias() {
-        val bottomSheetDialog = BottomSheetDialog(this)
+        val bottomSheetDialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
         val bsView = layoutInflater.inflate(R.layout.bottom_sheet_gerir_categorias, binding.root, false)
         bottomSheetDialog.setContentView(bsView)
+        bottomSheetDialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundColor(
+            Color.TRANSPARENT)
 
         val etNova = bsView.findViewById<TextInputEditText>(R.id.etNovaCategoriaBS)
         val btnAdd = bsView.findViewById<MaterialButton>(R.id.btnAdicionarCategoriaBS)

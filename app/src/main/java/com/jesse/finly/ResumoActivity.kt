@@ -315,9 +315,11 @@ class ResumoActivity : AppCompatActivity() {
     }
 
     private fun mostrarBottomSheetGerirCategorias() {
-        val bottomSheetDialog = BottomSheetDialog(this)
+        val bottomSheetDialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
         val bsView = layoutInflater.inflate(R.layout.bottom_sheet_gerir_categorias, binding.drawerLayout, false)
         bottomSheetDialog.setContentView(bsView)
+        bottomSheetDialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundColor(
+            Color.TRANSPARENT)
 
         val etNova = bsView.findViewById<TextInputEditText>(R.id.etNovaCategoriaBS)
         val btnAdd = bsView.findViewById<MaterialButton>(R.id.btnAdicionarCategoriaBS)
