@@ -8,6 +8,7 @@ import android.app.DatePickerDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
@@ -297,10 +298,15 @@ class RegistoActivity : AppCompatActivity() {
                         .show()
                 } else {
                     val quantidade = transacoesAfetadas.size
+                    val mensagem = if (quantidade == 1) {
+                        "1 transação será movida para a categoria Geral."
+                    } else {
+                        "$quantidade transações serão movidas para a categoria Geral."
+                    }
                     MaterialAlertDialogBuilder(this@RegistoActivity)
-                        .setTitle("Categoria em Utilização")
-                        .setMessage("Existem $quantidade transação(ões) associada(s) à categoria '$categoria'. Se continuar, essas transações serão alteradas para a categoria 'Geral'. Deseja continuar?")
-                        .setPositiveButton("Sim, Alterar e Eliminar") { _, _ ->
+                        .setTitle("Categoria em uso")
+                        .setMessage(mensagem)
+                        .setPositiveButton("Eliminar") { _, _ ->
                             lifecycleScope.launch(Dispatchers.IO) {
                                 transacoesAfetadas.forEach { trans ->
                                     val transAtualizada = trans.copy(categoria = "Geral")
@@ -312,7 +318,7 @@ class RegistoActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                        .setNegativeButton("Cancelar") { dialog, _ ->
                             dialog.dismiss()
                         }
                         .show()
@@ -349,6 +355,7 @@ class RegistoActivity : AppCompatActivity() {
         bottomSheetDialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundColor(
             Color.TRANSPARENT)
         bottomSheetDialog.window?.setDimAmount(0.85f)
+        bottomSheetDialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         val etNova = bsView.findViewById<TextInputEditText>(R.id.etNovaCategoriaBS)
         val btnAdd = bsView.findViewById<MaterialButton>(R.id.btnAdicionarCategoriaBS)
@@ -388,6 +395,12 @@ class RegistoActivity : AppCompatActivity() {
             if (novaCat.isNotEmpty()) {
                 salvarNovaCategoria(novaCat)
                 etNova.setText("")
+                etNova.clearFocus()
+
+                // Esconder o teclado para permitir ver a nova categoria na lista
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
+                imm?.hideSoftInputFromWindow(etNova.windowToken, 0)
+
                 atualizarListaCustom()
             } else {
                 showToast("Digite o nome da categoria")

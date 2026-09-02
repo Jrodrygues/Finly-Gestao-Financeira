@@ -12,6 +12,8 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
@@ -52,6 +54,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.util.Calendar
 import java.util.Locale
 
@@ -122,11 +126,7 @@ class ResumoActivity : AppCompatActivity() {
         }
 
         binding.btnExportarPDF.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                exportarParaPDF()
-            } else {
-                showToast("Exportação PDF requer Android 10+")
-            }
+            exportarParaPDF()
         }
 
         binding.btnDefinirMeta.setOnClickListener {
@@ -279,11 +279,7 @@ class ResumoActivity : AppCompatActivity() {
                     mostrarBottomSheetGerirCategorias()
                 }
                 R.id.nav_exportar -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        exportarParaPDF()
-                    } else {
-                        showToast("Exportação PDF requer Android 10+")
-                    }
+                    exportarParaPDF()
                 }
                 R.id.nav_sair -> {
                     mostrarDialogSair()
@@ -375,10 +371,15 @@ class ResumoActivity : AppCompatActivity() {
                         .show()
                 } else {
                     val quantidade = transacoesAfetadas.size
+                    val mensagem = if (quantidade == 1) {
+                        "1 transação será movida para a categoria Geral."
+                    } else {
+                        "$quantidade transações serão movidas para a categoria Geral."
+                    }
                     MaterialAlertDialogBuilder(this@ResumoActivity)
-                        .setTitle("Categoria em Utilização")
-                        .setMessage("Existem $quantidade transação(ões) associada(s) à categoria '$categoria'. Se continuar, essas transações serão alteradas para a categoria 'Geral'. Deseja continuar?")
-                        .setPositiveButton("Sim, Alterar e Eliminar") { _, _ ->
+                        .setTitle("Categoria em uso")
+                        .setMessage(mensagem)
+                        .setPositiveButton("Eliminar") { _, _ ->
                             lifecycleScope.launch(Dispatchers.IO) {
                                 transacoesAfetadas.forEach { trans ->
                                     val transAtualizada = trans.copy(categoria = "Geral")
@@ -390,7 +391,7 @@ class ResumoActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                        .setNegativeButton("Cancelar") { dialog, _ ->
                             dialog.dismiss()
                         }
                         .show()
@@ -427,6 +428,7 @@ class ResumoActivity : AppCompatActivity() {
         bottomSheetDialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundColor(
             Color.TRANSPARENT)
         bottomSheetDialog.window?.setDimAmount(0.85f)
+        bottomSheetDialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         val etNova = bsView.findViewById<TextInputEditText>(R.id.etNovaCategoriaBS)
         val btnAdd = bsView.findViewById<MaterialButton>(R.id.btnAdicionarCategoriaBS)
@@ -466,6 +468,12 @@ class ResumoActivity : AppCompatActivity() {
             if (novaCat.isNotEmpty()) {
                 salvarNovaCategoria(novaCat)
                 etNova.setText("")
+                etNova.clearFocus()
+
+                // Esconder o teclado para visualizar a nova categoria na lista
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
+                imm?.hideSoftInputFromWindow(etNova.windowToken, 0)
+
                 atualizarListaCustom()
             } else {
                 showToast("Digite o nome da categoria")
@@ -566,7 +574,8 @@ class ResumoActivity : AppCompatActivity() {
         val pageHeight = 842
 
         // Paints para estilo
-        val headerPaint = Paint().apply { color = "#0F3D3A".toColorInt() }
+        val primaryColorHex = "#009688"
+        val headerPaint = Paint().apply { color = primaryColorHex.toColorInt() }
         val titlePaint = Paint().apply {
             color = Color.WHITE
             textSize = 20f
@@ -601,11 +610,11 @@ class ResumoActivity : AppCompatActivity() {
             textSize = 10f
         }
         val textBoldPaint = Paint().apply {
-            color = "#0F3D3A".toColorInt()
+            color = primaryColorHex.toColorInt()
             textSize = 11f
             isFakeBoldText = true
         }
-        val tableHeaderPaint = Paint().apply { color = "#0F3D3A".toColorInt() }
+        val tableHeaderPaint = Paint().apply { color = primaryColorHex.toColorInt() }
         val tableHeaderCellPaint = Paint().apply {
             color = Color.WHITE
             textSize = 10f
@@ -615,7 +624,6 @@ class ResumoActivity : AppCompatActivity() {
             color = "#E0E0E0".toColorInt()
             strokeWidth = 0.8f
         }
-
 
         var pageNumber = 1
         var pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
@@ -628,16 +636,13 @@ class ResumoActivity : AppCompatActivity() {
             c.drawText("Finly", 30f, 40f, titlePaint)
             c.drawText("Relatório Financeiro Mensal • $mes / $ano", 30f, 62f, subtitlePaint)
 
-            // Logo vetorial (SVG) desenhado diretamente no Canvas do PDF (Qualidade 100% Cristalina)
+            // Logo vetorial (SVG)
             val logoVector = ContextCompat.getDrawable(this, R.drawable.ic_logo_full_transp)
                 ?: ContextCompat.getDrawable(this, R.drawable.ic_logo_full)
             logoVector?.let {
                 it.setBounds(490, 10, 565, 75)
                 it.draw(c)
             }
-
-
-
 
             // Footer
             c.drawLine(30f, 810f, 565f, 810f, linePaint)
@@ -677,8 +682,65 @@ class ResumoActivity : AppCompatActivity() {
         val metaFormatada = String.format(Locale.getDefault(), "%.2f €", metaAtual)
         canvas.drawText("Poupança Real: $poupancaText   |   Meta do Mês: $metaFormatada", 50f, 175f, textPaint)
 
-        // Tabela de Transações
-        canvas.drawText("EXTRATO DETALHADO DO MÊS", 30f, 215f, textBoldPaint)
+        var currentY = 210f
+
+        // Bloco 1: Resumo de Despesas por Categoria
+        val despesas = transacoes.filter { it.tipo == "DESPESA" }
+        val totalDespesasVal = despesas.sumOf { it.valor }
+        val gastosPorCategoria = despesas.groupBy { it.categoria }
+            .mapValues { entry -> entry.value.sumOf { it.valor } }
+            .toList()
+            .sortedByDescending { it.second }
+
+        if (gastosPorCategoria.isNotEmpty()) {
+            canvas.drawText("RESUMO DE DESPESAS POR CATEGORIA", 30f, currentY, textBoldPaint)
+            currentY += 12f
+
+            canvas.drawRoundRect(30f, currentY, 565f, currentY + 20f, 4f, 4f, tableHeaderPaint)
+            val miniHeaderY = currentY + 14f
+            canvas.drawText("Categoria", 40f, miniHeaderY, tableHeaderCellPaint)
+            canvas.drawText("Total Gasto", 320f, miniHeaderY, tableHeaderCellPaint)
+            canvas.drawText("% do Total", 460f, miniHeaderY, tableHeaderCellPaint)
+            currentY += 26f
+
+            for ((cat, totalCat) in gastosPorCategoria) {
+                if (currentY > 780f) {
+                    pdfDocument.finishPage(page)
+                    pageNumber++
+                    pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
+                    page = pdfDocument.startPage(pageInfo)
+                    canvas = page.canvas
+                    drawHeaderAndFooter(canvas, pageNumber)
+                    currentY = 110f
+                }
+
+                val catNome = if (cat.length > 28) cat.take(26) + ".." else cat
+                val valorFormatado = String.format(Locale.getDefault(), "%.2f €", totalCat)
+                val percent = if (totalDespesasVal > 0) ((totalCat / totalDespesasVal) * 100).toInt() else 0
+
+                canvas.drawText(catNome, 40f, currentY, textPaint)
+                canvas.drawText(valorFormatado, 320f, currentY, labelPaint)
+                canvas.drawText("$percent%", 460f, currentY, labelPaint)
+
+                canvas.drawLine(30f, currentY + 4f, 565f, currentY + 4f, linePaint)
+                currentY += 18f
+            }
+            currentY += 15f
+        }
+
+        // Bloco 2: Extrato Detalhado
+        if (currentY > 700f) {
+            pdfDocument.finishPage(page)
+            pageNumber++
+            pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
+            page = pdfDocument.startPage(pageInfo)
+            canvas = page.canvas
+            drawHeaderAndFooter(canvas, pageNumber)
+            currentY = 110f
+        }
+
+        canvas.drawText("EXTRATO DETALHADO DO MÊS", 30f, currentY, textBoldPaint)
+        currentY += 12f
 
         fun drawTableHeader(c: Canvas, y: Float) {
             c.drawRoundRect(30f, y, 565f, y + 22f, 4f, 4f, tableHeaderPaint)
@@ -690,9 +752,8 @@ class ResumoActivity : AppCompatActivity() {
             c.drawText("Valor", 515f, headerY, tableHeaderCellPaint)
         }
 
-        var currentY = 230f
         drawTableHeader(canvas, currentY)
-        currentY += 38f
+        currentY += 34f
 
         val paintRendaRight = Paint(valueRendaPaint).apply {
             textSize = 10f
@@ -709,7 +770,6 @@ class ResumoActivity : AppCompatActivity() {
             canvas.drawText("Nenhuma transação registada para este período.", 40f, currentY, labelPaint)
         } else {
             for (t in transacoes) {
-                // Checar estouro de página
                 if (currentY > 780f) {
                     pdfDocument.finishPage(page)
                     pageNumber++
@@ -720,7 +780,7 @@ class ResumoActivity : AppCompatActivity() {
                     drawHeaderAndFooter(canvas, pageNumber)
                     currentY = 110f
                     drawTableHeader(canvas, currentY)
-                    currentY += 38f
+                    currentY += 34f
                 }
 
                 // Descrição
@@ -774,7 +834,13 @@ class ResumoActivity : AppCompatActivity() {
                 }
                 showToast("Relatório salvo em Downloads!", isLong = true)
             } else {
-                showToast("Erro ao criar ficheiro PDF")
+                // Fallback para gravação direta
+                val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                val file = File(downloadsDir, nomeFicheiro)
+                FileOutputStream(file).use { outputStream ->
+                    pdfDocument.writeTo(outputStream)
+                }
+                showToast("Relatório salvo em Downloads!", isLong = true)
             }
         } catch (e: Exception) {
             showToast("Erro ao gerar PDF: ${e.message}")
