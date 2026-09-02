@@ -265,6 +265,7 @@ class RegistoActivity : AppCompatActivity() {
         bottomSheetDialog.setContentView(bsView)
         bottomSheetDialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundColor(
             Color.TRANSPARENT)
+        bottomSheetDialog.window?.setDimAmount(0.85f)
 
         val etNova = bsView.findViewById<TextInputEditText>(R.id.etNovaCategoriaBS)
         val btnAdd = bsView.findViewById<MaterialButton>(R.id.btnAdicionarCategoriaBS)
