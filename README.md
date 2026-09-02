@@ -17,6 +17,25 @@
 
 ---
 
+## 📸 Demonstração Visual (Screenshots)
+
+### 🔐 Autenticação & Entrada
+| Login | Registo de Conta | Modo Convidado |
+| :---: | :---: | :---: |
+| <img src="screenshots/01_login.png" width="220"/> | <img src="screenshots/02_registo.png" width="220"/> | <img src="screenshots/03_aviso_convidado.png" width="220"/> |
+
+### 📊 Resumo Mensal & Gráficos
+| Resumo com Gráfico | Detalhe de Categorias | Resumo Inicial |
+| :---: | :---: | :---: |
+| <img src="screenshots/08_resumo_grafico.png" width="220"/> | <img src="screenshots/10_resumo_categorias.png" width="220"/> | <img src="screenshots/04_resumo_inicial.png" width="220"/> |
+
+### 📈 Evolução Anual & Perfil
+| Evolução Anual (Barras) | Perfil & Definições | Guia do Utilizador |
+| :---: | :---: | :---: |
+| <img src="screenshots/09_evolucao_grafico.png" width="220"/> | <img src="screenshots/06_perfil.png" width="220"/> | <img src="screenshots/11_guia_utilizador.png" width="220"/> |
+
+---
+
 ## 🛠️ Tecnologias Utilizadas
 
 O projeto foi construído com as melhores práticas de desenvolvimento Android:
@@ -31,21 +50,11 @@ O projeto foi construído com as melhores práticas de desenvolvimento Android:
 
 ---
 
-## 📸 Screenshots (Exemplos)
-
-*(Dica: Adicione aqui as imagens do seu app após fazer o upload para a pasta `screenshots` no GitHub)*
-
-| Login | Resumo Mensal | Evolução Anual |
-| :---: | :---: | :---: |
-| ![Login](https://via.placeholder.com/200x400?text=Login) | ![Resumo](https://via.placeholder.com/200x400?text=Resumo) | ![Anual](https://via.placeholder.com/200x400?text=Anual) |
-
----
-
 ## 🚀 Como Executar o Projeto
 
 1.  Clone este repositório:
     ```bash
-    git clone https://github.com/seu-utilizador/Finly-Gestao-Financeira.git
+    git clone https://github.com/Jrodrygues/Finly-Gestao-Financeira.git
     ```
 2.  Abra o projeto no **Android Studio**.
 3.  Configure o seu ficheiro `google-services.json` do Firebase na pasta `app/`.
