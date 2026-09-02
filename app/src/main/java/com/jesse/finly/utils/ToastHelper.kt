@@ -18,6 +18,7 @@ object ToastHelper {
 
             val toast = Toast(context)
             toast.duration = if (isLong) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
+            @Suppress("DEPRECATION")
             toast.view = layout
             toast.show()
         } catch (e: Exception) {

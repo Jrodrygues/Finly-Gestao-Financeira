@@ -8,7 +8,6 @@ import androidx.core.app.NotificationCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.jesse.finly.database.MinhaBaseDados
-import com.jesse.finly.R
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -16,7 +15,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
 
     override fun doWork(): Result {
         val sharedPref = applicationContext.getSharedPreferences("PreferenciasDaMinhaApp", Context.MODE_PRIVATE)
-        val notificationsEnabled = sharedPref.getBoolean("notifications_active", false)
+        val notificationsEnabled = sharedPref.getBoolean("NOTIFICATIONS", false)
         val userEmail = sharedPref.getString("EMAIL", "") ?: ""
 
         if (!notificationsEnabled || userEmail.isEmpty()) return Result.success()

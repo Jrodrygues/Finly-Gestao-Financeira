@@ -15,16 +15,21 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.DetalhesBinding
 import com.jesse.finly.models.Transacao
+import com.jesse.finly.notifications.NotificationWorker
 import com.jesse.finly.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 
 class DetalhesPageActivity : AppCompatActivity() {
 
@@ -325,13 +330,30 @@ class DetalhesPageActivity : AppCompatActivity() {
     private fun ativarNotificacoes() {
         getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { putBoolean("NOTIFICATIONS", true) }
         atualizarPreferenciaUtilizador(valor = true, "NOTIFICATIONS")
+        agendarWorkerNotificacoes()
         showToast("Notificações ativadas!")
     }
 
     private fun cancelarNotificacoes() {
         getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { putBoolean("NOTIFICATIONS", false) }
         atualizarPreferenciaUtilizador(false, "NOTIFICATIONS")
+        cancelarWorkerNotificacoes()
         showToast("Notificações desativadas")
+    }
+
+    private fun agendarWorkerNotificacoes() {
+        val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(
+            24, TimeUnit.HOURS
+        ).build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "LembreteDespesasWork",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
+    }
+
+    private fun cancelarWorkerNotificacoes() {
+        WorkManager.getInstance(this).cancelUniqueWork("LembreteDespesasWork")
     }
 
     private fun atualizarPreferenciaUtilizador(valor: Boolean, tipo: String) {

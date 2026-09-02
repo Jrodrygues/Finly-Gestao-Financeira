@@ -9,6 +9,7 @@ import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.jesse.finly.R
 import com.jesse.finly.models.Transacao
+import java.util.Locale
 
 class TransacaoAdapter(
     private var lista: List<Transacao>,
@@ -51,7 +52,7 @@ class TransacaoAdapter(
 
         holder.tvItem.text = textoExibicao
         holder.tvVencimento.text = item.vencimento
-        holder.tvValor.text = String.format("%.2f €", item.valor)
+        holder.tvValor.text = String.format(Locale.getDefault(), "%.2f €", item.valor)
 
         if (item.tipo == "DESPESA") {
             holder.tvValor.setTextColor("#F44336".toColorInt())

@@ -8,7 +8,6 @@ import com.jesse.finly.models.MetaPoupanca
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.models.Utilizador
 import kotlinx.coroutines.tasks.await
-import android.net.Uri
 
 object FirebaseManager {
     private val auth = FirebaseAuth.getInstance()

@@ -23,7 +23,7 @@ abstract class MinhaBaseDados: RoomDatabase() {
                     MinhaBaseDados::class.java,
                     "minha_base_dados"
                 )
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(dropAllTables = true)
                     .build()
 
                 INSTANCE = instance
