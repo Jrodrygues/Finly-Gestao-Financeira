@@ -2,10 +2,11 @@ package com.jesse.finly
 
 import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
-
 import android.graphics.Paint
+import android.graphics.RectF
 import android.graphics.pdf.PdfDocument
 import android.os.Build
 import android.os.Bundle
@@ -641,11 +642,24 @@ class ResumoActivity : AppCompatActivity() {
             c.drawText("Finly", 30f, 40f, titlePaint)
             c.drawText("Relatório Financeiro Mensal • $mes / $ano", 30f, 62f, subtitlePaint)
 
+            // Logo vetorial de altíssima definição (Renderizado a 4x para evitar pixelização ao fazer zoom)
             val logoVector = ContextCompat.getDrawable(this, R.drawable.ic_logo_full_transp)
                 ?: ContextCompat.getDrawable(this, R.drawable.ic_logo_full)
-            logoVector?.let {
-                it.setBounds(490, 10, 565, 75)
-                it.draw(c)
+            logoVector?.let { drawable ->
+                val scale = 4
+                val width = (565 - 490) * scale
+                val height = (75 - 10) * scale
+                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                val bitmapCanvas = Canvas(bitmap)
+                drawable.setBounds(0, 0, width, height)
+                drawable.draw(bitmapCanvas)
+
+                val logoPaint = Paint().apply {
+                    isAntiAlias = true
+                    isFilterBitmap = true
+                    isDither = true
+                }
+                c.drawBitmap(bitmap, null, RectF(490f, 10f, 565f, 75f), logoPaint)
             }
 
             c.drawLine(30f, 810f, 565f, 810f, linePaint)
@@ -675,6 +689,14 @@ class ResumoActivity : AppCompatActivity() {
             c.drawText("Categoria", 250f, headerY, tableHeaderCellPaint)
             c.drawText("Data de Vencimento", 370f, headerY, tableHeaderCellPaint)
             c.drawText("Valor", 555f, headerY, tableHeaderCellRightPaint)
+        }
+
+        fun extrairOrdemData(vencimento: String): Int {
+            val partes = vencimento.split("/")
+            val dia = partes.getOrNull(0)?.toIntOrNull() ?: 1
+            val mesNum = partes.getOrNull(1)?.toIntOrNull() ?: 1
+            val anoNum = partes.getOrNull(2)?.toIntOrNull() ?: 2026
+            return anoNum * 10000 + mesNum * 100 + dia
         }
 
         drawHeaderAndFooter(canvas, pageNumber)
@@ -751,8 +773,8 @@ class ResumoActivity : AppCompatActivity() {
         }
         val rowHeight = 22f
 
-        // 2. Tabela de RENDAS (ENTRADAS)
-        val rendas = transacoes.filter { it.tipo == "RENDA" }
+        // 2. Tabela de RENDAS (ENTRADAS) ordenadas por data de vencimento
+        val rendas = transacoes.filter { it.tipo == "RENDA" }.sortedBy { extrairOrdemData(it.vencimento) }
         checkPageBreak(60f)
 
         canvas.drawText("RENDAS (ENTRADAS)", 30f, currentY, textBoldPaint)
@@ -789,7 +811,8 @@ class ResumoActivity : AppCompatActivity() {
 
         currentY += 15f
 
-        // 3. Tabela de DESPESAS (SAÍDAS)
+        // 3. Tabela de DESPESAS (SAÍDAS) ordenadas por data de vencimento
+        val despesasOrdenadas = despesas.sortedBy { extrairOrdemData(it.vencimento) }
         checkPageBreak(60f)
 
         canvas.drawText("DESPESAS (SAÍDAS)", 30f, currentY, textBoldPaint)
@@ -797,7 +820,7 @@ class ResumoActivity : AppCompatActivity() {
         drawTableHeader(canvas, currentY)
         currentY += 34f
 
-        if (despesas.isEmpty()) {
+        if (despesasOrdenadas.isEmpty()) {
             canvas.drawText("Nenhuma despesa registada para este período.", 40f, currentY, labelPaint)
             currentY += rowHeight
         } else {
