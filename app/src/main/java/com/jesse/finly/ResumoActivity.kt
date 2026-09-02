@@ -17,13 +17,13 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.ViewCompat
+
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
@@ -343,45 +343,192 @@ class ResumoActivity : AppCompatActivity() {
             .show()
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     private fun exportarParaPDF() {
-        val pdfDocument = PdfDocument()
-        val paint = Paint()
-        val titlePaint = Paint()
-
-        val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
-        val page = pdfDocument.startPage(pageInfo)
-        val canvas: Canvas = page.canvas
-
-        val logoBitmap = vectorToBitmap(R.drawable.ic_logo_full)
-        logoBitmap?.let {
-            canvas.drawBitmap(it, 450f, 20f, null)
-        }
-
-        titlePaint.textSize = 24f
-        titlePaint.isFakeBoldText = true
-        titlePaint.color = ContextCompat.getColor(this, R.color.colorAccent)
-        canvas.drawText(getString(R.string.pdf_titulo), 40f, 60f, titlePaint)
-
-        paint.textSize = 14f
         val mes = binding.spinnerMes.selectedItem.toString()
         val ano = binding.spinnerAno.selectedItem.toString()
-        
-        paint.isFakeBoldText = true
-        canvas.drawText(getString(R.string.pdf_periodo, mes, ano), 40f, 100f, paint)
-        
-        paint.isFakeBoldText = false
-        val startY = 140f
-        val lineSpacing = 30f
-        
-        canvas.drawText(getString(R.string.pdf_renda_total, binding.tvTotalRenda.text), 40f, startY, paint)
-        canvas.drawText(getString(R.string.pdf_despesa_total, binding.tvTotalDespesas.text), 40f, startY + lineSpacing, paint)
-        canvas.drawText(getString(R.string.pdf_poupanca_total, binding.tvTotalPoupanca.text), 40f, startY + (lineSpacing * 2), paint)
-        canvas.drawText(getString(R.string.pdf_meta_definida, metaAtual), 40f, startY + (lineSpacing * 3), paint)
+        val transacoes = transacoesAtuaisGrafico
 
-        paint.textSize = 18f
-        paint.isFakeBoldText = true
-        canvas.drawText(getString(R.string.pdf_saldo_final, binding.tvSaldoFinal.text), 40f, startY + (lineSpacing * 5), paint)
+        val pdfDocument = PdfDocument()
+        val pageWidth = 595
+        val pageHeight = 842
+
+        // Paints para estilo
+        val headerPaint = Paint().apply { color = Color.parseColor("#0F3D3A") }
+        val titlePaint = Paint().apply {
+            color = Color.WHITE
+            textSize = 20f
+            isFakeBoldText = true
+        }
+        val subtitlePaint = Paint().apply {
+            color = Color.parseColor("#B2FFFFFF")
+            textSize = 12f
+        }
+        val cardBgPaint = Paint().apply { color = Color.parseColor("#F4F8F7") }
+        val cardBorderPaint = Paint().apply {
+            color = Color.parseColor("#D1E0DE")
+            style = Paint.Style.STROKE
+            strokeWidth = 1f
+        }
+        val labelPaint = Paint().apply {
+            color = Color.parseColor("#666666")
+            textSize = 10f
+        }
+        val valueRendaPaint = Paint().apply {
+            color = Color.parseColor("#2E7D32")
+            textSize = 13f
+            isFakeBoldText = true
+        }
+        val valueDespesaPaint = Paint().apply {
+            color = Color.parseColor("#C62828")
+            textSize = 13f
+            isFakeBoldText = true
+        }
+        val textPaint = Paint().apply {
+            color = Color.parseColor("#333333")
+            textSize = 10f
+        }
+        val textBoldPaint = Paint().apply {
+            color = Color.parseColor("#0F3D3A")
+            textSize = 11f
+            isFakeBoldText = true
+        }
+        val tableHeaderPaint = Paint().apply { color = Color.parseColor("#0F3D3A") }
+        val tableHeaderCellPaint = Paint().apply {
+            color = Color.WHITE
+            textSize = 10f
+            isFakeBoldText = true
+        }
+        val linePaint = Paint().apply {
+            color = Color.parseColor("#E0E0E0")
+            strokeWidth = 0.8f
+        }
+
+        var pageNumber = 1
+        var pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
+        var page = pdfDocument.startPage(pageInfo)
+        var canvas = page.canvas
+
+        fun drawHeaderAndFooter(c: Canvas, pNum: Int) {
+            // Header Bar
+            c.drawRect(0f, 0f, pageWidth.toFloat(), 85f, headerPaint)
+            c.drawText("Finly", 30f, 40f, titlePaint)
+            c.drawText("Relatório Financeiro Mensal • $mes / $ano", 30f, 62f, subtitlePaint)
+
+            // Logo ajustado sem cortes
+            val logo = drawableToBitmap(R.drawable.ic_logo_full_transp, 65, 65)
+                ?: drawableToBitmap(R.drawable.ic_logo_full, 65, 65)
+            logo?.let {
+                c.drawBitmap(it, 495f, 10f, null)
+            }
+
+            // Footer
+            c.drawLine(30f, 810f, 565f, 810f, linePaint)
+            val dataHoje = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(java.util.Date())
+            c.drawText("Gerado por Finly em $dataHoje", 30f, 825f, labelPaint)
+            c.drawText("Página $pNum", 525f, 825f, labelPaint)
+        }
+
+        // Desenhar Header & Footer da primeira página
+        drawHeaderAndFooter(canvas, pageNumber)
+
+        // Card de Resumo no topo
+        canvas.drawRoundRect(30f, 100f, 565f, 190f, 10f, 10f, cardBgPaint)
+        canvas.drawRoundRect(30f, 100f, 565f, 190f, 10f, 10f, cardBorderPaint)
+
+        val rendaText = binding.tvTotalRenda.text.toString()
+        val despesaText = binding.tvTotalDespesas.text.toString()
+        val poupancaText = binding.tvTotalPoupanca.text.toString()
+        val saldoText = binding.tvSaldoFinal.text.toString()
+
+        // Coluna 1: Rendas
+        canvas.drawText("TOTAL RENDAS", 50f, 122f, labelPaint)
+        canvas.drawText(rendaText, 50f, 142f, valueRendaPaint)
+
+        // Coluna 2: Despesas
+        canvas.drawText("TOTAL DESPESAS", 210f, 122f, labelPaint)
+        canvas.drawText(despesaText, 210f, 142f, valueDespesaPaint)
+
+        // Coluna 3: Saldo Final
+        canvas.drawText("SALDO FINAL", 380f, 122f, labelPaint)
+        val isSaldoNegativo = binding.tvSaldoFinal.currentTextColor == ContextCompat.getColor(this, R.color.colorNegative)
+        val saldoPaint = if (isSaldoNegativo) valueDespesaPaint else valueRendaPaint
+        canvas.drawText(saldoText, 380f, 142f, saldoPaint)
+
+        // Linha secundária do Card: Poupança & Meta
+        canvas.drawLine(50f, 157f, 545f, 157f, linePaint)
+        val metaFormatada = String.format(Locale.getDefault(), "%.2f €", metaAtual)
+        canvas.drawText("Poupança Real: $poupancaText   |   Meta do Mês: $metaFormatada", 50f, 175f, textPaint)
+
+        // Tabela de Transações
+        canvas.drawText("EXTRATO DETALHADO DO MÊS", 30f, 215f, textBoldPaint)
+
+        fun drawTableHeader(c: Canvas, y: Float) {
+            c.drawRoundRect(30f, y, 565f, y + 22f, 4f, 4f, tableHeaderPaint)
+            val headerY = y + 15f
+            c.drawText("Item / Descrição", 40f, headerY, tableHeaderCellPaint)
+            c.drawText("Categoria", 240f, headerY, tableHeaderCellPaint)
+            c.drawText("Data", 360f, headerY, tableHeaderCellPaint)
+            c.drawText("Tipo", 440f, headerY, tableHeaderCellPaint)
+            c.drawText("Valor", 515f, headerY, tableHeaderCellPaint)
+        }
+
+        var currentY = 230f
+        drawTableHeader(canvas, currentY)
+        currentY += 38f
+
+        val paintRendaRight = Paint(valueRendaPaint).apply {
+            textSize = 10f
+            textAlign = Paint.Align.RIGHT
+        }
+        val paintDespesaRight = Paint(valueDespesaPaint).apply {
+            textSize = 10f
+            textAlign = Paint.Align.RIGHT
+        }
+
+        val rowHeight = 22f
+
+        if (transacoes.isEmpty()) {
+            canvas.drawText("Nenhuma transação registada para este período.", 40f, currentY, labelPaint)
+        } else {
+            for (t in transacoes) {
+                // Checar estouro de página
+                if (currentY > 780f) {
+                    pdfDocument.finishPage(page)
+                    pageNumber++
+                    pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
+                    page = pdfDocument.startPage(pageInfo)
+                    canvas = page.canvas
+
+                    drawHeaderAndFooter(canvas, pageNumber)
+                    currentY = 110f
+                    drawTableHeader(canvas, currentY)
+                    currentY += 38f
+                }
+
+                // Descrição
+                val itemNome = if (t.item.length > 25) t.item.take(23) + ".." else t.item
+                canvas.drawText(itemNome, 40f, currentY, textPaint)
+
+                // Categoria
+                val catNome = if (t.categoria.length > 18) t.categoria.take(16) + ".." else t.categoria
+                canvas.drawText(catNome, 240f, currentY, labelPaint)
+
+                // Data
+                canvas.drawText(t.vencimento, 360f, currentY, labelPaint)
+
+                // Tipo
+                canvas.drawText(t.tipo, 440f, currentY, labelPaint)
+
+                // Valor
+                val valorFormatado = String.format(Locale.getDefault(), "%.2f €", t.valor)
+                val valPaint = if (t.tipo == "RENDA") paintRendaRight else paintDespesaRight
+                canvas.drawText(valorFormatado, 555f, currentY, valPaint)
+
+                // Linha divisória
+                canvas.drawLine(30f, currentY + 6f, 565f, currentY + 6f, linePaint)
+                currentY += rowHeight
+            }
+        }
 
         pdfDocument.finishPage(page)
 
@@ -391,21 +538,41 @@ class ResumoActivity : AppCompatActivity() {
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, nomeFicheiro)
                 put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
-                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                }
             }
-            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+
+            val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            } else {
+                resolver.insert(MediaStore.Files.getContentUri("external"), contentValues)
+            }
+
             if (uri != null) {
                 resolver.openOutputStream(uri)?.use { outputStream ->
                     pdfDocument.writeTo(outputStream)
                 }
                 showToast("Relatório salvo em Downloads!", isLong = true)
+            } else {
+                showToast("Erro ao criar ficheiro PDF")
             }
-        } catch (_: Exception) {
-            showToast("Erro ao gerar PDF")
+        } catch (e: Exception) {
+            showToast("Erro ao gerar PDF: ${e.message}")
         } finally {
             pdfDocument.close()
         }
     }
+
+    private fun drawableToBitmap(drawableId: Int, width: Int, height: Int): Bitmap? {
+        val drawable = ContextCompat.getDrawable(this, drawableId) ?: return null
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, width, height)
+        drawable.draw(canvas)
+        return bitmap
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -726,11 +893,8 @@ class ResumoActivity : AppCompatActivity() {
         }
     }
 
-    private fun vectorToBitmap(drawableId: Int): Bitmap? {
-        return ContextCompat.getDrawable(this, drawableId)?.toBitmap(100, 100)
-    }
-
     private fun setupBackNavigation() {
+
         onBackPressedDispatcher.addCallback(
             this,
             object : androidx.activity.OnBackPressedCallback(enabled = true) {
