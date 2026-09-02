@@ -30,6 +30,9 @@ import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Locale
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+
 class RegistoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegistoBinding
 
@@ -46,9 +49,6 @@ class RegistoActivity : AppCompatActivity() {
     private var isNewUserRegistration = false
 
     private val meses = arrayOf("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro")
-    private val categorias = arrayOf(
-        "Geral", "Habitação", "Alimentação", "Transporte", "Saúde", "Lazer", "Educação", "Compras", "Assinaturas", "Investimentos", "Poupança", "Exterior",
-    )
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -194,9 +194,80 @@ class RegistoActivity : AppCompatActivity() {
 
 
 
+    private fun obterCategoriasDisponiveis(): MutableList<String> {
+        val lista = mutableListOf(
+            "Geral", "Habitação", "Alimentação", "Transporte", "Saúde", "Lazer",
+            "Educação", "Compras", "Assinaturas", "Investimentos", "Poupança", "Exterior"
+        )
+        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val emailClean = userEmail.trim().lowercase()
+
+        val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet()) ?: emptySet()
+        for (cat in customSet) {
+            if (cat.isNotBlank() && !lista.contains(cat)) {
+                lista.add(cat)
+            }
+        }
+        lista.add(getString(R.string.option_nova_categoria))
+        return lista
+    }
+
+    private fun salvarNovaCategoria(nome: String) {
+        val catClean = nome.trim()
+        if (catClean.isEmpty()) return
+
+        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val emailClean = userEmail.trim().lowercase()
+
+        val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet())?.toMutableSet() ?: mutableSetOf()
+        customSet.add(catClean)
+        prefs.edit { putStringSet("CUSTOM_CATEGORIES_$emailClean", customSet) }
+
+        configurarSpinners()
+        binding.autoCompleteCategoria.setText(catClean, false)
+        showToast(getString(R.string.toast_categoria_adicionada, catClean))
+    }
+
+    private fun mostrarDialogNovaCategoria() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_nova_categoria, null)
+        val etNovaCategoria = dialogView.findViewById<TextInputEditText>(R.id.novaCategoriaEditText)
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.dialog_nova_categoria_titulo))
+            .setView(dialogView)
+            .setPositiveButton(getString(R.string.btn_adicionar)) { _, _ ->
+                val novaCat = etNovaCategoria.text.toString().trim()
+                if (novaCat.isNotEmpty()) {
+                    salvarNovaCategoria(novaCat)
+                } else {
+                    showToast("Por favor, digite o nome da categoria")
+                }
+            }
+            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
     private fun configurarSpinners() {
-        val adapterCat = ArrayAdapter(this, R.layout.dropdown_item, categorias)
+        val listaCategorias = obterCategoriasDisponiveis()
+        val adapterCat = ArrayAdapter(this, R.layout.dropdown_item, listaCategorias)
         binding.autoCompleteCategoria.setAdapter(adapterCat)
+
+        binding.autoCompleteCategoria.setOnItemClickListener { _, _, position, _ ->
+            val selecionada = adapterCat.getItem(position)
+            if (selecionada == getString(R.string.option_nova_categoria)) {
+                val primeiraValida = listaCategorias.firstOrNull { it != getString(R.string.option_nova_categoria) } ?: ""
+                binding.autoCompleteCategoria.setText(primeiraValida, false)
+                mostrarDialogNovaCategoria()
+            }
+        }
+
+        binding.btnAddNovaCategoria.setOnClickListener {
+            mostrarDialogNovaCategoria()
+        }
     }
 
 

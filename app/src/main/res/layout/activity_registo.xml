@@ -162,39 +162,62 @@
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Seleção de Categoria -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/categoriaLayout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        <!-- Seleção de Categoria com Botão + -->
+        <LinearLayout
+            android:id="@+id/containerCategoria"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="@string/label_categoria"
-            app:startIconDrawable="@drawable/ic_list"
-            app:startIconTint="@color/colorPrimary"
-            app:boxBackgroundColor="@color/surfaceColor"
-            app:boxCornerRadiusBottomEnd="16dp"
-            app:boxCornerRadiusBottomStart="16dp"
-            app:boxCornerRadiusTopEnd="16dp"
-            app:boxCornerRadiusTopStart="16dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             app:layout_constraintEnd_toEndOf="@+id/guidelineEnd"
             app:layout_constraintStart_toStartOf="@+id/guidelineStart"
             app:layout_constraintTop_toBottomOf="@+id/senhaLayout">
 
-            <AutoCompleteTextView
-                android:id="@+id/autoCompleteCategoria"
-                android:layout_width="match_parent"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/categoriaLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:inputType="none"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:clickable="true"
-                android:longClickable="false"
-                android:textColor="@color/textColorPrimary" />
+                android:layout_weight="1"
+                android:hint="@string/label_categoria"
+                app:startIconDrawable="@drawable/ic_list"
+                app:startIconTint="@color/colorPrimary"
+                app:boxBackgroundColor="@color/surfaceColor"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp">
 
+                <AutoCompleteTextView
+                    android:id="@+id/autoCompleteCategoria"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:clickable="true"
+                    android:longClickable="false"
+                    android:textColor="@color/textColorPrimary" />
 
+            </com.google.android.material.textfield.TextInputLayout>
 
-        </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddNovaCategoria"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/dialog_nova_categoria_titulo"
+                android:padding="0dp"
+                app:icon="@drawable/ic_add"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="@color/white"
+                app:backgroundTint="@color/colorPrimary"
+                app:cornerRadius="16dp" />
+
+        </LinearLayout>
 
 
         <RadioGroup
@@ -205,7 +228,7 @@
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="@+id/guidelineEnd"
             app:layout_constraintStart_toStartOf="@+id/guidelineStart"
-            app:layout_constraintTop_toBottomOf="@+id/categoriaLayout">
+            app:layout_constraintTop_toBottomOf="@+id/containerCategoria">
 
 
             <RadioButton
