@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     app:cardCornerRadius="10dp"
@@ -24,7 +25,7 @@
             android:textColor="@color/textColorPrimary"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:text="Janeiro" />
+            tools:text="Janeiro" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -39,14 +40,14 @@
                 android:textColor="@color/colorPositive"
                 android:textSize="11sp"
                 android:textStyle="bold"
-                android:text="+0€" />
+                tools:text="0€" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/textColorSecondary"
                 android:textSize="11sp"
-                android:text="  |  " />
+                android:text="@string/marker_separator" />
 
             <TextView
                 android:id="@+id/tvMarkerDespesa"
@@ -55,7 +56,7 @@
                 android:textColor="@color/colorNegative"
                 android:textSize="11sp"
                 android:textStyle="bold"
-                android:text="-0€" />
+                tools:text="0€" />
         </LinearLayout>
 
     </LinearLayout>

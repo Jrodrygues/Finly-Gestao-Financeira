@@ -163,4 +163,5 @@
     <string name="label_ano">Ano</string>
     <string name="aviso_convidado_titulo">Aviso de Convidado</string>
     <string name="aviso_convidado_msg">Como convidado, os seus dados são locais. Deseja continuar?</string>
+    <string name="marker_separator">"  |  "</string>
 </resources>
