@@ -14,7 +14,7 @@ import java.util.*
 class NotificationWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
     override fun doWork(): Result {
-        val sharedPref = applicationContext.getSharedPreferences("PreferenciasDaMinhaApp", Context.MODE_PRIVATE)
+        val sharedPref = applicationContext.getSharedPreferences("FinlyAppPrefs", Context.MODE_PRIVATE)
         val notificationsEnabled = sharedPref.getBoolean("NOTIFICATIONS", false)
         val userEmail = sharedPref.getString("EMAIL", "") ?: ""
 

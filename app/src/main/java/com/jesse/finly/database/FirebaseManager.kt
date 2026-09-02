@@ -13,6 +13,7 @@ object FirebaseManager {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
     private var listenerTransacoes: ListenerRegistration? = null
+    private var listenerPerfil: ListenerRegistration? = null
 
     fun isUserLoggedIn() = auth.currentUser != null
     fun getCurrentUserEmail() = auth.currentUser?.email
@@ -41,9 +42,36 @@ object FirebaseManager {
             }
     }
 
+    /**
+     * Inicia a escuta em tempo real para o perfil (utilizador/categorias/configurações).
+     */
+    fun monitorarPerfil(email: String, onUpdate: (Utilizador) -> Unit) {
+        listenerPerfil?.remove()
+        val emailClean = email.trim().lowercase()
+        if (emailClean.isEmpty() || emailClean == "convidado") return
+
+        listenerPerfil = db.collection("utilizadores")
+            .document(emailClean)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.e("FirebaseManager", "Erro no listener de perfil: ${e.message}")
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val user = snapshot.toObject(Utilizador::class.java)
+                    if (user != null) {
+                        onUpdate(user)
+                    }
+                }
+            }
+    }
+
     fun pararMonitoramento() {
         listenerTransacoes?.remove()
         listenerTransacoes = null
+        listenerPerfil?.remove()
+        listenerPerfil = null
     }
 
     /**

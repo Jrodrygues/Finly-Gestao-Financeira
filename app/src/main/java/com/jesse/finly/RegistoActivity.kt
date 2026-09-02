@@ -199,17 +199,18 @@ class RegistoActivity : AppCompatActivity() {
 
 
 
+    override fun onResume() {
+        super.onResume()
+        configurarSpinners()
+    }
+
     private fun obterCategoriasDisponiveis(): MutableList<String> {
         val lista = mutableListOf(
             "Geral", "Habitação", "Alimentação", "Transporte", "Saúde", "Lazer",
             "Educação", "Compras", "Assinaturas", "Investimentos", "Poupança", "Exterior"
         )
-        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
-        val userEmail = prefs.getString("EMAIL", "") ?: ""
-        val emailClean = userEmail.trim().lowercase()
-
-        val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet()) ?: emptySet()
-        for (cat in customSet) {
+        val customList = obterCategoriasCustomizadas()
+        for (cat in customList) {
             if (cat.isNotBlank() && !lista.contains(cat)) {
                 lista.add(cat)
             }
@@ -219,20 +220,30 @@ class RegistoActivity : AppCompatActivity() {
     }
 
     private fun obterCategoriasCustomizadas(): MutableList<String> {
-        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
-        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val userEmail = prefs.getString(KEY_EMAIL, "") ?: ""
         val emailClean = userEmail.trim().lowercase()
 
-        val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet()) ?: emptySet()
-        return customSet.filter { it.isNotBlank() }.toMutableList()
+        var customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", null)
+
+        if (customSet == null) {
+            val oldPrefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+            val oldSet = oldPrefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", null)
+            if (!oldSet.isNullOrEmpty()) {
+                customSet = oldSet
+                prefs.edit { putStringSet("CUSTOM_CATEGORIES_$emailClean", oldSet) }
+            }
+        }
+
+        return (customSet ?: emptySet()).filter { it.isNotBlank() }.toMutableList()
     }
 
     private fun salvarNovaCategoria(nome: String) {
         val catClean = nome.trim()
         if (catClean.isEmpty()) return
 
-        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
-        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val userEmail = prefs.getString(KEY_EMAIL, "") ?: ""
         val emailClean = userEmail.trim().lowercase()
 
         val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet())?.toMutableSet() ?: mutableSetOf()
@@ -246,8 +257,8 @@ class RegistoActivity : AppCompatActivity() {
     }
 
     private fun removerCategoriaCustomizada(categoria: String) {
-        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
-        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val userEmail = prefs.getString(KEY_EMAIL, "") ?: ""
         val emailClean = userEmail.trim().lowercase()
 
         val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet())?.toMutableSet() ?: mutableSetOf()
@@ -263,33 +274,70 @@ class RegistoActivity : AppCompatActivity() {
     }
 
     private fun confirmarEliminacaoCategoria(categoria: String, onConfirm: () -> Unit) {
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Eliminar Categoria")
-            .setMessage("Tem a certeza que deseja eliminar a categoria '$categoria'?")
-            .setPositiveButton(getString(R.string.btn_sim_eliminar)) { _, _ ->
-                onConfirm()
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val userEmail = prefs.getString(KEY_EMAIL, "") ?: ""
+        val emailClean = userEmail.trim().lowercase()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
+            val transacoesAfetadas = db.utilizadorDao().obterTransacoesPorDono(emailClean)
+                .filter { it.categoria.equals(categoria, ignoreCase = true) }
+
+            withContext(Dispatchers.Main) {
+                if (transacoesAfetadas.isEmpty()) {
+                    MaterialAlertDialogBuilder(this@RegistoActivity)
+                        .setTitle("Eliminar Categoria")
+                        .setMessage("Tem a certeza que deseja eliminar a categoria '$categoria'?")
+                        .setPositiveButton(getString(R.string.btn_sim_eliminar)) { _, _ ->
+                            onConfirm()
+                        }
+                        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                } else {
+                    val quantidade = transacoesAfetadas.size
+                    MaterialAlertDialogBuilder(this@RegistoActivity)
+                        .setTitle("Categoria em Utilização")
+                        .setMessage("Existem $quantidade transação(ões) associada(s) à categoria '$categoria'. Se continuar, essas transações serão alteradas para a categoria 'Geral'. Deseja continuar?")
+                        .setPositiveButton("Sim, Alterar e Eliminar") { _, _ ->
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                transacoesAfetadas.forEach { trans ->
+                                    val transAtualizada = trans.copy(categoria = "Geral")
+                                    db.utilizadorDao().atualizarTransacao(transAtualizada)
+                                    FirebaseManager.salvarTransacaoNoFirestore(transAtualizada)
+                                }
+                                withContext(Dispatchers.Main) {
+                                    onConfirm()
+                                }
+                            }
+                        }
+                        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                }
             }
-            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+        }
     }
 
     private fun sincronizarCategoriasNuvem(customSet: Set<String>) {
-        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
-        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val userEmail = prefs.getString(KEY_EMAIL, "") ?: ""
         val emailClean = userEmail.trim().lowercase()
 
         if (emailClean.isNotEmpty() && emailClean != "convidado") {
             lifecycleScope.launch(Dispatchers.IO) {
                 val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
                 val user = db.utilizadorDao().buscarPorEmail(emailClean)
-                user?.let {
-                    val catStr = customSet.joinToString(",")
-                    val updatedUser = it.copy(customCategories = catStr)
-                    db.utilizadorDao().atualizarUtilizador(updatedUser)
-                    FirebaseManager.salvarUtilizadorNoFirestore(updatedUser)
-                }
+                val catStr = customSet.joinToString(",")
+                val updatedUser = user?.copy(customCategories = catStr) ?: Utilizador(
+                    email = emailClean,
+                    donoEmail = emailClean,
+                    customCategories = catStr
+                )
+                db.utilizadorDao().atualizarUtilizador(updatedUser)
+                FirebaseManager.salvarUtilizadorNoFirestore(updatedUser)
             }
         }
     }

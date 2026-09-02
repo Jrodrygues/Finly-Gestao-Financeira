@@ -43,6 +43,7 @@ import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.ActivityResumoBinding
 import com.jesse.finly.models.MetaPoupanca
+import com.jesse.finly.models.Utilizador
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.showToast
@@ -189,8 +190,30 @@ class ResumoActivity : AppCompatActivity() {
         if (email.isEmpty() || email == "CONVIDADO") return
         val emailClean = email.trim().lowercase()
 
+        // Escuta em tempo real para o perfil (incluindo categorias customizadas)
+        FirebaseManager.monitorarPerfil(emailClean) { perfilNuvem ->
+            lifecycleScope.launch(Dispatchers.IO) {
+                val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
+                val perfilLocal = db.utilizadorDao().buscarPorEmail(emailClean)
+                db.utilizadorDao().atualizarUtilizador(perfilNuvem.copy(id = perfilLocal?.id ?: perfilNuvem.id))
+
+                withContext(Dispatchers.Main) {
+                    val customSetNuvem = perfilNuvem.customCategories.split(",").map { it.trim() }.filter { it.isNotBlank() }.toSet()
+                    getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
+                        putBoolean("DARK_MODE", perfilNuvem.darkMode)
+                        putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
+                        putStringSet("CUSTOM_CATEGORIES_$emailClean", customSetNuvem)
+                    }
+                    AppCompatDelegate.setDefaultNightMode(
+                        if (perfilNuvem.darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO,
+                    )
+                    atualizarDrawerHeader()
+                }
+            }
+        }
+
         lifecycleScope.launch(Dispatchers.IO) {
-            // 1. sincronizar PERFIL (TEMA E NOTIFICAÇÕES Apenas)
+            // 1. sincronizar PERFIL inicial
             val perfilNuvem = FirebaseManager.obterPerfilDoFirestore(emailClean)
             if (perfilNuvem != null) {
                 val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
@@ -199,13 +222,11 @@ class ResumoActivity : AppCompatActivity() {
                 db.utilizadorDao().atualizarUtilizador(perfilNuvem.copy(id = perfilLocal?.id ?: perfilNuvem.id))
                 
                 withContext(Dispatchers.Main) {
-                    val customSetNuvem = perfilNuvem.customCategories.split(",").filter { it.isNotBlank() }.toSet()
+                    val customSetNuvem = perfilNuvem.customCategories.split(",").map { it.trim() }.filter { it.isNotBlank() }.toSet()
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                         putBoolean("DARK_MODE", perfilNuvem.darkMode)
                         putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
-                        if (customSetNuvem.isNotEmpty()) {
-                            putStringSet("CUSTOM_CATEGORIES_$emailClean", customSetNuvem)
-                        }
+                        putStringSet("CUSTOM_CATEGORIES_$emailClean", customSetNuvem)
                     }
                     AppCompatDelegate.setDefaultNightMode(
                         if (perfilNuvem.darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO,
@@ -277,19 +298,29 @@ class ResumoActivity : AppCompatActivity() {
     }
 
     private fun obterCategoriasCustomizadas(): MutableList<String> {
-        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val userEmail = prefs.getString("EMAIL", "") ?: ""
         val emailClean = userEmail.trim().lowercase()
 
-        val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet()) ?: emptySet()
-        return customSet.filter { it.isNotBlank() }.toMutableList()
+        var customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", null)
+
+        if (customSet == null) {
+            val oldPrefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+            val oldSet = oldPrefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", null)
+            if (!oldSet.isNullOrEmpty()) {
+                customSet = oldSet
+                prefs.edit { putStringSet("CUSTOM_CATEGORIES_$emailClean", oldSet) }
+            }
+        }
+
+        return (customSet ?: emptySet()).filter { it.isNotBlank() }.toMutableList()
     }
 
     private fun salvarNovaCategoria(nome: String) {
         val catClean = nome.trim()
         if (catClean.isEmpty()) return
 
-        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val userEmail = prefs.getString("EMAIL", "") ?: ""
         val emailClean = userEmail.trim().lowercase()
 
@@ -305,7 +336,7 @@ class ResumoActivity : AppCompatActivity() {
     }
 
     private fun removerCategoriaCustomizada(categoria: String) {
-        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val userEmail = prefs.getString("EMAIL", "") ?: ""
         val emailClean = userEmail.trim().lowercase()
 
@@ -321,16 +352,51 @@ class ResumoActivity : AppCompatActivity() {
     }
 
     private fun confirmarEliminacaoCategoria(categoria: String, onConfirm: () -> Unit) {
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Eliminar Categoria")
-            .setMessage("Tem a certeza que deseja eliminar a categoria '$categoria'?")
-            .setPositiveButton(getString(R.string.btn_sim_eliminar)) { _, _ ->
-                onConfirm()
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val emailClean = userEmail.trim().lowercase()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
+            val transacoesAfetadas = db.utilizadorDao().obterTransacoesPorDono(emailClean)
+                .filter { it.categoria.equals(categoria, ignoreCase = true) }
+
+            withContext(Dispatchers.Main) {
+                if (transacoesAfetadas.isEmpty()) {
+                    MaterialAlertDialogBuilder(this@ResumoActivity)
+                        .setTitle("Eliminar Categoria")
+                        .setMessage("Tem a certeza que deseja eliminar a categoria '$categoria'?")
+                        .setPositiveButton(getString(R.string.btn_sim_eliminar)) { _, _ ->
+                            onConfirm()
+                        }
+                        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                } else {
+                    val quantidade = transacoesAfetadas.size
+                    MaterialAlertDialogBuilder(this@ResumoActivity)
+                        .setTitle("Categoria em Utilização")
+                        .setMessage("Existem $quantidade transação(ões) associada(s) à categoria '$categoria'. Se continuar, essas transações serão alteradas para a categoria 'Geral'. Deseja continuar?")
+                        .setPositiveButton("Sim, Alterar e Eliminar") { _, _ ->
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                transacoesAfetadas.forEach { trans ->
+                                    val transAtualizada = trans.copy(categoria = "Geral")
+                                    db.utilizadorDao().atualizarTransacao(transAtualizada)
+                                    FirebaseManager.salvarTransacaoNoFirestore(transAtualizada)
+                                }
+                                withContext(Dispatchers.Main) {
+                                    onConfirm()
+                                }
+                            }
+                        }
+                        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                }
             }
-            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+        }
     }
 
     private fun sincronizarCategoriasNuvem(customSet: Set<String>) {
@@ -342,12 +408,14 @@ class ResumoActivity : AppCompatActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
                 val user = db.utilizadorDao().buscarPorEmail(emailClean)
-                user?.let {
-                    val catStr = customSet.joinToString(",")
-                    val updatedUser = it.copy(customCategories = catStr)
-                    db.utilizadorDao().atualizarUtilizador(updatedUser)
-                    FirebaseManager.salvarUtilizadorNoFirestore(updatedUser)
-                }
+                val catStr = customSet.joinToString(",")
+                val updatedUser = user?.copy(customCategories = catStr) ?: Utilizador(
+                    email = emailClean,
+                    donoEmail = emailClean,
+                    customCategories = catStr
+                )
+                db.utilizadorDao().atualizarUtilizador(updatedUser)
+                FirebaseManager.salvarUtilizadorNoFirestore(updatedUser)
             }
         }
     }
@@ -790,11 +858,11 @@ class ResumoActivity : AppCompatActivity() {
     }
 
     private fun configurarSpinners() {
-        val adapterMes = ArrayAdapter(this, android.R.layout.simple_spinner_item, meses)
+        val adapterMes = ArrayAdapter(this, R.layout.spinner_selected_item, meses)
         adapterMes.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerMes.adapter = adapterMes
 
-        val adapterAno = ArrayAdapter(this, android.R.layout.simple_spinner_item, anos)
+        val adapterAno = ArrayAdapter(this, R.layout.spinner_selected_item, anos)
         adapterAno.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerAno.adapter = adapterAno
 
