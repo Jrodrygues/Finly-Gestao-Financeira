@@ -696,12 +696,12 @@ class ResumoActivity : AppCompatActivity() {
             canvas.drawText("RESUMO DE DESPESAS POR CATEGORIA", 30f, currentY, textBoldPaint)
             currentY += 12f
 
-            canvas.drawRoundRect(30f, currentY, 565f, currentY + 20f, 4f, 4f, tableHeaderPaint)
-            val miniHeaderY = currentY + 14f
+            canvas.drawRoundRect(30f, currentY, 565f, currentY + 22f, 4f, 4f, tableHeaderPaint)
+            val miniHeaderY = currentY + 15f
             canvas.drawText("Categoria", 40f, miniHeaderY, tableHeaderCellPaint)
             canvas.drawText("Total Gasto", 320f, miniHeaderY, tableHeaderCellPaint)
             canvas.drawText("% do Total", 460f, miniHeaderY, tableHeaderCellPaint)
-            currentY += 26f
+            currentY += 34f
 
             for ((cat, totalCat) in gastosPorCategoria) {
                 if (currentY > 780f) {
