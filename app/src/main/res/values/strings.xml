@@ -171,11 +171,15 @@
     <string name="default_year">2026</string>
     <string name="default_value_currency">0,00 €</string>
 
-    <!-- Nova Categoria -->
-    <string name="hint_nova_categoria">Nome da Categoria (ex: Animais, Viagens)</string>
+    <!-- Nova Categoria & Gestão -->
+    <string name="hint_nova_categoria">Nome da Categoria (ex: Mascotas, Viagens)</string>
     <string name="dialog_nova_categoria_titulo">Nova Categoria</string>
     <string name="btn_adicionar">ADICIONAR</string>
-    <string name="option_nova_categoria">+ Nova Categoria&#8230;</string>
+    <string name="option_nova_categoria">⚙️ Gerir Categorias&#8230;</string>
+    <string name="titulo_gerir_categorias">Gerir Categorias</string>
+    <string name="label_categorias_personalizadas">As Minhas Categorias Personalizadas</string>
+    <string name="sem_categorias_custom">Ainda não adicionou categorias personalizadas.</string>
     <string name="toast_categoria_adicionada">Categoria \'%1$s\' adicionada!</string>
+    <string name="toast_categoria_removida">Categoria \'%1$s\' removida!</string>
 </resources>
 

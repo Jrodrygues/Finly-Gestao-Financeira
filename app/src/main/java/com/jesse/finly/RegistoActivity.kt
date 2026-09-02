@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.core.content.edit
@@ -30,7 +32,8 @@ import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Locale
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 
 class RegistoActivity : AppCompatActivity() {
@@ -213,6 +216,15 @@ class RegistoActivity : AppCompatActivity() {
         return lista
     }
 
+    private fun obterCategoriasCustomizadas(): MutableList<String> {
+        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val emailClean = userEmail.trim().lowercase()
+
+        val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet()) ?: emptySet()
+        return customSet.filter { it.isNotBlank() }.toMutableList()
+    }
+
     private fun salvarNovaCategoria(nome: String) {
         val catClean = nome.trim()
         if (catClean.isEmpty()) return
@@ -230,25 +242,74 @@ class RegistoActivity : AppCompatActivity() {
         showToast(getString(R.string.toast_categoria_adicionada, catClean))
     }
 
-    private fun mostrarDialogNovaCategoria() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_nova_categoria, null)
-        val etNovaCategoria = dialogView.findViewById<TextInputEditText>(R.id.novaCategoriaEditText)
+    private fun removerCategoriaCustomizada(categoria: String) {
+        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val emailClean = userEmail.trim().lowercase()
 
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.dialog_nova_categoria_titulo))
-            .setView(dialogView)
-            .setPositiveButton(getString(R.string.btn_adicionar)) { _, _ ->
-                val novaCat = etNovaCategoria.text.toString().trim()
-                if (novaCat.isNotEmpty()) {
-                    salvarNovaCategoria(novaCat)
-                } else {
-                    showToast("Por favor, digite o nome da categoria")
+        val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet())?.toMutableSet() ?: mutableSetOf()
+        customSet.remove(categoria)
+        prefs.edit { putStringSet("CUSTOM_CATEGORIES_$emailClean", customSet) }
+
+        configurarSpinners()
+        val lista = obterCategoriasDisponiveis()
+        val primeiraValida = lista.firstOrNull { it != getString(R.string.option_nova_categoria) } ?: "Geral"
+        binding.autoCompleteCategoria.setText(primeiraValida, false)
+        showToast(getString(R.string.toast_categoria_removida, categoria))
+    }
+
+    private fun mostrarBottomSheetGerirCategorias() {
+        val bottomSheetDialog = BottomSheetDialog(this)
+        val bsView = layoutInflater.inflate(R.layout.bottom_sheet_gerir_categorias, binding.root, false)
+        bottomSheetDialog.setContentView(bsView)
+
+        val etNova = bsView.findViewById<TextInputEditText>(R.id.etNovaCategoriaBS)
+        val btnAdd = bsView.findViewById<MaterialButton>(R.id.btnAdicionarCategoriaBS)
+        val btnFechar = bsView.findViewById<MaterialButton>(R.id.btnFecharBS)
+        val containerCustom = bsView.findViewById<LinearLayout>(R.id.containerCategoriasCustom)
+        val tvSemCategorias = bsView.findViewById<TextView>(R.id.tvSemCategoriasCustom)
+
+        fun atualizarListaCustom() {
+            containerCustom.removeAllViews()
+            val customList = obterCategoriasCustomizadas()
+
+            if (customList.isEmpty()) {
+                tvSemCategorias.visibility = View.VISIBLE
+            } else {
+                tvSemCategorias.visibility = View.GONE
+                for (cat in customList) {
+                    val itemView = layoutInflater.inflate(R.layout.item_categoria_custom, containerCustom, false)
+                    val tvNome = itemView.findViewById<TextView>(R.id.tvNomeCategoriaCustom)
+                    val btnRemover = itemView.findViewById<View>(R.id.btnRemoverCategoriaCustom)
+
+                    tvNome.text = cat
+                    btnRemover.setOnClickListener {
+                        removerCategoriaCustomizada(cat)
+                        atualizarListaCustom()
+                    }
+                    containerCustom.addView(itemView)
                 }
             }
-            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
-                dialog.dismiss()
+        }
+
+        atualizarListaCustom()
+
+        btnAdd.setOnClickListener {
+            val novaCat = etNova.text.toString().trim()
+            if (novaCat.isNotEmpty()) {
+                salvarNovaCategoria(novaCat)
+                etNova.setText("")
+                atualizarListaCustom()
+            } else {
+                showToast("Digite o nome da categoria")
             }
-            .show()
+        }
+
+        btnFechar.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.show()
     }
 
     private fun configurarSpinners() {
@@ -259,14 +320,10 @@ class RegistoActivity : AppCompatActivity() {
         binding.autoCompleteCategoria.setOnItemClickListener { _, _, position, _ ->
             val selecionada = adapterCat.getItem(position)
             if (selecionada == getString(R.string.option_nova_categoria)) {
-                val primeiraValida = listaCategorias.firstOrNull { it != getString(R.string.option_nova_categoria) } ?: ""
+                val primeiraValida = listaCategorias.firstOrNull { it != getString(R.string.option_nova_categoria) } ?: "Geral"
                 binding.autoCompleteCategoria.setText(primeiraValida, false)
-                mostrarDialogNovaCategoria()
+                mostrarBottomSheetGerirCategorias()
             }
-        }
-
-        binding.btnAddNovaCategoria.setOnClickListener {
-            mostrarDialogNovaCategoria()
         }
     }
 
