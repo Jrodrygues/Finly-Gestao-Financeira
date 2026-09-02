@@ -35,6 +35,7 @@ import java.util.Locale
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 
 class RegistoActivity : AppCompatActivity() {
@@ -261,6 +262,19 @@ class RegistoActivity : AppCompatActivity() {
         showToast(getString(R.string.toast_categoria_removida, categoria))
     }
 
+    private fun confirmarEliminacaoCategoria(categoria: String, onConfirm: () -> Unit) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Eliminar Categoria")
+            .setMessage("Tem a certeza que deseja eliminar a categoria '$categoria'?")
+            .setPositiveButton(getString(R.string.btn_sim_eliminar)) { _, _ ->
+                onConfirm()
+            }
+            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
     private fun sincronizarCategoriasNuvem(customSet: Set<String>) {
         val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
         val userEmail = prefs.getString("EMAIL", "") ?: ""
@@ -309,8 +323,10 @@ class RegistoActivity : AppCompatActivity() {
 
                     tvNome.text = cat
                     btnRemover.setOnClickListener {
-                        removerCategoriaCustomizada(cat)
-                        atualizarListaCustom()
+                        confirmarEliminacaoCategoria(cat) {
+                            removerCategoriaCustomizada(cat)
+                            atualizarListaCustom()
+                        }
                     }
                     containerCustom.addView(itemView)
                 }

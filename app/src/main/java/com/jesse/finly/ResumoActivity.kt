@@ -320,6 +320,19 @@ class ResumoActivity : AppCompatActivity() {
         carregarDados(mesSel, anoSel)
     }
 
+    private fun confirmarEliminacaoCategoria(categoria: String, onConfirm: () -> Unit) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Eliminar Categoria")
+            .setMessage("Tem a certeza que deseja eliminar a categoria '$categoria'?")
+            .setPositiveButton(getString(R.string.btn_sim_eliminar)) { _, _ ->
+                onConfirm()
+            }
+            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
     private fun sincronizarCategoriasNuvem(customSet: Set<String>) {
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val userEmail = prefs.getString("EMAIL", "") ?: ""
@@ -368,8 +381,10 @@ class ResumoActivity : AppCompatActivity() {
 
                     tvNome.text = cat
                     btnRemover.setOnClickListener {
-                        removerCategoriaCustomizada(cat)
-                        atualizarListaCustom()
+                        confirmarEliminacaoCategoria(cat) {
+                            removerCategoriaCustomizada(cat)
+                            atualizarListaCustom()
+                        }
                     }
                     containerCustom.addView(itemView)
                 }
