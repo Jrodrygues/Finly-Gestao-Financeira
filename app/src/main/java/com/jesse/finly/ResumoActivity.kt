@@ -2,9 +2,9 @@ package com.jesse.finly
 
 import android.content.ContentValues
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.os.Build
@@ -415,17 +415,14 @@ class ResumoActivity : AppCompatActivity() {
             c.drawText("Finly", 30f, 40f, titlePaint)
             c.drawText("Relatório Financeiro Mensal • $mes / $ano", 30f, 62f, subtitlePaint)
 
-            // Logo de alta resolução sem perda de qualidade
-            val logo = loadHighResBitmap(R.drawable.ic_logo_full_transp)
-                ?: loadHighResBitmap(R.drawable.ic_logo_full)
-            logo?.let {
-                val bitmapPaint = Paint().apply {
-                    isFilterBitmap = true
-                    isAntiAlias = true
-                }
-                val destRect = android.graphics.RectF(490f, 10f, 565f, 75f)
-                c.drawBitmap(it, null, destRect, bitmapPaint)
+            // Logo vetorial (SVG) desenhado diretamente no Canvas do PDF (Qualidade 100% Cristalina)
+            val logoVector = ContextCompat.getDrawable(this, R.drawable.ic_logo_full_transp)
+                ?: ContextCompat.getDrawable(this, R.drawable.ic_logo_full)
+            logoVector?.let {
+                it.setBounds(490, 10, 565, 75)
+                it.draw(c)
             }
+
 
 
 
@@ -543,6 +540,7 @@ class ResumoActivity : AppCompatActivity() {
         val nomeFicheiro = "Relatorio_${mes}_$ano.pdf"
         try {
             val resolver = contentResolver
+
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, nomeFicheiro)
                 put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
@@ -572,26 +570,8 @@ class ResumoActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadHighResBitmap(drawableId: Int): Bitmap? {
-        val drawable = ContextCompat.getDrawable(this, drawableId) ?: return null
-        return if (drawable is android.graphics.drawable.BitmapDrawable) {
-            drawable.bitmap
-        } else {
-            val width = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else 300
-            val height = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else 300
-            val bitmap = createBitmap(width, height)
-            val canvas = Canvas(bitmap)
-            drawable.setBounds(0, 0, width, height)
-            drawable.draw(canvas)
-            bitmap
-        }
-    }
-
-
-
-
-
     override fun onResume() {
+
         super.onResume()
         ativarSincronizacaoTempoReal()
         prosseguirComCarregamento()
