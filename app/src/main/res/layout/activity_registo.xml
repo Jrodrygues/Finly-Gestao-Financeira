@@ -237,20 +237,20 @@
             app:layout_constraintStart_toStartOf="@+id/guidelineStart"
             app:layout_constraintTop_toBottomOf="@+id/rgTipo">
 
-            <CheckBox
+            <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/cbRepetirSempre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/cb_repetir_sempre"
-                android:buttonTint="@color/colorPrimary"
+                app:buttonTint="@color/colorPrimary"
                 android:textColor="@color/textColorPrimary" />
 
-            <CheckBox
+            <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/cbRepetirVezes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/cb_repetir_vezes"
-                android:buttonTint="@color/colorPrimary"
+                app:buttonTint="@color/colorPrimary"
                 android:textColor="@color/textColorPrimary" />
 
             <!-- Opção de parcelas -->

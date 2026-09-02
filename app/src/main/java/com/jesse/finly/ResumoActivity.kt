@@ -15,6 +15,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -34,7 +35,10 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.utils.ColorTemplate
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.ActivityResumoBinding
@@ -246,6 +250,9 @@ class ResumoActivity : AppCompatActivity() {
                 R.id.nav_evolucao -> {
                     startActivity(Intent(this@ResumoActivity, EvolucaoAnualActivity::class.java))
                 }
+                R.id.nav_gerir_categorias -> {
+                    mostrarBottomSheetGerirCategorias()
+                }
                 R.id.nav_exportar -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         exportarParaPDF()
@@ -263,6 +270,102 @@ class ResumoActivity : AppCompatActivity() {
 
         // 2. Carregar dados do cabeçalho
         atualizarDrawerHeader()
+    }
+
+    private fun obterCategoriasCustomizadas(): MutableList<String> {
+        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val emailClean = userEmail.trim().lowercase()
+
+        val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet()) ?: emptySet()
+        return customSet.filter { it.isNotBlank() }.toMutableList()
+    }
+
+    private fun salvarNovaCategoria(nome: String) {
+        val catClean = nome.trim()
+        if (catClean.isEmpty()) return
+
+        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val emailClean = userEmail.trim().lowercase()
+
+        val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet())?.toMutableSet() ?: mutableSetOf()
+        customSet.add(catClean)
+        prefs.edit { putStringSet("CUSTOM_CATEGORIES_$emailClean", customSet) }
+
+        showToast(getString(R.string.toast_categoria_adicionada, catClean))
+        val mesSel = binding.spinnerMes.selectedItem?.toString() ?: "Janeiro"
+        val anoSel = binding.spinnerAno.selectedItem?.toString()?.toIntOrNull() ?: 2026
+        carregarDados(mesSel, anoSel)
+    }
+
+    private fun removerCategoriaCustomizada(categoria: String) {
+        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val emailClean = userEmail.trim().lowercase()
+
+        val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet())?.toMutableSet() ?: mutableSetOf()
+        customSet.remove(categoria)
+        prefs.edit { putStringSet("CUSTOM_CATEGORIES_$emailClean", customSet) }
+
+        showToast(getString(R.string.toast_categoria_removida, categoria))
+        val mesSel = binding.spinnerMes.selectedItem?.toString() ?: "Janeiro"
+        val anoSel = binding.spinnerAno.selectedItem?.toString()?.toIntOrNull() ?: 2026
+        carregarDados(mesSel, anoSel)
+    }
+
+    private fun mostrarBottomSheetGerirCategorias() {
+        val bottomSheetDialog = BottomSheetDialog(this)
+        val bsView = layoutInflater.inflate(R.layout.bottom_sheet_gerir_categorias, binding.drawerLayout, false)
+        bottomSheetDialog.setContentView(bsView)
+
+        val etNova = bsView.findViewById<TextInputEditText>(R.id.etNovaCategoriaBS)
+        val btnAdd = bsView.findViewById<MaterialButton>(R.id.btnAdicionarCategoriaBS)
+        val btnFechar = bsView.findViewById<MaterialButton>(R.id.btnFecharBS)
+        val containerCustom = bsView.findViewById<LinearLayout>(R.id.containerCategoriasCustom)
+        val tvSemCategorias = bsView.findViewById<TextView>(R.id.tvSemCategoriasCustom)
+
+        fun atualizarListaCustom() {
+            containerCustom.removeAllViews()
+            val customList = obterCategoriasCustomizadas()
+
+            if (customList.isEmpty()) {
+                tvSemCategorias.visibility = View.VISIBLE
+            } else {
+                tvSemCategorias.visibility = View.GONE
+                for (cat in customList) {
+                    val itemView = layoutInflater.inflate(R.layout.item_categoria_custom, containerCustom, false)
+                    val tvNome = itemView.findViewById<TextView>(R.id.tvNomeCategoriaCustom)
+                    val btnRemover = itemView.findViewById<View>(R.id.btnRemoverCategoriaCustom)
+
+                    tvNome.text = cat
+                    btnRemover.setOnClickListener {
+                        removerCategoriaCustomizada(cat)
+                        atualizarListaCustom()
+                    }
+                    containerCustom.addView(itemView)
+                }
+            }
+        }
+
+        atualizarListaCustom()
+
+        btnAdd.setOnClickListener {
+            val novaCat = etNova.text.toString().trim()
+            if (novaCat.isNotEmpty()) {
+                salvarNovaCategoria(novaCat)
+                etNova.setText("")
+                atualizarListaCustom()
+            } else {
+                showToast("Digite o nome da categoria")
+            }
+        }
+
+        btnFechar.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.show()
     }
 
     private fun atualizarDrawerHeader() {

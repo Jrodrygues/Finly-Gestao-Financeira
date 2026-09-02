@@ -27,6 +27,10 @@
     <item android:title="@string/accoes">
         <menu>
             <item
+                android:id="@+id/nav_gerir_categorias"
+                android:icon="@drawable/ic_list"
+                android:title="@string/titulo_gerir_categorias" />
+            <item
                 android:id="@+id/nav_exportar"
                 android:icon="@drawable/ic_pdf"
                 android:title="@string/menu_exportar" />
