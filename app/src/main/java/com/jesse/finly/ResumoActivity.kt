@@ -48,6 +48,7 @@ import com.jesse.finly.databinding.ActivityResumoBinding
 import com.jesse.finly.models.MetaPoupanca
 import com.jesse.finly.models.Utilizador
 import com.jesse.finly.models.Transacao
+import com.jesse.finly.utils.showToast
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.showToast
 import kotlinx.coroutines.Dispatchers
@@ -642,13 +643,13 @@ class ResumoActivity : AppCompatActivity() {
             c.drawText("Finly", 30f, 40f, titlePaint)
             c.drawText("Relatório Financeiro Mensal • $mes / $ano", 30f, 62f, subtitlePaint)
 
-            // Logo vetorial de altíssima definição (Renderizado a 4x para evitar pixelização ao fazer zoom)
-            val logoVector = ContextCompat.getDrawable(this, R.drawable.ic_logo_full_transp)
-                ?: ContextCompat.getDrawable(this, R.drawable.ic_logo_full)
+            // Logo ícone vetorial de altíssima definição (Renderizado a 6x para nitidez cristalina ao fazer zoom no PDF)
+            val logoVector = ContextCompat.getDrawable(this, R.drawable.ic_logo_finly_transp)
+                ?: ContextCompat.getDrawable(this, R.drawable.ic_logo_finly)
             logoVector?.let { drawable ->
-                val scale = 4
-                val width = (565 - 490) * scale
-                val height = (75 - 10) * scale
+                val scale = 6
+                val width = (565 - 505) * scale // 360px
+                val height = (72 - 12) * scale  // 360px
                 val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
                 val bitmapCanvas = Canvas(bitmap)
                 drawable.setBounds(0, 0, width, height)
@@ -659,7 +660,7 @@ class ResumoActivity : AppCompatActivity() {
                     isFilterBitmap = true
                     isDither = true
                 }
-                c.drawBitmap(bitmap, null, RectF(490f, 10f, 565f, 75f), logoPaint)
+                c.drawBitmap(bitmap, null, RectF(505f, 12f, 565f, 72f), logoPaint)
             }
 
             c.drawLine(30f, 810f, 565f, 810f, linePaint)
@@ -824,7 +825,7 @@ class ResumoActivity : AppCompatActivity() {
             canvas.drawText("Nenhuma despesa registada para este período.", 40f, currentY, labelPaint)
             currentY += rowHeight
         } else {
-            for (t in despesas) {
+            for (t in despesasOrdenadas) {
                 checkPageBreak(rowHeight)
 
                 val itemNomeStr = if (t.recorrente && t.parcelasTotais > 0) {
