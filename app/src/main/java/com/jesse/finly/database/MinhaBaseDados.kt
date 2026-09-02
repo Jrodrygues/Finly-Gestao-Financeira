@@ -9,7 +9,7 @@ import com.jesse.finly.models.MetaPoupanca
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.models.Utilizador
 
-@Database(entities = [Utilizador::class, Transacao::class, MetaPoupanca::class], version = 20) // Versão 20: Cleanup final, removido fotoUri definitivamente
+@Database(entities = [Utilizador::class, Transacao::class, MetaPoupanca::class], version = 21)
 abstract class MinhaBaseDados: RoomDatabase() {
     abstract fun utilizadorDao(): UtilizadorDAO
 

@@ -395,7 +395,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             }
             
             dialog.setContentView(view)
-            dialog.window?.setDimAmount(0.85f)
+            dialog.window?.setDimAmount(0.90f)
             dialog.show()
         } else {
             val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
@@ -414,7 +414,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             }
 
             dialog.setContentView(view)
-            dialog.window?.setDimAmount(0.85f)
+            dialog.window?.setDimAmount(0.90f)
             dialog.show()
         }
     }

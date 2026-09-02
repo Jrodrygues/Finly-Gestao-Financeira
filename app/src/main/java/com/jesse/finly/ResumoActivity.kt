@@ -199,9 +199,13 @@ class ResumoActivity : AppCompatActivity() {
                 db.utilizadorDao().atualizarUtilizador(perfilNuvem.copy(id = perfilLocal?.id ?: perfilNuvem.id))
                 
                 withContext(Dispatchers.Main) {
+                    val customSetNuvem = perfilNuvem.customCategories.split(",").filter { it.isNotBlank() }.toSet()
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                         putBoolean("DARK_MODE", perfilNuvem.darkMode)
                         putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
+                        if (customSetNuvem.isNotEmpty()) {
+                            putStringSet("CUSTOM_CATEGORIES_$emailClean", customSetNuvem)
+                        }
                     }
                     AppCompatDelegate.setDefaultNightMode(
                         if (perfilNuvem.darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO,
@@ -293,6 +297,7 @@ class ResumoActivity : AppCompatActivity() {
         customSet.add(catClean)
         prefs.edit { putStringSet("CUSTOM_CATEGORIES_$emailClean", customSet) }
 
+        sincronizarCategoriasNuvem(customSet)
         showToast(getString(R.string.toast_categoria_adicionada, catClean))
         val mesSel = binding.spinnerMes.selectedItem?.toString() ?: "Janeiro"
         val anoSel = binding.spinnerAno.selectedItem?.toString()?.toIntOrNull() ?: 2026
@@ -308,10 +313,30 @@ class ResumoActivity : AppCompatActivity() {
         customSet.remove(categoria)
         prefs.edit { putStringSet("CUSTOM_CATEGORIES_$emailClean", customSet) }
 
+        sincronizarCategoriasNuvem(customSet)
         showToast(getString(R.string.toast_categoria_removida, categoria))
         val mesSel = binding.spinnerMes.selectedItem?.toString() ?: "Janeiro"
         val anoSel = binding.spinnerAno.selectedItem?.toString()?.toIntOrNull() ?: 2026
         carregarDados(mesSel, anoSel)
+    }
+
+    private fun sincronizarCategoriasNuvem(customSet: Set<String>) {
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val emailClean = userEmail.trim().lowercase()
+
+        if (emailClean.isNotEmpty() && emailClean != "convidado") {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
+                val user = db.utilizadorDao().buscarPorEmail(emailClean)
+                user?.let {
+                    val catStr = customSet.joinToString(",")
+                    val updatedUser = it.copy(customCategories = catStr)
+                    db.utilizadorDao().atualizarUtilizador(updatedUser)
+                    FirebaseManager.salvarUtilizadorNoFirestore(updatedUser)
+                }
+            }
+        }
     }
 
     private fun mostrarBottomSheetGerirCategorias() {

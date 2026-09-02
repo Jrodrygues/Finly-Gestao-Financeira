@@ -238,6 +238,7 @@ class RegistoActivity : AppCompatActivity() {
         customSet.add(catClean)
         prefs.edit { putStringSet("CUSTOM_CATEGORIES_$emailClean", customSet) }
 
+        sincronizarCategoriasNuvem(customSet)
         configurarSpinners()
         binding.autoCompleteCategoria.setText(catClean, false)
         showToast(getString(R.string.toast_categoria_adicionada, catClean))
@@ -252,11 +253,31 @@ class RegistoActivity : AppCompatActivity() {
         customSet.remove(categoria)
         prefs.edit { putStringSet("CUSTOM_CATEGORIES_$emailClean", customSet) }
 
+        sincronizarCategoriasNuvem(customSet)
         configurarSpinners()
         val lista = obterCategoriasDisponiveis()
         val primeiraValida = lista.firstOrNull { it != getString(R.string.option_nova_categoria) } ?: "Geral"
         binding.autoCompleteCategoria.setText(primeiraValida, false)
         showToast(getString(R.string.toast_categoria_removida, categoria))
+    }
+
+    private fun sincronizarCategoriasNuvem(customSet: Set<String>) {
+        val prefs = getSharedPreferences("PreferenciasDaMinhaApp", MODE_PRIVATE)
+        val userEmail = prefs.getString("EMAIL", "") ?: ""
+        val emailClean = userEmail.trim().lowercase()
+
+        if (emailClean.isNotEmpty() && emailClean != "convidado") {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
+                val user = db.utilizadorDao().buscarPorEmail(emailClean)
+                user?.let {
+                    val catStr = customSet.joinToString(",")
+                    val updatedUser = it.copy(customCategories = catStr)
+                    db.utilizadorDao().atualizarUtilizador(updatedUser)
+                    FirebaseManager.salvarUtilizadorNoFirestore(updatedUser)
+                }
+            }
+        }
     }
 
     private fun mostrarBottomSheetGerirCategorias() {

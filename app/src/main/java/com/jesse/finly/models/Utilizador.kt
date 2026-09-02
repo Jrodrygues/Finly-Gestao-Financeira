@@ -13,5 +13,6 @@ data class Utilizador (
     val donoEmail: String = "SISTEMA",
     val senha: String = "",
     val darkMode: Boolean = false,
-    val notifications: Boolean = false
+    val notifications: Boolean = false,
+    @ColumnInfo(name = "custom_categories") val customCategories: String = ""
 )
