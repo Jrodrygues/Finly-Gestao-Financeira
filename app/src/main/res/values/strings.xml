@@ -1,4 +1,5 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="Typos,Spelling">
+
     <string name="app_name">Finly</string>
     <string name="menu_resumo">Resumo Mensal</string>
     <string name="menu_planilha">Ver Listagem</string>
@@ -85,7 +86,8 @@
     <string name="btn_exportar_pdf">EXPORTAR RELATÓRIO PDF</string>
 
     <!-- Listagem (Home) -->
-    <string name="hint_pesquisar">Pesquisar...</string>
+    <string name="hint_pesquisar">Pesquisar&#8230;</string>
+
     <string name="tab_todas">TODAS</string>
     <string name="tab_despesas">DESPESAS</string>
     <string name="tab_rendas">RENDAS</string>
@@ -164,4 +166,7 @@
     <string name="aviso_convidado_titulo">Aviso de Convidado</string>
     <string name="aviso_convidado_msg">Como convidado, os seus dados são locais. Deseja continuar?</string>
     <string name="marker_separator">"  |  "</string>
+    <string name="default_year">2026</string>
+    <string name="default_value_currency">0,00 €</string>
 </resources>
+
