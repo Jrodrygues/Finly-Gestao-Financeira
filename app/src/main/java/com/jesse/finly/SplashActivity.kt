@@ -11,6 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
+import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,6 +37,11 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_splash)
+
+        // Limpeza de segurança: Garante que documentos do modo convidado não fiquem guardados na nuvem
+        lifecycleScope.launch(Dispatchers.IO) {
+            FirebaseManager.limparConvidadoDoFirestore()
+        }
 
         // Aguarda 2 segundos e decide o ecrã seguinte
         Handler(Looper.getMainLooper()).postDelayed(

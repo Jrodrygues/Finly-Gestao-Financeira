@@ -19,15 +19,26 @@ object FirebaseManager {
     fun getCurrentUserEmail() = auth.currentUser?.email
 
     /**
+     * Verifica se o e-mail pertence ao modo Convidado ou Sistema local.
+     * Dados de convidados NUNCA devem ir para o Firebase.
+     */
+    fun isGuestEmail(email: String?): Boolean {
+        if (email.isNullOrBlank()) return true
+        val clean = email.trim().lowercase()
+        return clean == "convidado" || clean == "sistema"
+    }
+
+    /**
      * Inicia a escuta em tempo real para as transações do utilizador.
      * Sempre que algo mudar no Firebase, a função onUpdate será chamada.
      */
     fun monitorarTransacoes(email: String, onUpdate: (List<Transacao>) -> Unit) {
-        // Remover listener anterior se existir para evitar duplicados
         listenerTransacoes?.remove()
+        val emailClean = email.trim().lowercase()
+        if (isGuestEmail(emailClean)) return
 
         listenerTransacoes = db.collection("utilizadores")
-            .document(email.trim().lowercase())
+            .document(emailClean)
             .collection("transacoes")
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
@@ -48,7 +59,7 @@ object FirebaseManager {
     fun monitorarPerfil(email: String, onUpdate: (Utilizador) -> Unit) {
         listenerPerfil?.remove()
         val emailClean = email.trim().lowercase()
-        if (emailClean.isEmpty() || emailClean == "convidado") return
+        if (isGuestEmail(emailClean)) return
 
         listenerPerfil = db.collection("utilizadores")
             .document(emailClean)
@@ -76,11 +87,11 @@ object FirebaseManager {
 
     /**
      * Sincroniza um utilizador local para o Firestore após o registo ou alteração de perfil.
-     * ISOLA a foto de perfil: Mantém o que já está na nuvem, ignorando caminhos locais.
      */
     suspend fun salvarUtilizadorNoFirestore(utilizador: Utilizador) {
         val email = utilizador.email.trim().lowercase()
-        
+        if (isGuestEmail(email) || isGuestEmail(utilizador.donoEmail)) return
+
         try {
             db.collection("utilizadores")
                 .document(email)
@@ -96,8 +107,8 @@ object FirebaseManager {
      */
     suspend fun salvarTransacaoNoFirestore(transacao: Transacao) {
         val email = transacao.donoEmail.trim().lowercase()
-        // Usamos o ID local como nome do documento para facilitar a atualização, 
-        // mas no Firestore o ID será string.
+        if (isGuestEmail(email)) return
+
         try {
             db.collection("utilizadores")
                 .document(email)
@@ -115,6 +126,8 @@ object FirebaseManager {
      */
     suspend fun eliminarTransacaoDoFirestore(transacao: Transacao) {
         val email = transacao.donoEmail.trim().lowercase()
+        if (isGuestEmail(email)) return
+
         try {
             db.collection("utilizadores")
                 .document(email)
@@ -131,12 +144,15 @@ object FirebaseManager {
      * Descarrega os dados do perfil do utilizador do Firestore.
      */
     suspend fun obterPerfilDoFirestore(email: String): Utilizador? {
+        val emailClean = email.trim().lowercase()
+        if (isGuestEmail(emailClean)) return null
+
         return try {
             val snapshot = db.collection("utilizadores")
-                .document(email.trim().lowercase())
+                .document(emailClean)
                 .get()
                 .await()
-            
+
             snapshot.toObject(Utilizador::class.java)
         } catch (e: Exception) {
             Log.e("FirebaseManager", "Erro ao obter perfil: ${e.message}")
@@ -146,44 +162,35 @@ object FirebaseManager {
 
     /**
      * Move todos os dados de um e-mail para outro no Firestore.
-     * Usado quando o utilizador edita o seu próprio e-mail.
      */
     suspend fun migrarDadosDeEmail(emailAntigo: String, emailNovo: String) {
         val old = emailAntigo.trim().lowercase()
         val new = emailNovo.trim().lowercase()
-        if (old == new) return
+        if (old == new || isGuestEmail(old) || isGuestEmail(new)) return
 
         try {
             val oldUserRef = db.collection("utilizadores").document(old)
             val newUserRef = db.collection("utilizadores").document(new)
 
-            // 1. Obter Transações e Metas da "pasta" antiga
             val transacoesSnapshot = oldUserRef.collection("transacoes").get().await()
             val metasSnapshot = oldUserRef.collection("metas").get().await()
 
-            // 2. Usar um Batch para migrar tudo de uma vez
             db.runBatch { batch ->
-                // Migrar Transações
                 transacoesSnapshot.forEach { doc ->
                     val trans = doc.toObject(Transacao::class.java).copy(donoEmail = emailNovo)
-                    // Garantimos que o documento existe no novo local
                     batch.set(newUserRef.collection("transacoes").document(doc.id), trans)
-                    // Apagamos do antigo
                     batch.delete(doc.reference)
                 }
-                
-                // Migrar Metas
+
                 metasSnapshot.forEach { doc ->
                     val meta = doc.toObject(MetaPoupanca::class.java).copy(donoEmail = emailNovo)
                     batch.set(newUserRef.collection("metas").document(doc.id), meta)
                     batch.delete(doc.reference)
                 }
-                
-                // IMPORTANTE: Criar o documento do utilizador no novo local antes de apagar o antigo
-                // Se o documento de perfil novo já foi criado pelo RegistoActivity, o Batch apenas o atualizará
+
                 batch.delete(oldUserRef)
             }.await()
-            
+
             Log.d("FirebaseManager", "Migração total concluída: $old -> $new")
         } catch (e: Exception) {
             Log.e("FirebaseManager", "Erro na migração de e-mail: ${e.message}")
@@ -194,13 +201,16 @@ object FirebaseManager {
      * Descarrega todas as transações do Firestore para o Room (Sync inicial).
      */
     suspend fun descarregarTransacoesDoFirestore(email: String): List<Transacao> {
+        val emailClean = email.trim().lowercase()
+        if (isGuestEmail(emailClean)) return emptyList()
+
         return try {
             val snapshot = db.collection("utilizadores")
-                .document(email.trim().lowercase())
+                .document(emailClean)
                 .collection("transacoes")
                 .get()
                 .await()
-            
+
             snapshot.toObjects(Transacao::class.java)
         } catch (e: Exception) {
             Log.e("FirebaseManager", "Erro ao descarregar transações: ${e.message}")
@@ -213,25 +223,23 @@ object FirebaseManager {
      */
     suspend fun excluirContaTotal(email: String): Boolean {
         val emailClean = email.trim().lowercase()
+        if (isGuestEmail(emailClean)) return false
+
         return try {
             val userRef = db.collection("utilizadores").document(emailClean)
 
-            // 1. Eliminar Transações
             val transacoes = userRef.collection("transacoes").get().await()
             db.runBatch { batch ->
                 transacoes.forEach { batch.delete(it.reference) }
             }.await()
 
-            // 2. Eliminar Metas
             val metas = userRef.collection("metas").get().await()
             db.runBatch { batch ->
                 metas.forEach { batch.delete(it.reference) }
             }.await()
 
-            // 3. Eliminar Documento do Utilizador
             userRef.delete().await()
 
-            // 4. Eliminar do Firebase Auth
             val currentUser = auth.currentUser
             if (currentUser != null && currentUser.email?.trim()?.lowercase() == emailClean) {
                 currentUser.delete().await()
@@ -241,6 +249,31 @@ object FirebaseManager {
         } catch (e: Exception) {
             Log.e("FirebaseManager", "Erro ao excluir conta total: ${e.message}")
             false
+        }
+    }
+
+    /**
+     * Remove o documento 'convidado' e suas subcoleções do Firestore se tiver sido criado anteriormente.
+     */
+    suspend fun limparConvidadoDoFirestore() {
+        try {
+            val userRef = db.collection("utilizadores").document("convidado")
+            val transacoes = userRef.collection("transacoes").get().await()
+            if (!transacoes.isEmpty) {
+                db.runBatch { batch ->
+                    transacoes.forEach { batch.delete(it.reference) }
+                }.await()
+            }
+            val metas = userRef.collection("metas").get().await()
+            if (!metas.isEmpty) {
+                db.runBatch { batch ->
+                    metas.forEach { batch.delete(it.reference) }
+                }.await()
+            }
+            userRef.delete().await()
+            Log.d("FirebaseManager", "Limpeza automática: documento 'convidado' eliminado do Firestore com sucesso.")
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Erro ao limpar convidado do Firestore: ${e.message}")
         }
     }
 }
