@@ -25,19 +25,24 @@
 | <img src="screenshots/01_login.png" width="220"/> | <img src="screenshots/02_registo.png" width="220"/> | <img src="screenshots/03_aviso_convidado.png" width="220"/> |
 
 ### 📝 Gestão & Adição de Transações
-| Listagem Detalhada | Nova Transação | Perfil & Definições |
+| Listagem Detalhada | Nova Transação | Detalhes da Transação |
 | :---: | :---: | :---: |
-| <img src="screenshots/12_listagem.png" width="220"/> | <img src="screenshots/13_nova_transacao.png" width="220"/> | <img src="screenshots/06_perfil.png" width="220"/> |
+| <img src="screenshots/12_listagem.png" width="220"/> | <img src="screenshots/13_nova_transacao.png" width="220"/> | <img src="screenshots/14_detalhes_item.png" width="220"/> |
+
+### ⚙️ Edição & Eliminação Inteligente
+| Editar Item | Eliminar Item | Eliminar Recorrência |
+| :---: | :---: | :---: |
+| <img src="screenshots/15_editar_item.png" width="220"/> | <img src="screenshots/16_dialog_eliminar_item.png" width="220"/> | <img src="screenshots/17_dialog_eliminar_recorrencia.png" width="220"/> |
 
 ### 📊 Dashboards & Relatórios
 | Resumo com Gráfico | Lista por Categorias | Evolução Anual (Barras) |
 | :---: | :---: | :---: |
 | <img src="screenshots/08_resumo_grafico.png" width="220"/> | <img src="screenshots/10_resumo_categorias.png" width="220"/> | <img src="screenshots/09_evolucao_grafico.png" width="220"/> |
 
-### 📖 Perfil & Guia
-| Editar Perfil | Guia do Utilizador | Resumo Inicial |
+### 📖 Perfil & Guia do Utilizador
+| O Meu Perfil | Editar Perfil | Guia do Utilizador |
 | :---: | :---: | :---: |
-| <img src="screenshots/07_editar_perfil.png" width="220"/> | <img src="screenshots/11_guia_utilizador.png" width="220"/> | <img src="screenshots/04_resumo_inicial.png" width="220"/> |
+| <img src="screenshots/06_perfil.png" width="220"/> | <img src="screenshots/07_editar_perfil.png" width="220"/> | <img src="screenshots/11_guia_utilizador.png" width="220"/> |
 
 ---
 
