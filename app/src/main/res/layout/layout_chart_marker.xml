@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="@color/surfaceColor"
+    app:strokeColor="#33FFFFFF"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/tvMarkerMes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:text="Janeiro" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/tvMarkerRenda"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPositive"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:text="+0€" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="11sp"
+                android:text="  |  " />
+
+            <TextView
+                android:id="@+id/tvMarkerDespesa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorNegative"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:text="-0€" />
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
