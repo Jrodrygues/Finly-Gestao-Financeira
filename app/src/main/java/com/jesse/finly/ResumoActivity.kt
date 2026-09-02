@@ -415,12 +415,18 @@ class ResumoActivity : AppCompatActivity() {
             c.drawText("Finly", 30f, 40f, titlePaint)
             c.drawText("Relatório Financeiro Mensal • $mes / $ano", 30f, 62f, subtitlePaint)
 
-            // Logo ajustado sem cortes
-            val logo = drawableToBitmap(R.drawable.ic_logo_full_transp, 65)
-                ?: drawableToBitmap(R.drawable.ic_logo_full, 65)
+            // Logo de alta resolução sem perda de qualidade
+            val logo = loadHighResBitmap(R.drawable.ic_logo_full_transp)
+                ?: loadHighResBitmap(R.drawable.ic_logo_full)
             logo?.let {
-                c.drawBitmap(it, 495f, 10f, null)
+                val bitmapPaint = Paint().apply {
+                    isFilterBitmap = true
+                    isAntiAlias = true
+                }
+                val destRect = android.graphics.RectF(490f, 10f, 565f, 75f)
+                c.drawBitmap(it, null, destRect, bitmapPaint)
             }
+
 
 
             // Footer
@@ -566,14 +572,21 @@ class ResumoActivity : AppCompatActivity() {
         }
     }
 
-    private fun drawableToBitmap(drawableId: Int, size: Int): Bitmap? {
+    private fun loadHighResBitmap(drawableId: Int): Bitmap? {
         val drawable = ContextCompat.getDrawable(this, drawableId) ?: return null
-        val bitmap = createBitmap(size, size)
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, size, size)
-        drawable.draw(canvas)
-        return bitmap
+        return if (drawable is android.graphics.drawable.BitmapDrawable) {
+            drawable.bitmap
+        } else {
+            val width = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else 300
+            val height = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else 300
+            val bitmap = createBitmap(width, height)
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, width, height)
+            drawable.draw(canvas)
+            bitmap
+        }
     }
+
 
 
 
