@@ -7,13 +7,14 @@
     android:layout_height="match_parent"
     android:background="@color/backgroundColor">
 
-    <!-- Cabeçalho com Seletor Integrado -->
+    <!-- Cabeçalho com Sombra e Cores Unificadas -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/viewHeaderEvolucao"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/header_min_height"
-        android:background="@color/colorAccent"
+        android:background="@color/headerColor"
+        android:elevation="4dp"
         android:paddingBottom="12dp"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -27,28 +28,28 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white" />
+            app:tint="@color/colorPrimary" />
 
         <TextView
             android:id="@+id/tvTitleEvolucao"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/menu_evolucao"
-            android:textColor="@color/white"
+            android:textColor="@color/textColorPrimary"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/btnBackEvolucao"
             app:layout_constraintStart_toEndOf="@+id/btnBackEvolucao"
             app:layout_constraintTop_toTopOf="@+id/btnBackEvolucao" />
 
-        <!-- Seletor de Ano Compacto (Badge Integrado) -->
+        <!-- Seletor de Ano Compacto -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/anoSelectorLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="115dp"
             android:layout_height="38dp"
             android:layout_marginEnd="16dp"
-            app:boxBackgroundColor="#20FFFFFF"
+            app:boxBackgroundColor="@color/surfaceColor"
             app:boxCornerRadiusBottomEnd="19dp"
             app:boxCornerRadiusBottomStart="19dp"
             app:boxCornerRadiusTopEnd="19dp"
@@ -74,12 +75,11 @@
                 android:text="@string/default_year"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:textColor="@color/white"
+                android:textColor="@color/textColorPrimary"
                 android:gravity="center_vertical"
                 android:labelFor="@id/autoCompleteAno"
                 tools:ignore="LabelFor" />
         </com.google.android.material.textfield.TextInputLayout>
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -91,7 +91,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
         app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
+        app:cardElevation="2dp"
         app:cardBackgroundColor="@color/surfaceColor"
         app:layout_constraintTop_toBottomOf="@+id/viewHeaderEvolucao">
 
@@ -128,7 +128,7 @@
                 android:layout_width="1dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center_vertical"
-                android:background="#33000000" />
+                android:background="@color/dividerColor" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -156,7 +156,7 @@
                 android:layout_width="1dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center_vertical"
-                android:background="#33000000" />
+                android:background="@color/dividerColor" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -183,13 +183,118 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- Gráfico de Barras Anual -->
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barChartAnual"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="16dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/cardDetalheMes"
         app:layout_constraintTop_toBottomOf="@+id/cardResumoAnual" />
+
+    <!-- Card de Detalhe do Mês Selecionado -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardDetalheMes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="24dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="@color/surfaceColor"
+        app:layout_constraintTop_toBottomOf="@+id/barChartAnual"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvTituloDetalheMes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Detalhe do Mês (Toque numa barra)"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rendas do Mês"
+                        android:textSize="12sp"
+                        android:textColor="@color/textColorSecondary" />
+                    <TextView
+                        android:id="@+id/tvRendaMesDetalhe"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0,00 €"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPositive" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Despesas do Mês"
+                        android:textSize="12sp"
+                        android:textColor="@color/textColorSecondary" />
+                    <TextView
+                        android:id="@+id/tvDespesaMesDetalhe"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0,00 €"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorNegative" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Balanço do Mês"
+                        android:textSize="12sp"
+                        android:textColor="@color/textColorSecondary" />
+                    <TextView
+                        android:id="@+id/tvSaldoMesDetalhe"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0,00 €"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/textColorPrimary" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
