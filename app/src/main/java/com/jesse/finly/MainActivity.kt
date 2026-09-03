@@ -315,14 +315,17 @@ class MainActivity : AppCompatActivity() {
         val colorPositivo = ContextCompat.getColor(this, R.color.colorPositive)
         val colorNegativo = ContextCompat.getColor(this, R.color.colorNegative)
 
+        val progressoPercent = if (despesaTotal > 0) ((despesasPagas / despesaTotal) * 100).toInt().coerceIn(0, 100) else 100
+        binding.pbProgressoPagamento.progress = progressoPercent
+
         when (posicaoTab) {
             1 -> {
                 // Aba Despesas
                 setSaldoColorido("Total Despesas: ", despesaTotal, colorNegativo)
                 binding.tvDetalheSaldo.text = String.format(
                     Locale.getDefault(),
-                    "Pagas: %.2f €  |  A Pagar: %.2f €",
-                    despesasPagas, despesasAPagar
+                    "Pagas: %.2f€  |  A Pagar: %.2f€  (%d%% pagas)",
+                    despesasPagas, despesasAPagar, progressoPercent
                 )
                 binding.tvDetalheSaldo.visibility = View.VISIBLE
             }
@@ -341,8 +344,8 @@ class MainActivity : AppCompatActivity() {
 
                 binding.tvDetalheSaldo.text = String.format(
                     Locale.getDefault(),
-                    "Inicial: %.2f €  |  Pago: %.2f €  |  A Pagar: %.2f €",
-                    rendaTotal, despesasPagas, despesasAPagar
+                    "Inicial: %.2f€  |  Pago: %.2f€ (%d%%)  |  A Pagar: %.2f€",
+                    rendaTotal, despesasPagas, progressoPercent, despesasAPagar
                 )
                 binding.tvDetalheSaldo.visibility = View.VISIBLE
             }

@@ -230,7 +230,7 @@
                 android:textSize="16sp" />
         </LinearLayout>
 
-        <!-- Saldo Dinâmico do Rodapé -->
+        <!-- Saldo Dinâmico & Barra de Progresso do Rodapé -->
         <LinearLayout
             android:id="@+id/llSaldoFooter"
             android:layout_width="match_parent"
@@ -240,8 +240,17 @@
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp"
+            android:paddingVertical="10dp"
             app:layout_constraintBottom_toBottomOf="parent">
+
+            <ProgressBar
+                android:id="@+id/pbProgressoPagamento"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_marginBottom="8dp"
+                android:progress="0"
+                android:progressDrawable="@drawable/custom_progress_bar" />
 
             <TextView
                 android:id="@+id/tvSaldoTotal"
