@@ -169,17 +169,22 @@ class ResumoActivity : AppCompatActivity() {
         val email = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString("EMAIL", "") ?: ""
         val mesSel = binding.spinnerMes.selectedItem.toString()
         val anoSel = binding.spinnerAno.selectedItem as Int
+        val emailClean = email.trim().lowercase()
         
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
             val dao = db.utilizadorDao()
             
-            // Tentar encontrar meta existente para atualizar ou criar uma.
-            val metaExistente = dao.obterMetaPorMes(email, mesSel, anoSel)
+            val metaExistente = dao.obterMetaPorMes(emailClean, mesSel, anoSel)
             val metaObj = metaExistente?.copy(valor = valor)
-                ?: MetaPoupanca(mes = mesSel, ano = anoSel, valor = valor, donoEmail = email)
+                ?: MetaPoupanca(mes = mesSel, ano = anoSel, valor = valor, donoEmail = emailClean)
             
             dao.salvarMeta(metaObj)
+
+            // Sincronizar com o Firebase Firestore se não for convidado
+            if (!FirebaseManager.isGuestEmail(emailClean)) {
+                FirebaseManager.salvarMetaNoFirestore(metaObj)
+            }
             
             withContext(Dispatchers.Main) {
                 carregarDados(mesSel, anoSel)
@@ -231,13 +236,12 @@ class ResumoActivity : AppCompatActivity() {
             }
 
             // 2. sincronizar TRANSAÇÕES
-            val transacoesNuvem = FirebaseManager.descarregarTransacoesDoFirestore(email)
+            val transacoesNuvem = FirebaseManager.descarregarTransacoesDoFirestore(emailClean)
             if (transacoesNuvem.isNotEmpty()) {
                 val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
                 val dao = db.utilizadorDao()
                 
                 transacoesNuvem.forEach { trans ->
-                    // Inserir ou atualizar localmente
                     val existe = dao.obterTransacaoPorId(trans.id)
                     if (existe == null) {
                         dao.inserirTransacao(trans)
@@ -246,6 +250,21 @@ class ResumoActivity : AppCompatActivity() {
                     }
                 }
                 
+                withContext(Dispatchers.Main) {
+                    prosseguirComCarregamento()
+                }
+            }
+
+            // 3. sincronizar METAS DE POUPANÇA
+            val metasNuvem = FirebaseManager.descarregarMetasDoFirestore(emailClean)
+            if (metasNuvem.isNotEmpty()) {
+                val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
+                val dao = db.utilizadorDao()
+                metasNuvem.forEach { meta ->
+                    val existe = dao.obterMetaPorMes(emailClean, meta.mes, meta.ano)
+                    val metaSalvar = meta.copy(id = existe?.id ?: meta.id, donoEmail = emailClean)
+                    dao.salvarMeta(metaSalvar)
+                }
                 withContext(Dispatchers.Main) {
                     prosseguirComCarregamento()
                 }
@@ -900,8 +919,9 @@ class ResumoActivity : AppCompatActivity() {
     private fun ativarSincronizacaoTempoReal() {
         val email = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString("EMAIL", "") ?: ""
         if (email.isEmpty() || email == "CONVIDADO") return
+        val emailClean = email.trim().lowercase()
 
-        FirebaseManager.monitorarTransacoes(email) { listaNuvem ->
+        FirebaseManager.monitorarTransacoes(emailClean) { listaNuvem ->
             lifecycleScope.launch(Dispatchers.IO) {
                 val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
                 val dao = db.utilizadorDao()
@@ -916,6 +936,21 @@ class ResumoActivity : AppCompatActivity() {
                     }
                 }
                 
+                withContext(Dispatchers.Main) {
+                    prosseguirComCarregamento()
+                }
+            }
+        }
+
+        FirebaseManager.monitorarMetas(emailClean) { metasNuvem ->
+            lifecycleScope.launch(Dispatchers.IO) {
+                val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
+                val dao = db.utilizadorDao()
+                metasNuvem.forEach { meta ->
+                    val existe = dao.obterMetaPorMes(emailClean, meta.mes, meta.ano)
+                    val metaSalvar = meta.copy(id = existe?.id ?: meta.id, donoEmail = emailClean)
+                    dao.salvarMeta(metaSalvar)
+                }
                 withContext(Dispatchers.Main) {
                     prosseguirComCarregamento()
                 }

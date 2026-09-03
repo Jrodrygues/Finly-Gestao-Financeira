@@ -9,7 +9,7 @@
 *   **📊 Dashboards Visuais:** Gráficos circulares (Donut) para resumo mensal, cartões dinâmicos por categoria e gráficos de barras para evolução anual de rendas e despesas.
 *   **🎯 Destaque Visual do Período:** Seleção compacta de mês e ano com destaque proeminente no cabeçalho para rápida identificação do filtro ativo.
 *   **🔔 Notificações Inteligentes de Vencimento:** Alertas automáticos via **WorkManager** sobre contas a vencer (hoje, nos próximos dias ou em atraso recente) com atalho direto ao resumo.
-*   **🔄 Sincronização em Tempo Real:** Integração total com **Firebase Firestore**, garantindo que transações e categorias personalizadas sejam atualizadas instantaneamente entre todos os telemóveis ligados à mesma conta.
+*   **🔄 Sincronização em Tempo Real:** Integração total com **Firebase Firestore**, garantindo que transações, metas de poupança e categorias personalizadas sejam atualizadas instantaneamente em tempo real entre todos os telemóveis ligados à mesma conta.
 *   **🏷️ Gestão de Categorias Personalizadas:** Crie e gira as suas próprias categorias. Ao eliminar uma categoria em utilização, as transações associadas são reatribuídas em segurança para a categoria **"Geral"**.
 *   **🔐 Autenticação & Modo Convidado 100% Privado:** Sistema de login/registo via Firebase Auth. O modo "Convidado" guarda dados exclusivamente locais (Room DB), sem qualquer envio para a nuvem.
 *   **📅 Recorrência Inteligente:** Registe contas fixas uma única vez e o sistema gera automaticamente as transações para os meses futuros com controlo de parcelas (ex: `1/3`).

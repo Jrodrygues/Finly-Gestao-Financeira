@@ -14,6 +14,7 @@ object FirebaseManager {
     private val db = FirebaseFirestore.getInstance()
     private var listenerTransacoes: ListenerRegistration? = null
     private var listenerPerfil: ListenerRegistration? = null
+    private var listenerMetas: ListenerRegistration? = null
 
     fun isUserLoggedIn() = auth.currentUser != null
     fun getCurrentUserEmail() = auth.currentUser?.email
@@ -78,11 +79,37 @@ object FirebaseManager {
             }
     }
 
+    /**
+     * Inicia a escuta em tempo real para as metas de poupança do utilizador.
+     */
+    fun monitorarMetas(email: String, onUpdate: (List<MetaPoupanca>) -> Unit) {
+        listenerMetas?.remove()
+        val emailClean = email.trim().lowercase()
+        if (isGuestEmail(emailClean)) return
+
+        listenerMetas = db.collection("utilizadores")
+            .document(emailClean)
+            .collection("metas")
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.e("FirebaseManager", "Erro no listener de metas: ${e.message}")
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    val lista = snapshot.toObjects(MetaPoupanca::class.java)
+                    onUpdate(lista)
+                }
+            }
+    }
+
     fun pararMonitoramento() {
         listenerTransacoes?.remove()
         listenerTransacoes = null
         listenerPerfil?.remove()
         listenerPerfil = null
+        listenerMetas?.remove()
+        listenerMetas = null
     }
 
     /**
@@ -118,6 +145,26 @@ object FirebaseManager {
                 .await()
         } catch (e: Exception) {
             Log.e("FirebaseManager", "Erro ao salvar transação: ${e.message}")
+        }
+    }
+
+    /**
+     * Sincroniza uma meta de poupança para o Firestore.
+     */
+    suspend fun salvarMetaNoFirestore(meta: MetaPoupanca) {
+        val email = meta.donoEmail.trim().lowercase()
+        if (isGuestEmail(email)) return
+
+        val docId = "${meta.mes.trim().lowercase()}_${meta.ano}"
+        try {
+            db.collection("utilizadores")
+                .document(email)
+                .collection("metas")
+                .document(docId)
+                .set(meta)
+                .await()
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Erro ao salvar meta no Firestore: ${e.message}")
         }
     }
 
@@ -214,6 +261,27 @@ object FirebaseManager {
             snapshot.toObjects(Transacao::class.java)
         } catch (e: Exception) {
             Log.e("FirebaseManager", "Erro ao descarregar transações: ${e.message}")
+            emptyList()
+        }
+    }
+
+    /**
+     * Descarrega todas as metas de poupança do Firestore para o Room (Sync inicial).
+     */
+    suspend fun descarregarMetasDoFirestore(email: String): List<MetaPoupanca> {
+        val emailClean = email.trim().lowercase()
+        if (isGuestEmail(emailClean)) return emptyList()
+
+        return try {
+            val snapshot = db.collection("utilizadores")
+                .document(emailClean)
+                .collection("metas")
+                .get()
+                .await()
+
+            snapshot.toObjects(MetaPoupanca::class.java)
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Erro ao descarregar metas do Firestore: ${e.message}")
             emptyList()
         }
     }
