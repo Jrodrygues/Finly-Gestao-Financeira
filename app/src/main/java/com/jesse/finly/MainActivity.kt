@@ -8,8 +8,6 @@ import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.util.TypedValue
-import android.view.GestureDetector
-import android.view.MotionEvent
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,7 +15,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -71,7 +68,6 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnMesAnterior.setOnClickListener { navegarMes(-1) }
         binding.btnMesProximo.setOnClickListener { navegarMes(1) }
-        configurarGestoSwipe()
 
         binding.fabAddTransacao.setOnClickListener {
             val intent = Intent(this, RegistoActivity::class.java)
@@ -190,53 +186,6 @@ class MainActivity : AppCompatActivity() {
         getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
             putString("ULTIMO_MES_SELECIONADO", mesFiltro)
             putInt("ULTIMO_ANO_SELECIONADO", anoFiltro)
-        }
-    }
-
-    private fun configurarGestoSwipe() {
-        val gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
-            private val SWIPE_THRESHOLD = 80
-            private val SWIPE_VELOCITY_THRESHOLD = 80
-
-            override fun onDown(e: MotionEvent): Boolean {
-                return true
-            }
-
-            override fun onFling(
-                e1: MotionEvent?,
-                e2: MotionEvent,
-                velocityX: Float,
-                velocityY: Float
-            ): Boolean {
-                if (e1 == null) return false
-                val diffX = e2.x - e1.x
-                val diffY = e2.y - e1.y
-
-                // Garante que é um gesto predominantemente horizontal para não interferir na rolagem vertical da lista
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        if (diffX > 0) {
-                            // Arrastou da esquerda para a direita -> Mês Anterior (-1)
-                            navegarMes(-1)
-                        } else {
-                            // Arrastou da direita para a esquerda -> Mês Seguinte (1)
-                            navegarMes(1)
-                        }
-                        return true
-                    }
-                }
-                return false
-            }
-        })
-
-        binding.rvTransacoes.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
-            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                return gestureDetector.onTouchEvent(e)
-            }
-        })
-
-        binding.root.setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
         }
     }
 
