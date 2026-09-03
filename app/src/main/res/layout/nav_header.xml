@@ -7,12 +7,7 @@
     android:gravity="bottom"
     android:orientation="vertical"
     android:padding="24dp"
-    android:minHeight="180dp"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
-
-
-
-
+    android:minHeight="180dp">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/nav_card_view"
@@ -21,7 +16,6 @@
         app:cardCornerRadius="36dp"
         app:cardElevation="0dp"
         app:cardBackgroundColor="@android:color/transparent">
-
 
         <TextView
             android:id="@+id/nav_header_initial"
@@ -36,20 +30,20 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-
     <TextView
         android:id="@+id/nav_header_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Utilizador"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="16sp"
         android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -59,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="email@exemplo.com"
-            android:textColor="#E0F2F1"
+            android:textColor="@color/textColorSecondary"
             android:textSize="14sp" />
 
         <ImageView
@@ -69,8 +63,7 @@
             android:layout_marginStart="8dp"
             android:src="@drawable/ic_cloud_done"
             android:contentDescription="Status da Nuvem"
-            app:tint="#B2DFDB" />
+            app:tint="@color/colorPrimary" />
     </LinearLayout>
-
 
 </LinearLayout>

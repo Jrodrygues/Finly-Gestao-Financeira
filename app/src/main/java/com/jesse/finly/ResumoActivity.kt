@@ -17,6 +17,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -132,6 +133,7 @@ class ResumoActivity : AppCompatActivity() {
         }
 
         binding.btnMenu.setOnClickListener {
+            binding.navigationView.setCheckedItem(R.id.nav_resumo)
             binding.drawerLayout.openDrawer(androidx.core.view.GravityCompat.START)
         }
 
@@ -279,6 +281,54 @@ class ResumoActivity : AppCompatActivity() {
         }
     }
 
+    private fun estilarMenuItemsDrawer() {
+        val colorPrimary = ContextCompat.getColor(this, R.color.colorPrimary)
+        val colorTextPrimary = ContextCompat.getColor(this, R.color.textColorPrimary)
+        val colorNegative = ContextCompat.getColor(this, R.color.colorNegative)
+
+        val menu = binding.navigationView.menu
+        binding.navigationView.itemIconTintList = null
+        binding.navigationView.itemTextColor = null
+
+        val checkedId = R.id.nav_resumo
+        binding.navigationView.setCheckedItem(checkedId)
+
+        fun aplicarEstiloItem(item: MenuItem) {
+            val isSair = item.itemId == R.id.nav_sair
+            val isChecked = item.itemId == checkedId
+
+            val corAtual = when {
+                isSair -> colorNegative
+                isChecked -> colorPrimary
+                else -> colorTextPrimary
+            }
+
+            val titleStr = item.title.toString()
+            val spannable = SpannableString(titleStr)
+            spannable.setSpan(ForegroundColorSpan(corAtual), 0, spannable.length, 0)
+            item.title = spannable
+
+            item.icon?.mutate()?.let { iconDrawable ->
+                iconDrawable.setTint(corAtual)
+                item.icon = iconDrawable
+            }
+        }
+
+        for (i in 0 until menu.size()) {
+            val item = menu.getItem(i)
+            if (item.hasSubMenu()) {
+                val subMenu = item.subMenu
+                if (subMenu != null) {
+                    for (j in 0 until subMenu.size()) {
+                        aplicarEstiloItem(subMenu.getItem(j))
+                    }
+                }
+            } else {
+                aplicarEstiloItem(item)
+            }
+        }
+    }
+
     private fun configurarDrawer() {
         // 1. Configurar listeners de navegação apenas uma vez
         binding.navigationView.setNavigationItemSelectedListener { menuItem ->
@@ -310,18 +360,8 @@ class ResumoActivity : AppCompatActivity() {
             true
         }
 
-        // 2. Carregar dados do cabeçalho
+        estilarMenuItemsDrawer()
         atualizarDrawerHeader()
-
-        // 3. Destacar ação destrutiva 'Terminar sessão' em vermelho
-        val menuItemSair = binding.navigationView.menu.findItem(R.id.nav_sair)
-        if (menuItemSair != null) {
-            val titleStr = menuItemSair.title.toString()
-            val spannable = SpannableString(titleStr)
-            spannable.setSpan(ForegroundColorSpan(ContextCompat.getColor(this, R.color.colorNegative)), 0, spannable.length, 0)
-            menuItemSair.title = spannable
-            menuItemSair.icon?.mutate()?.setTint(ContextCompat.getColor(this, R.color.colorNegative))
-        }
     }
 
     private fun obterCategoriasCustomizadas(): MutableList<String> {
@@ -762,6 +802,7 @@ class ResumoActivity : AppCompatActivity() {
         val gastosPorCategoria = despesas.groupBy { it.categoria }
             .mapValues { entry -> entry.value.sumOf { it.valor } }
             .toList()
+            .filter { it.second > 0.0 }
             .sortedByDescending { it.second }
 
         if (gastosPorCategoria.isNotEmpty()) {
@@ -919,6 +960,7 @@ class ResumoActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        estilarMenuItemsDrawer()
         ativarSincronizacaoTempoReal()
         val notifEnabled = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getBoolean("NOTIFICATIONS", false)
         if (notifEnabled) {
@@ -1148,6 +1190,7 @@ class ResumoActivity : AppCompatActivity() {
         val gastosPorCategoria = despesas.groupBy { it.categoria }
             .mapValues { it.value.sumOf { t -> t.valor }.toFloat() }
             .toList()
+            .filter { it.second > 0f }
             .sortedByDescending { it.second }
 
         if (gastosPorCategoria.isEmpty()) {
@@ -1159,18 +1202,22 @@ class ResumoActivity : AppCompatActivity() {
         binding.pieChart.visibility = View.VISIBLE
         binding.llCategoryDetails.visibility = View.VISIBLE
 
-        // Lógica de expansão/colapso
-        val itensParaMostrar = if (isCategoriesExpanded || gastosPorCategoria.size <= 4) {
-            gastosPorCategoria
+        // Se colapsado e existirem mais de 4 categorias, agrupar as restantes como "Outros"
+        // para garantir correspondência 1-para-1 exata entre as fatias do gráfico e a legenda
+        val itensGraficoELegenda = if (!isCategoriesExpanded && gastosPorCategoria.size > 4) {
+            val top3 = gastosPorCategoria.take(3).toMutableList()
+            val restoValor = gastosPorCategoria.drop(3).sumOf { it.second.toDouble() }.toFloat()
+            top3.add(Pair("Outros", restoValor))
+            top3
         } else {
-            gastosPorCategoria.take(4)
+            gastosPorCategoria
         }
 
         binding.btnVerMaisCategorias.visibility = if (gastosPorCategoria.size > 4) View.VISIBLE else View.GONE
         binding.btnVerMaisCategorias.text = if (isCategoriesExpanded) "Ver menos" else "Ver mais categorias"
 
         val totalGastos = gastosPorCategoria.sumOf { it.second.toDouble() }
-        val entries = gastosPorCategoria.map { PieEntry(it.second, it.first) }
+        val entries = itensGraficoELegenda.map { PieEntry(it.second, it.first) }
         
         // Cores diversificadas
         val colors = mutableListOf<Int>()
@@ -1209,11 +1256,8 @@ class ResumoActivity : AppCompatActivity() {
 
         // PREENCHER A Lista DE LEGENDA DETALHADA ABAIXO DO GRÁFICO
         binding.llCategoryDetails.removeAllViews()
-        itensParaMostrar.forEach { pair ->
-            // Encontrar a cor original correta baseada no index do gráfico completo
-            val corOriginalIndex = gastosPorCategoria.indexOf(pair)
-            val color = colors[corOriginalIndex % colors.size]
-            
+        itensGraficoELegenda.forEachIndexed { index, pair ->
+            val color = colors[index % colors.size]
             val percent = if (totalGastos > 0) (pair.second / totalGastos * 100).toInt() else 0
             adicionarItemCategoria(pair.first, pair.second.toDouble(), percent, color)
         }
@@ -1277,7 +1321,7 @@ class ResumoActivity : AppCompatActivity() {
             binding.tvSaldoFinal.setTextColor(colorPositivo)
         }
 
-        binding.tvSpentValue.text = String.format(Locale.getDefault(), "%.2f €", abs(despesa))
+        binding.tvSpentValue.text = String.format(Locale.getDefault(), "Gasto total: %.2f €", abs(despesa))
         binding.tvPercentValue.text = String.format(Locale.getDefault(), "%d%%", percent)
 
         val colorPercent = when {

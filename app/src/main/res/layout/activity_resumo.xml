@@ -149,9 +149,9 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="0,00 €"
+                                android:text="Gasto total: 0,00 €"
                                 android:textColor="@color/textColorSecondary"
-                                android:textSize="15sp" />
+                                android:textSize="14sp" />
 
                             <TextView
                                 android:id="@+id/tvPercentValue"
@@ -286,6 +286,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="end"
+                            android:layout_marginEnd="8dp"
                             android:paddingStart="16dp"
                             android:paddingEnd="16dp"
                             android:text="@string/btn_definir_meta"
@@ -421,7 +422,7 @@
         app:insetForeground="@android:color/transparent"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu"
-        app:itemIconTint="@color/colorPrimary"
-        app:itemTextColor="@color/textColorPrimary" />
+        app:itemIconTint="@color/drawer_icon_selector"
+        app:itemTextColor="@color/drawer_text_selector" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
