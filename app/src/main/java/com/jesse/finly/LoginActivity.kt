@@ -1,6 +1,7 @@
 package com.jesse.finly
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
@@ -163,8 +164,12 @@ class LoginActivity : AppCompatActivity() {
                                 putBoolean("DARK_MODE", u.darkMode)
                                 putBoolean("NOTIFICATIONS", u.notifications)
                             }
-                            val desiredMode = if (u.darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-                            if (AppCompatDelegate.getDefaultNightMode() != desiredMode) {
+                            val currentMode = AppCompatDelegate.getDefaultNightMode()
+                            val isSystemDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+                            val isCurrentlyDark = if (currentMode == AppCompatDelegate.MODE_NIGHT_UNSPECIFIED) isSystemDark else (currentMode == AppCompatDelegate.MODE_NIGHT_YES)
+
+                            if (isCurrentlyDark != u.darkMode) {
+                                val desiredMode = if (u.darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
                                 AppCompatDelegate.setDefaultNightMode(desiredMode)
                             }
                             if (u.notifications) {

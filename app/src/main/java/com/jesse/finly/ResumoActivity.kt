@@ -203,13 +203,8 @@ class ResumoActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     val customSetNuvem = perfilNuvem.customCategories.split(",").map { it.trim() }.filter { it.isNotBlank() }.toSet()
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
-                        putBoolean("DARK_MODE", perfilNuvem.darkMode)
                         putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
                         putStringSet("CUSTOM_CATEGORIES_$emailClean", customSetNuvem)
-                    }
-                    val desiredMode = if (perfilNuvem.darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-                    if (AppCompatDelegate.getDefaultNightMode() != desiredMode) {
-                        AppCompatDelegate.setDefaultNightMode(desiredMode)
                     }
                     atualizarDrawerHeader()
                 }
@@ -228,13 +223,8 @@ class ResumoActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     val customSetNuvem = perfilNuvem.customCategories.split(",").map { it.trim() }.filter { it.isNotBlank() }.toSet()
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
-                        putBoolean("DARK_MODE", perfilNuvem.darkMode)
                         putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
                         putStringSet("CUSTOM_CATEGORIES_$emailClean", customSetNuvem)
-                    }
-                    val desiredMode = if (perfilNuvem.darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-                    if (AppCompatDelegate.getDefaultNightMode() != desiredMode) {
-                        AppCompatDelegate.setDefaultNightMode(desiredMode)
                     }
                     atualizarDrawerHeader()
                 }
