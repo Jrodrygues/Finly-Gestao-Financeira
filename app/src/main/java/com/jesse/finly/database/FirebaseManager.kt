@@ -117,13 +117,14 @@ object FirebaseManager {
      */
     suspend fun salvarUtilizadorNoFirestore(utilizador: Utilizador) {
         val email = utilizador.email.trim().lowercase()
-        if (isGuestEmail(email) || isGuestEmail(utilizador.donoEmail)) return
+        if (isGuestEmail(email)) return
 
         try {
             db.collection("utilizadores")
                 .document(email)
                 .set(utilizador)
                 .await()
+            Log.d("FirebaseManager", "Utilizador salvo no Firestore: $email | customCategories: ${utilizador.customCategories}")
         } catch (e: Exception) {
             Log.e("FirebaseManager", "Erro ao salvar utilizador: ${e.message}")
         }

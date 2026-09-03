@@ -182,7 +182,7 @@
     <string name="default_value_currency">0,00 €</string>
 
     <!-- Nova Categoria & Gestão -->
-    <string name="hint_nova_categoria">Nome da Categoria (ex: Mascotas, Viagens)</string>
+    <string name="hint_nova_categoria">Ex: Lazer, Ginásio</string>
     <string name="dialog_nova_categoria_titulo">Nova Categoria</string>
     <string name="btn_adicionar">ADICIONAR</string>
     <string name="option_nova_categoria">⚙️ Gerir Categorias&#8230;</string>

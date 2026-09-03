@@ -9,11 +9,12 @@
     android:paddingHorizontal="8dp">
 
     <ImageView
+        android:id="@+id/ivIconCategoriaCustom"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:src="@drawable/ic_list"
+        android:src="@drawable/ic_edit"
         android:contentDescription="@null"
-        app:tint="@color/colorAccent" />
+        app:tint="@color/colorPrimary" />
 
     <TextView
         android:id="@+id/tvNomeCategoriaCustom"
@@ -25,6 +26,22 @@
         android:textSize="15sp"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/tvTagPadraoCustom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:text="Padrão"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:background="@drawable/badge_padrao_background"
+        android:visibility="gone" />
+
     <ImageButton
         android:id="@+id/btnRemoverCategoriaCustom"
         android:layout_width="40dp"
@@ -32,5 +49,5 @@
         android:background="?android:attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_delete"
         android:contentDescription="@string/btn_eliminar_este_item"
-        app:tint="#F44336" />
+        app:tint="@color/colorNegative" />
 </LinearLayout>

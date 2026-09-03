@@ -45,7 +45,9 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.utils.ColorTemplate
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import android.widget.Button
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -212,13 +214,25 @@ class ResumoActivity : AppCompatActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
                 val perfilLocal = db.utilizadorDao().buscarPorEmail(emailClean)
-                db.utilizadorDao().atualizarUtilizador(perfilNuvem.copy(id = perfilLocal?.id ?: perfilNuvem.id))
+
+                val listLocal = (perfilLocal?.customCategories?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList())
+                val setPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet()) ?: emptySet()
+                val listNuvem = perfilNuvem.customCategories.split(",").map { it.trim() }.filter { it.isNotBlank() }
+
+                val setUnido = (listLocal + setPrefs + listNuvem).filter { it.isNotBlank() }.toSet()
+                val customStrFinal = setUnido.joinToString(",")
+
+                val userAtualizado = perfilNuvem.copy(
+                    id = perfilLocal?.id ?: perfilNuvem.id,
+                    customCategories = customStrFinal
+                )
+
+                db.utilizadorDao().atualizarUtilizador(userAtualizado)
 
                 withContext(Dispatchers.Main) {
-                    val customSetNuvem = perfilNuvem.customCategories.split(",").map { it.trim() }.filter { it.isNotBlank() }.toSet()
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                         putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
-                        putStringSet("CUSTOM_CATEGORIES_$emailClean", customSetNuvem)
+                        putStringSet("CUSTOM_CATEGORIES_$emailClean", HashSet(setUnido))
                     }
                     atualizarDrawerHeader()
                 }
@@ -231,14 +245,25 @@ class ResumoActivity : AppCompatActivity() {
             if (perfilNuvem != null) {
                 val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
                 val perfilLocal = db.utilizadorDao().buscarPorEmail(emailClean)
-                
-                db.utilizadorDao().atualizarUtilizador(perfilNuvem.copy(id = perfilLocal?.id ?: perfilNuvem.id))
-                
+
+                val listLocal = (perfilLocal?.customCategories?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList())
+                val setPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet()) ?: emptySet()
+                val listNuvem = perfilNuvem.customCategories.split(",").map { it.trim() }.filter { it.isNotBlank() }
+
+                val setUnido = (listLocal + setPrefs + listNuvem).filter { it.isNotBlank() }.toSet()
+                val customStrFinal = setUnido.joinToString(",")
+
+                val userAtualizado = perfilNuvem.copy(
+                    id = perfilLocal?.id ?: perfilNuvem.id,
+                    customCategories = customStrFinal
+                )
+
+                db.utilizadorDao().atualizarUtilizador(userAtualizado)
+
                 withContext(Dispatchers.Main) {
-                    val customSetNuvem = perfilNuvem.customCategories.split(",").map { it.trim() }.filter { it.isNotBlank() }.toSet()
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                         putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
-                        putStringSet("CUSTOM_CATEGORIES_$emailClean", customSetNuvem)
+                        putStringSet("CUSTOM_CATEGORIES_$emailClean", HashSet(setUnido))
                     }
                     atualizarDrawerHeader()
                 }
@@ -492,57 +517,123 @@ class ResumoActivity : AppCompatActivity() {
         }
     }
 
+    private fun obterIconeParaCategoria(nome: String): Int {
+        return when (nome.trim().lowercase()) {
+            "geral" -> R.drawable.ic_list
+            "habitação" -> R.drawable.ic_home
+            "alimentação" -> R.drawable.ic_restaurant
+            "transporte" -> R.drawable.ic_transport
+            "saúde" -> R.drawable.ic_health
+            "lazer" -> R.drawable.ic_sports
+            "educação" -> R.drawable.ic_school
+            "compras" -> R.drawable.ic_list
+            "assinaturas" -> R.drawable.ic_pdf
+            "investimentos" -> R.drawable.ic_attach_money
+            "poupança" -> R.drawable.ic_lock
+            "exterior" -> R.drawable.ic_flight
+            else -> R.drawable.ic_tag
+        }
+    }
+
     private fun mostrarBottomSheetGerirCategorias() {
         val bottomSheetDialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
-        val bsView = layoutInflater.inflate(R.layout.bottom_sheet_gerir_categorias, binding.drawerLayout, false)
+        val bsView = layoutInflater.inflate(R.layout.bottom_sheet_gerir_categorias, null)
         bottomSheetDialog.setContentView(bsView)
-        (bsView.parent as? View)?.setBackgroundColor(Color.TRANSPARENT)
         bottomSheetDialog.window?.setDimAmount(0.85f)
         bottomSheetDialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
+        bottomSheetDialog.setOnShowListener {
+            val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.let { sheet ->
+                sheet.setBackgroundColor(Color.TRANSPARENT)
+                val behavior = BottomSheetBehavior.from(sheet)
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                behavior.skipCollapsed = true
+            }
+        }
+
         val etNova = bsView.findViewById<TextInputEditText>(R.id.etNovaCategoriaBS)
         val btnAdd = bsView.findViewById<MaterialButton>(R.id.btnAdicionarCategoriaBS)
-        val btnFechar = bsView.findViewById<MaterialButton>(R.id.btnFecharBS)
-        val containerCustom = bsView.findViewById<LinearLayout>(R.id.containerCategoriasCustom)
+        val btnFechar = bsView.findViewById<View>(R.id.btnFecharBS)
+        val containerMinhas = bsView.findViewById<LinearLayout>(R.id.containerMinhasCategorias)
+        val containerPadrao = bsView.findViewById<LinearLayout>(R.id.containerCategoriasPadrao)
         val tvSemCategorias = bsView.findViewById<TextView>(R.id.tvSemCategoriasCustom)
 
+        val categoriasPadrao = listOf(
+            "Geral", "Habitação", "Alimentação", "Transporte", "Saúde", "Lazer",
+            "Educação", "Compras", "Assinaturas", "Investimentos", "Poupança", "Exterior"
+        )
+
+        var isPadraoExpanded = false
+        val btnVerMaisPadrao = bsView.findViewById<Button>(R.id.btnVerMaisPadrao)
+
         fun atualizarListaCustom() {
-            containerCustom.removeAllViews()
+            containerMinhas?.removeAllViews()
+            containerPadrao?.removeAllViews()
             val customList = obterCategoriasCustomizadas()
 
+            // 1. As Minhas Categorias Personalizadas (NO TOPO)
             if (customList.isEmpty()) {
-                tvSemCategorias.visibility = View.VISIBLE
+                tvSemCategorias?.visibility = View.VISIBLE
             } else {
-                tvSemCategorias.visibility = View.GONE
+                tvSemCategorias?.visibility = View.GONE
                 for (cat in customList) {
-                    val itemView = layoutInflater.inflate(R.layout.item_categoria_custom, containerCustom, false)
+                    val itemView = layoutInflater.inflate(R.layout.item_categoria_custom, containerMinhas, false)
+                    val ivIcon = itemView.findViewById<ImageView>(R.id.ivIconCategoriaCustom)
                     val tvNome = itemView.findViewById<TextView>(R.id.tvNomeCategoriaCustom)
+                    val tvTag = itemView.findViewById<TextView>(R.id.tvTagPadraoCustom)
                     val btnRemover = itemView.findViewById<View>(R.id.btnRemoverCategoriaCustom)
 
-                    tvNome.text = cat
-                    btnRemover.setOnClickListener {
+                    ivIcon?.setImageResource(R.drawable.ic_tag)
+                    tvNome?.text = cat
+                    tvTag?.visibility = View.GONE
+                    btnRemover?.visibility = View.VISIBLE
+                    btnRemover?.setOnClickListener {
                         confirmarEliminacaoCategoria(cat) {
                             removerCategoriaCustomizada(cat)
                             atualizarListaCustom()
                         }
                     }
-                    containerCustom.addView(itemView)
+                    containerMinhas?.addView(itemView)
                 }
             }
+
+            // 2. Categorias do Sistema (Mostrar 4 por omissão ou todas se expandido)
+            val padraoParaMostrar = if (isPadraoExpanded) categoriasPadrao else categoriasPadrao.take(4)
+            btnVerMaisPadrao?.visibility = View.VISIBLE
+            btnVerMaisPadrao?.text = if (isPadraoExpanded) "Ver menos" else "Ver mais categorias do sistema"
+
+            for (catPadrao in padraoParaMostrar) {
+                val itemView = layoutInflater.inflate(R.layout.item_categoria_custom, containerPadrao, false)
+                val ivIcon = itemView.findViewById<ImageView>(R.id.ivIconCategoriaCustom)
+                val tvNome = itemView.findViewById<TextView>(R.id.tvNomeCategoriaCustom)
+                val tvTag = itemView.findViewById<TextView>(R.id.tvTagPadraoCustom)
+                val btnRemover = itemView.findViewById<View>(R.id.btnRemoverCategoriaCustom)
+
+                ivIcon?.setImageResource(obterIconeParaCategoria(catPadrao))
+                tvNome?.text = catPadrao
+                tvTag?.visibility = View.VISIBLE
+                btnRemover?.visibility = View.GONE
+                containerPadrao?.addView(itemView)
+            }
+        }
+
+        btnVerMaisPadrao?.setOnClickListener {
+            isPadraoExpanded = !isPadraoExpanded
+            atualizarListaCustom()
         }
 
         atualizarListaCustom()
 
-        btnAdd.setOnClickListener {
-            val novaCat = etNova.text.toString().trim()
+        btnAdd?.setOnClickListener {
+            val novaCat = etNova?.text.toString().trim()
             if (novaCat.isNotEmpty()) {
                 salvarNovaCategoria(novaCat)
-                etNova.setText("")
-                etNova.clearFocus()
+                etNova?.setText("")
+                etNova?.clearFocus()
 
-                // Esconder o teclado para visualizar a nova categoria na lista
                 val imm = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
-                imm?.hideSoftInputFromWindow(etNova.windowToken, 0)
+                imm?.hideSoftInputFromWindow(etNova?.windowToken, 0)
 
                 atualizarListaCustom()
             } else {
@@ -550,7 +641,7 @@ class ResumoActivity : AppCompatActivity() {
             }
         }
 
-        btnFechar.setOnClickListener {
+        btnFechar?.setOnClickListener {
             bottomSheetDialog.dismiss()
         }
 
