@@ -48,6 +48,7 @@ import com.jesse.finly.databinding.ActivityResumoBinding
 import com.jesse.finly.models.MetaPoupanca
 import com.jesse.finly.models.Utilizador
 import com.jesse.finly.models.Transacao
+import com.jesse.finly.notifications.NotificationHelper
 import com.jesse.finly.utils.showToast
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.showToast
@@ -427,8 +428,7 @@ class ResumoActivity : AppCompatActivity() {
         val bottomSheetDialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
         val bsView = layoutInflater.inflate(R.layout.bottom_sheet_gerir_categorias, binding.drawerLayout, false)
         bottomSheetDialog.setContentView(bsView)
-        bottomSheetDialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundColor(
-            Color.TRANSPARENT)
+        (bsView.parent as? View)?.setBackgroundColor(Color.TRANSPARENT)
         bottomSheetDialog.window?.setDimAmount(0.85f)
         bottomSheetDialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
@@ -890,9 +890,12 @@ class ResumoActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-
         super.onResume()
         ativarSincronizacaoTempoReal()
+        val notifEnabled = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getBoolean("NOTIFICATIONS", false)
+        if (notifEnabled) {
+            NotificationHelper.agendarWorkerNotificacoes(this)
+        }
         prosseguirComCarregamento()
         atualizarDrawerHeader()
     }

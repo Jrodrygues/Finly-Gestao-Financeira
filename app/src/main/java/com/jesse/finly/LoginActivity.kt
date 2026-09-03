@@ -18,6 +18,7 @@ import com.jesse.finly.database.FirebaseManager
 import kotlinx.coroutines.tasks.await
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.LoginBinding
+import com.jesse.finly.notifications.NotificationHelper
 import com.jesse.finly.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -166,6 +167,9 @@ class LoginActivity : AppCompatActivity() {
                             AppCompatDelegate.setDefaultNightMode(
                                 if (u.darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO,
                             )
+                            if (u.notifications) {
+                                NotificationHelper.agendarWorkerNotificacoes(this@LoginActivity)
+                            }
                         }
 
                         finalizarSessaoLogin(email, utilizador?.nome ?: "Utilizador")

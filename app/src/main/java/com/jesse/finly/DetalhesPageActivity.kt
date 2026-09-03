@@ -24,6 +24,7 @@ import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.DetalhesBinding
 import com.jesse.finly.models.Transacao
+import com.jesse.finly.notifications.NotificationHelper
 import com.jesse.finly.notifications.NotificationWorker
 import com.jesse.finly.utils.showToast
 import kotlinx.coroutines.Dispatchers
@@ -342,18 +343,11 @@ class DetalhesPageActivity : AppCompatActivity() {
     }
 
     private fun agendarWorkerNotificacoes() {
-        val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(
-            24, TimeUnit.HOURS
-        ).build()
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "LembreteDespesasWork",
-            ExistingPeriodicWorkPolicy.KEEP,
-            workRequest
-        )
+        NotificationHelper.agendarWorkerNotificacoes(this)
     }
 
     private fun cancelarWorkerNotificacoes() {
-        WorkManager.getInstance(this).cancelUniqueWork("LembreteDespesasWork")
+        NotificationHelper.cancelarWorkerNotificacoes(this)
     }
 
     private fun atualizarPreferenciaUtilizador(valor: Boolean, tipo: String) {

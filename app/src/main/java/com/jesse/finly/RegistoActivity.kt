@@ -352,8 +352,7 @@ class RegistoActivity : AppCompatActivity() {
         val bottomSheetDialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
         val bsView = layoutInflater.inflate(R.layout.bottom_sheet_gerir_categorias, binding.root, false)
         bottomSheetDialog.setContentView(bsView)
-        bottomSheetDialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundColor(
-            Color.TRANSPARENT)
+        (bsView.parent as? View)?.setBackgroundColor(Color.TRANSPARENT)
         bottomSheetDialog.window?.setDimAmount(0.85f)
         bottomSheetDialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
