@@ -28,6 +28,8 @@ import com.jesse.finly.models.Transacao
 import com.jesse.finly.notifications.NotificationHelper
 import com.jesse.finly.notifications.NotificationWorker
 import com.jesse.finly.utils.showToast
+import java.util.Locale
+import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -110,15 +112,28 @@ class DetalhesPageActivity : AppCompatActivity() {
         configurarCliques()
     }
 
+    private fun obterIconeParaCategoria(nome: String): Int {
+        return when (nome.trim().lowercase()) {
+            "geral" -> R.drawable.ic_list
+            "habitação" -> R.drawable.ic_home
+            "alimentação" -> R.drawable.ic_restaurant
+            "transporte" -> R.drawable.ic_transport
+            "saúde" -> R.drawable.ic_health
+            "lazer" -> R.drawable.ic_sports
+            "educação" -> R.drawable.ic_school
+            "compras" -> R.drawable.ic_list
+            "assinaturas" -> R.drawable.ic_pdf
+            "investimentos" -> R.drawable.ic_attach_money
+            "poupança" -> R.drawable.ic_lock
+            "exterior" -> R.drawable.ic_flight
+            else -> R.drawable.ic_tag
+        }
+    }
+
     private fun configurarParaTransacao() {
         binding.llTransacaoButtons.visibility = View.VISIBLE
         binding.llPerfilButtons.visibility = View.GONE
         binding.cardSettings.visibility = View.GONE
-        
-        // Garante que o círculo de iniciais da transação use o Teal correto
-        binding.tvUserInitial.setBackgroundResource(R.drawable.circle_background_teal)
-        val tealColor = ContextCompat.getColor(this, R.color.colorPrimary)
-        binding.tvUserInitial.background.mutate().setTint(tealColor)
 
         transId = intent.getIntExtra("id", -1)
         transItem = intent.getStringExtra("item") ?: ""
@@ -136,39 +151,112 @@ class DetalhesPageActivity : AppCompatActivity() {
         atualizarUITransacao()
     }
 
-
-
     private fun atualizarUITransacao() {
         binding.userName.text = transItem
-        binding.tvEmailDetail.text = getString(R.string.valor_label, transValor, transTipo)
-        binding.tvPhoneDetail.text = getString(R.string.data_label, transData)
-        binding.tvExtraDetail.text = getString(R.string.categoria_mes_label, transCat, transMes)
-        binding.tvExtraDetail.visibility = View.VISIBLE
         
-        // Mostrar RECORRÊNCIA EM LINHA separada
-        if (transIsRecorrente) {
-            val parcelasInfo = if (transParcelasTotais == -1) "Repetir Sempre" else "Repetir por $transParcelasTotais meses"
-            binding.tvRecurrenceDetail.text = getString(R.string.recorrencia_label, parcelasInfo)
-            binding.tvRecurrenceDetail.visibility = View.VISIBLE
+        // Ícone da Categoria dentro do círculo
+        binding.tvUserInitial.visibility = View.GONE
+        binding.ivUserProfile.visibility = View.VISIBLE
+        binding.ivUserProfile.setImageResource(obterIconeParaCategoria(transCat))
+
+        val corPositiva = ContextCompat.getColor(this, R.color.colorPositive)
+        val corNegativa = ContextCompat.getColor(this, R.color.colorNegative)
+
+        // Valor Prominente Grande
+        binding.llValorHighlight.visibility = View.VISIBLE
+        if (transTipo == "DESPESA") {
+            binding.tvValorHighlight.text = String.format(Locale.getDefault(), "-%.2f €", transValor)
+            binding.tvValorHighlight.setTextColor(corNegativa)
+            binding.tvBadgeTipo.text = "Despesa"
+            binding.tvBadgeTipo.setTextColor(corNegativa)
         } else {
-            binding.tvRecurrenceDetail.visibility = View.GONE
+            binding.tvValorHighlight.text = String.format(Locale.getDefault(), "+%.2f €", transValor)
+            binding.tvValorHighlight.setTextColor(corPositiva)
+            binding.tvBadgeTipo.text = "Renda"
+            binding.tvBadgeTipo.setTextColor(corPositiva)
         }
-        
-        binding.tvUserInitial.text = transItem.take(1).uppercase()
-        binding.tvUserInitial.visibility = View.VISIBLE
-        binding.tvUserInitial.setBackgroundResource(R.drawable.circle_background_teal)
+
+        // Campo 1: Categoria
+        binding.tvLabelField1.text = "Categoria"
+        binding.tvValueField1.text = transCat
+        binding.ivIconField1.setImageResource(obterIconeParaCategoria(transCat))
+
+        // Campo 2: Data de Vencimento
+        binding.tvLabelField2.text = "Data de Vencimento"
+        binding.tvValueField2.text = "$transData/$transAno"
+        binding.ivIconField2.setImageResource(R.drawable.ic_calendar)
+
+        // Campo 3: Recorrência
+        binding.llField3.visibility = View.VISIBLE
+        binding.divField2.visibility = View.VISIBLE
+        binding.tvLabelField3.text = "Recorrência"
+        binding.ivIconField3.setImageResource(R.drawable.ic_tag)
+        binding.tvValueField3.text = if (transIsRecorrente) {
+            if (transParcelasTotais == -1) "Repetir Sempre" else "Repetir por $transParcelasTotais meses"
+        } else {
+            "Única (Não recorrente)"
+        }
+
+        // Campo 4: Estado do Pagamento com Switch
+        binding.llField4.visibility = View.VISIBLE
+        binding.divField3.visibility = View.VISIBLE
+        binding.tvLabelField4.text = "Estado do Pagamento"
+        binding.switchStatusTransacao.visibility = View.VISIBLE
+        binding.switchStatusTransacao.setOnCheckedChangeListener(null)
+        binding.switchStatusTransacao.isChecked = transStatus
+
+        atualizarVisualStatusTransacao(transStatus, corPositiva, corNegativa)
+
+        binding.switchStatusTransacao.setOnCheckedChangeListener { _, isChecked ->
+            transStatus = isChecked
+            atualizarVisualStatusTransacao(isChecked, corPositiva, corNegativa)
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                val db = MinhaBaseDados.getDatabase(this@DetalhesPageActivity)
+                val trans = db.utilizadorDao().obterTransacaoPorId(transId)
+                trans?.let {
+                    val atualizada = it.copy(status = isChecked)
+                    db.utilizadorDao().atualizarTransacao(atualizada)
+                    FirebaseManager.salvarTransacaoNoFirestore(atualizada)
+                }
+            }
+        }
     }
 
+    private fun atualizarVisualStatusTransacao(isPago: Boolean, corPositiva: Int, corNegativa: Int) {
+        if (isPago) {
+            binding.tvValueField4.text = "Pago"
+            binding.tvValueField4.setTextColor(corPositiva)
+            binding.ivIconField4.setImageResource(android.R.drawable.checkbox_on_background)
+            binding.ivIconField4.setColorFilter(corPositiva)
+        } else {
+            binding.tvValueField4.text = "Pendente"
+            binding.tvValueField4.setTextColor(corNegativa)
+            binding.ivIconField4.setImageResource(android.R.drawable.checkbox_off_background)
+            binding.ivIconField4.setColorFilter(corNegativa)
+        }
+    }
 
     private fun configurarParaPerfil() {
         binding.llTransacaoButtons.visibility = View.GONE
         binding.llPerfilButtons.visibility = View.VISIBLE
         binding.cardSettings.visibility = View.VISIBLE
+        binding.llValorHighlight.visibility = View.GONE
+        binding.llField3.visibility = View.GONE
+        binding.divField2.visibility = View.GONE
+        binding.llField4.visibility = View.GONE
+
+        // Configurar Campo 1 para E-mail
+        binding.tvLabelField1.text = "E-mail"
+        binding.ivIconField1.setImageResource(R.drawable.ic_email)
+
+        // Configurar Campo 2 para Telemóvel
+        binding.tvLabelField2.text = "Telemóvel"
+        binding.ivIconField2.setImageResource(R.drawable.ic_phone)
 
         val currentEmail = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "") ?: ""
         emailStr = if (currentEmail == "CONVIDADO") currentEmail else currentEmail.trim().lowercase()
 
-        // CARREGAMENTO IMEDIATO VIA INTENT (Evita flicker e letra "U")
         userNameStr = intent.getStringExtra("name") ?: ""
         phoneStr = intent.getStringExtra("phone") ?: ""
         senhaStr = intent.getStringExtra("senha") ?: ""
@@ -176,19 +264,18 @@ class DetalhesPageActivity : AppCompatActivity() {
 
         if (emailStr == "CONVIDADO") {
             binding.userName.text = getString(R.string.utilizador_convidado)
-            binding.tvEmailDetail.text = getString(R.string.sem_email_sincronizado)
-            binding.tvPhoneDetail.visibility = View.GONE
+            binding.tvValueField1.text = getString(R.string.sem_email_sincronizado)
+            binding.llField2.visibility = View.GONE
             binding.btnEditarPerfil.visibility = View.GONE
             binding.btnExcluirConta.visibility = View.GONE
             configurarVisualSemFoto("Convidado")
         } else {
-            // Mostrar o que já temos antes de consultar o banco
             if (userNameStr.isNotEmpty()) {
                 atualizarUIPerfil()
             }
             recarregarDadosPerfil()
         }
-        
+
         configurarConfiguracoes()
     }
 
@@ -218,9 +305,9 @@ class DetalhesPageActivity : AppCompatActivity() {
 
     private fun atualizarUIPerfil() {
         binding.userName.text = userNameStr
-        binding.tvEmailDetail.text = emailStr
-        binding.tvPhoneDetail.text = formatarTelemovel(phoneStr)
-        binding.tvPhoneDetail.visibility = View.VISIBLE
+        binding.tvValueField1.text = emailStr
+        binding.tvValueField2.text = formatarTelemovel(phoneStr)
+        binding.llField2.visibility = View.VISIBLE
 
         configurarVisualSemFoto(userNameStr)
     }
@@ -229,7 +316,6 @@ class DetalhesPageActivity : AppCompatActivity() {
         binding.ivUserProfile.visibility = View.GONE
         binding.tvUserInitial.visibility = View.VISIBLE
         
-        // CORREÇÃO DEFINITIVA: Força verde oficial e remove qualquer interferência
         binding.tvUserInitial.setBackgroundResource(R.drawable.circle_background_teal)
         val color = ContextCompat.getColor(this, R.color.colorPrimary)
         binding.tvUserInitial.background.mutate().setTint(color)
@@ -238,12 +324,8 @@ class DetalhesPageActivity : AppCompatActivity() {
         binding.tvUserInitial.text = inicial
     }
 
-
-
-
     private fun configurarCliques() {
         binding.btnBackProfile.setOnClickListener { finish() }
-        binding.btnVoltarPlanilha.setOnClickListener { finish() }
 
         binding.btnEditarTransacao.setOnClickListener {
             val intent = Intent(this, RegistoActivity::class.java)
