@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Cores para o Modo Dark dentro do App -->
+    <!-- Cores da Marca para Modo Escuro -->
+    <color name="colorPrimary">#009688</color>
+    <color name="colorPrimaryDark">#004D40</color>
+    <color name="colorAccent">#80CBC4</color>
+
+    <!-- Cores de Estrutura e Superfície (Dark) -->
     <color name="backgroundColor">#121212</color>
     <color name="surfaceColor">#1E1E1E</color>
+    <color name="headerColor">#263238</color>
+
+    <!-- Cores dos Cartões (Dark) -->
+    <color name="cardBg">#1E1E1E</color>
+    <color name="cardBorder">#2C2C2C</color>
+
+    <!-- Cores de Tipografia (Dark) -->
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="textColorSecondary">#B0B0B0</color>
-    <color name="headerColor">#263238</color>
+
+    <!-- Cores Financeiras e de Estado (Dark) -->
+    <color name="colorNegative">#EF5350</color>
+    <color name="colorPositive">#66BB6A</color>
+    <color name="dividerColor">#2C2C2C</color>
 </resources>

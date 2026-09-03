@@ -3,18 +3,26 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Cores da Aplicação - Base -->
+    <!-- Cores da Marca (Brand Colors) -->
     <color name="colorPrimary">#009688</color>
     <color name="colorPrimaryDark">#00796B</color>
     <color name="colorAccent">#5F9EA0</color>
 
+    <!-- Cores de Estrutura e Superfície (Light) -->
     <color name="backgroundColor">#FFFFFF</color>
     <color name="surfaceColor">#F5F5F5</color>
     <color name="headerColor">#E0F2F1</color>
 
+    <!-- Cores dos Cartões (Light) -->
+    <color name="cardBg">#FFFFFF</color>
+    <color name="cardBorder">#E0E0E0</color>
+
+    <!-- Cores de Tipografia (Light) -->
     <color name="textColorPrimary">#333333</color>
     <color name="textColorSecondary">#666666</color>
 
+    <!-- Cores Financeiras e de Estado (Light) -->
     <color name="colorNegative">#F44336</color>
     <color name="colorPositive">#4CAF50</color>
+    <color name="dividerColor">#E0E0E0</color>
 </resources>
