@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -194,8 +195,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun configurarGestoSwipe() {
         val gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
-            private val SWIPE_THRESHOLD = 100
-            private val SWIPE_VELOCITY_THRESHOLD = 100
+            private val SWIPE_THRESHOLD = 80
+            private val SWIPE_VELOCITY_THRESHOLD = 80
+
+            override fun onDown(e: MotionEvent): Boolean {
+                return true
+            }
 
             override fun onFling(
                 e1: MotionEvent?,
@@ -224,16 +229,15 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        val touchListener = View.OnTouchListener { v, event ->
-            val handled = gestureDetector.onTouchEvent(event)
-            if (event.action == MotionEvent.ACTION_UP && !handled) {
-                v.performClick()
+        binding.rvTransacoes.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                return gestureDetector.onTouchEvent(e)
             }
-            handled
-        }
+        })
 
-        binding.root.setOnTouchListener(touchListener)
-        binding.rvTransacoes.setOnTouchListener(touchListener)
+        binding.root.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+        }
     }
 
     private fun atualizarTituloMes() {
