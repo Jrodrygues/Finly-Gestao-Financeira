@@ -10,13 +10,14 @@
         android:layout_height="match_parent"
         android:background="@color/backgroundColor">
 
-        <!-- Cabeçalho com Navegação de Meses -->
+        <!-- Cabeçalho com Navegação de Meses e Sombra -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/clHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="@dimen/header_min_height"
-            android:background="@color/colorAccent"
+            android:background="@color/headerColor"
+            android:elevation="4dp"
             android:paddingBottom="8dp"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -27,10 +28,11 @@
                 android:layout_marginStart="16dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_chevron_left"
+                android:contentDescription="@string/btn_voltar"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/white" />
+                app:tint="@color/colorPrimary" />
 
             <TextView
                 android:id="@+id/tvMainTitle"
@@ -39,7 +41,7 @@
                 android:gravity="center"
                 android:paddingHorizontal="8dp"
                 android:text="@string/nova_transacao"
-                android:textColor="@color/white"
+                android:textColor="@color/textColorPrimary"
                 android:textSize="@dimen/text_size_medium_title"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -54,10 +56,11 @@
                 android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_chevron_right"
+                android:contentDescription="@string/btn_voltar"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/white" />
+                app:tint="@color/colorPrimary" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -79,13 +82,15 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/hint_pesquisar"
-                app:startIconDrawable="@drawable/ic_search">
+                app:startIconDrawable="@drawable/ic_search"
+                app:startIconTint="@color/colorPrimary">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etSearch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text"
+                    android:textColor="@color/textColorPrimary"
                     android:textSize="14sp" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -100,7 +105,7 @@
                 android:insetTop="0dp"
                 android:insetRight="0dp"
                 android:insetBottom="0dp"
-                app:backgroundTint="@color/colorAccent"
+                app:backgroundTint="@color/colorPrimary"
                 app:icon="@drawable/ic_add"
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
@@ -117,8 +122,8 @@
             android:layout_marginTop="16dp"
             android:background="@color/surfaceColor"
             app:layout_constraintTop_toBottomOf="@+id/llSearchAndAdd"
-            app:tabIndicatorColor="@color/colorAccent"
-            app:tabSelectedTextColor="@color/colorAccent"
+            app:tabIndicatorColor="@color/colorPrimary"
+            app:tabSelectedTextColor="@color/colorPrimary"
             app:tabTextColor="@color/textColorSecondary">
 
             <com.google.android.material.tabs.TabItem
@@ -151,7 +156,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
+                android:layout_weight="1.8"
                 android:text="@string/col_item"
                 android:textColor="@color/textColorPrimary"
                 android:textStyle="bold" />
@@ -159,8 +164,9 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
+                android:layout_weight="1.2"
+                android:gravity="end"
+                android:paddingEnd="8dp"
                 android:text="@string/col_valor"
                 android:textColor="@color/textColorPrimary"
                 android:textStyle="bold" />
@@ -172,6 +178,7 @@
                 android:gravity="center"
                 android:text="@string/col_vencimento"
                 android:textColor="@color/textColorPrimary"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -180,15 +187,6 @@
                 android:layout_weight="0.8"
                 android:gravity="center"
                 android:text="@string/col_pago"
-                android:textColor="@color/textColorPrimary"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.7"
-                android:gravity="center"
-                android:text="@string/col_ver"
                 android:textColor="@color/textColorPrimary"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -220,6 +218,7 @@
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:src="@drawable/ic_list"
+                android:contentDescription="@null"
                 app:tint="@color/textColorSecondary" />
 
             <TextView
@@ -231,16 +230,16 @@
                 android:textSize="16sp" />
         </LinearLayout>
 
-        <!-- Saldo Dinâmico -->
+        <!-- Saldo Dinâmico do Rodapé -->
         <LinearLayout
             android:id="@+id/llSaldoFooter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/headerColor"
             android:elevation="8dp"
-            android:gravity="center"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp"
+            android:paddingHorizontal="16dp"
             android:paddingVertical="12dp"
             app:layout_constraintBottom_toBottomOf="parent">
 
@@ -248,20 +247,25 @@
                 android:id="@+id/tvSaldoTotal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SALDO TOTAL: 0,00 €"
+                android:gravity="center"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:text="Saldo Disponível: 0,00 €"
                 android:textColor="@color/textColorPrimary"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvDetalheSaldo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Rendas: 0,00 € | Despesas: 0,00 €"
+                android:layout_marginTop="2dp"
+                android:gravity="center"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:text="Inicial: 0,00€ | Pago: 0,00€ | A Pagar: 0,00€"
                 android:textColor="@color/textColorSecondary"
-                android:textSize="14sp"
-                android:visibility="gone" />
+                android:textSize="12sp" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

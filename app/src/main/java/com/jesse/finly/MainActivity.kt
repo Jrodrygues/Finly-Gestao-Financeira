@@ -1,6 +1,7 @@
 package com.jesse.finly
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.Spannable
@@ -17,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import com.jesse.finly.adapters.TransacaoAdapter
 import com.jesse.finly.database.FirebaseManager
@@ -32,6 +34,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.Locale
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: HomeBinding
@@ -275,37 +278,72 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun atualizarSaldoVisual(posicaoTab: Int) {
-        // Cálculo para o Saldo Final (Apenas Pagos)
-        val saldoFinalPaga = FinanceiroUtils.calcularSaldoPago(todasTransacoes)
+    private fun atualizarAparenciaCabecalho() {
+        val isDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        val headerBg = if (isDark) ContextCompat.getColor(this, R.color.surfaceColor) else ContextCompat.getColor(this, R.color.headerColor)
+        binding.clHeader.setBackgroundColor(headerBg)
 
-        // Cálculo para Totais Absolutos (Tudo o que foi lançado)
-        // ‘BUG’ FIX: Poupança e Exterior não somam mais no total de Renda da Home
+        val textColor = ContextCompat.getColor(this, R.color.textColorPrimary)
+        binding.tvMainTitle.setTextColor(textColor)
+        binding.btnMesAnterior.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary))
+        binding.btnMesProximo.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary))
+
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            isAppearanceLightStatusBars = !isDark
+            isAppearanceLightNavigationBars = !isDark
+        }
+    }
+
+    private fun atualizarSaldoVisual(posicaoTab: Int) {
+        atualizarAparenciaCabecalho()
+
         val rendaTotal = todasTransacoes.asSequence()
             .filter { it.tipo == "RENDA" && it.categoria != "Poupança" && it.categoria != "Exterior" }
             .sumOf { it.valor }
-        val despesaTotal = todasTransacoes.asSequence().filter { it.tipo == "DESPESA" }.sumOf { it.valor }
+
+        val despesasPagas = todasTransacoes.asSequence()
+            .filter { it.tipo == "DESPESA" && it.status }
+            .sumOf { it.valor }
+
+        val despesasAPagar = todasTransacoes.asSequence()
+            .filter { it.tipo == "DESPESA" && !it.status }
+            .sumOf { it.valor }
+
+        val despesaTotal = despesasPagas + despesasAPagar
+        val saldoDisponivel = rendaTotal - despesasPagas
 
         val colorPositivo = ContextCompat.getColor(this, R.color.colorPositive)
         val colorNegativo = ContextCompat.getColor(this, R.color.colorNegative)
 
         when (posicaoTab) {
             1 -> {
-                // Aba Despesas: Mostra Total de Despesas (Tudo)
-                setSaldoColorido(getString(R.string.total_despesas), despesaTotal, colorNegativo)
-                binding.tvDetalheSaldo.visibility = View.GONE
+                // Aba Despesas
+                setSaldoColorido("Total Despesas: ", despesaTotal, colorNegativo)
+                binding.tvDetalheSaldo.text = String.format(
+                    Locale.getDefault(),
+                    "Pagas: %.2f €  |  A Pagar: %.2f €",
+                    despesasPagas, despesasAPagar
+                )
+                binding.tvDetalheSaldo.visibility = View.VISIBLE
             }
             2 -> {
-                // Aba Rendas: Mostra Total de Rendas (Tudo)
-                setSaldoColorido(getString(R.string.total_rendas), rendaTotal, colorPositivo)
+                // Aba Rendas
+                setSaldoColorido("Total Rendas: ", rendaTotal, colorPositivo)
                 binding.tvDetalheSaldo.visibility = View.GONE
             }
             else -> {
-                // Aba Todas: Saldo Final (Pagos) | Detalhe (Tudo)
-                val corSaldo = if (saldoFinalPaga >= 0) colorPositivo else colorNegativo
-                setSaldoColorido(getString(R.string.saldo_final_label), saldoFinalPaga, corSaldo)
-                
-                binding.tvDetalheSaldo.text = String.format(Locale.getDefault(), "Rendas: %.2f € | Despesas: %.2f €", rendaTotal, despesaTotal)
+                // Aba Todas: Saldo Disponível (ou Défice / A Descoberto se negativo)
+                if (saldoDisponivel < 0) {
+                    setSaldoColorido("Défice / A Descoberto: -", abs(saldoDisponivel), colorNegativo)
+                } else {
+                    setSaldoColorido("Saldo Disponível: ", saldoDisponivel, colorPositivo)
+                }
+
+                binding.tvDetalheSaldo.text = String.format(
+                    Locale.getDefault(),
+                    "Inicial: %.2f €  |  Pago: %.2f €  |  A Pagar: %.2f €",
+                    rendaTotal, despesasPagas, despesasAPagar
+                )
                 binding.tvDetalheSaldo.visibility = View.VISIBLE
             }
         }

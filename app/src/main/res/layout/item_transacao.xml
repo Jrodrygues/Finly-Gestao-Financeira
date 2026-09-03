@@ -7,7 +7,7 @@
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingHorizontal="16dp"
-    android:paddingVertical="14dp"
+    android:paddingVertical="12dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground">
@@ -17,20 +17,24 @@
         android:id="@+id/tvItem"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.5"
+        android:layout_weight="1.8"
         android:text="Item"
         android:textColor="@color/textColorPrimary"
         android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:singleLine="true"
+        android:ellipsize="end" />
 
-    <!-- Valor -->
+    <!-- Valor - Alinhado à Direita com Fonte Tabular -->
     <TextView
         android:id="@+id/tvValor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="0.00 €"
+        android:layout_weight="1.2"
+        android:gravity="end"
+        android:paddingEnd="8dp"
+        android:fontFeatureSettings="tnum"
+        android:text="0,00 €"
         android:textColor="@color/colorNegative"
         android:textSize="14sp"
         android:textStyle="bold" />
@@ -44,7 +48,7 @@
         android:gravity="center"
         android:text="01/01"
         android:textColor="@color/textColorSecondary"
-        android:textSize="13sp" />
+        android:textSize="14sp" />
 
     <!-- Status (CheckBox) -->
     <ImageView
@@ -54,16 +58,7 @@
         android:layout_weight="0.8"
         android:scaleType="centerInside"
         android:src="@android:drawable/checkbox_off_background"
+        android:contentDescription="@string/col_pago"
         app:tint="#BDBDBD" />
-
-    <!-- Botão de Detalhes (Seta) Centrada -->
-    <ImageView
-        android:layout_width="0dp"
-        android:layout_height="24dp"
-        android:layout_weight="0.7"
-        android:scaleType="centerInside"
-        android:src="@android:drawable/ic_media_play"
-        android:rotation="0"
-        app:tint="@color/colorAccent" />
 
 </LinearLayout>
