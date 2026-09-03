@@ -35,6 +35,8 @@
     <string name="guia_sec10_desc">Aceda ao menu lateral para ver o gráfico de barras anual. Ele permite comparar os seus ganhos e gastos reais mês a mês durante todo o ano.</string>
     <string name="guia_sec11_titulo">11. Categorias Personalizadas</string>
     <string name="guia_sec11_desc">Gira as suas categorias no menu \'Gerir Categorias\' ou ao registar itens. As categorias criadas sincronizam-se entre dispositivos e, ao eliminar uma categoria em uso, as respetivas transações são reatribuídas em segurança para \'Geral\'.</string>
+    <string name="guia_sec12_titulo">12. Notificações de Vencimento</string>
+    <string name="guia_sec12_desc">Receba lembretes automáticos sobre contas próximas do vencimento (hoje, nos próximos 3 dias ou em atraso recente). Ao tocar na notificação, a aplicação abre diretamente no Resumo. Pode ativar ou desativar as notificações a qualquer momento no seu perfil.</string>
     <string name="snackbar_item_removido">Item removido: %1$s</string>
     <string name="btn_desfazer">DESFAZER</string>
 
