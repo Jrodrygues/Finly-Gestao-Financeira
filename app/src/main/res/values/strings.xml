@@ -93,7 +93,7 @@
     <string name="label_total_despesas">Total mensal de despesas: </string>
     <string name="label_total_poupanca">Total poupança: </string>
     <string name="label_total_exterior">Total exterior: </string>
-    <string name="label_saldo">SALDO: </string>
+    <string name="label_saldo">SALDO EM CONTA: </string>
     <string name="btn_exportar_pdf">EXPORTAR RELATÓRIO PDF</string>
 
     <!-- Listagem (Home) -->

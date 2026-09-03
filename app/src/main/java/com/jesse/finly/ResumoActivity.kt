@@ -12,8 +12,11 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.os.Build
 import android.os.Bundle
+import android.content.res.Configuration
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -64,6 +67,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
 import java.util.Locale
+import kotlin.math.abs
 
 class ResumoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityResumoBinding
@@ -308,6 +312,16 @@ class ResumoActivity : AppCompatActivity() {
 
         // 2. Carregar dados do cabeçalho
         atualizarDrawerHeader()
+
+        // 3. Destacar ação destrutiva 'Terminar sessão' em vermelho
+        val menuItemSair = binding.navigationView.menu.findItem(R.id.nav_sair)
+        if (menuItemSair != null) {
+            val titleStr = menuItemSair.title.toString()
+            val spannable = SpannableString(titleStr)
+            spannable.setSpan(ForegroundColorSpan(ContextCompat.getColor(this, R.color.colorNegative)), 0, spannable.length, 0)
+            menuItemSair.title = spannable
+            menuItemSair.icon?.mutate()?.setTint(ContextCompat.getColor(this, R.color.colorNegative))
+        }
     }
 
     private fun obterCategoriasCustomizadas(): MutableList<String> {
@@ -1220,12 +1234,29 @@ class ResumoActivity : AppCompatActivity() {
 
 
 
+    private fun atualizarAparenciaCabecalho() {
+        val isDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        val headerBgColor = if (isDark) ContextCompat.getColor(this, R.color.surfaceColor) else ContextCompat.getColor(this, R.color.headerColor)
+        binding.viewHeader.setBackgroundColor(headerBgColor)
+
+        val textColor = ContextCompat.getColor(this, R.color.textColorPrimary)
+        binding.tvTitle.setTextColor(textColor)
+        binding.btnMenu.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary))
+
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            isAppearanceLightStatusBars = !isDark
+            isAppearanceLightNavigationBars = !isDark
+        }
+    }
+
     private fun atualizarInterface(renda: Double, despesa: Double, poupanca: Double, exterior: Double, saldo: Double, percent: Int) {
+        atualizarAparenciaCabecalho()
+
         val colorPositivo = ContextCompat.getColor(this, R.color.colorPositive)
         val colorNegativo = ContextCompat.getColor(this, R.color.colorNegative)
         val colorPadrao = ContextCompat.getColor(this, R.color.textColorPrimary)
+        val colorAlertaAviso = Color.parseColor("#FF9800")
 
-        // Usar valor absoluto para remover sinal de menos
         binding.tvTotalRenda.text = String.format(Locale.getDefault(), "%.2f €", kotlin.math.abs(renda))
         binding.tvTotalRenda.setTextColor(colorPositivo)
 
@@ -1234,15 +1265,27 @@ class ResumoActivity : AppCompatActivity() {
 
         binding.tvTotalPoupanca.text = String.format(Locale.getDefault(), "%.2f €", kotlin.math.abs(poupanca))
         binding.tvTotalPoupanca.setTextColor(colorPadrao)
-        
-        binding.tvTotalBrasil.text = String.format(Locale.getDefault(), "%.2f €", kotlin.math.abs(exterior))
+
+        binding.tvTotalBrasil.text = String.format(Locale.getDefault(), "%.2f €", abs(exterior))
         binding.tvTotalBrasil.setTextColor(colorPadrao)
-        
-        binding.tvSaldoFinal.text = String.format(Locale.getDefault(), "%.2f €", kotlin.math.abs(saldo))
+
+        if (saldo < 0) {
+            binding.tvSaldoFinal.text = String.format(Locale.getDefault(), "-%.2f €", abs(saldo))
+            binding.tvSaldoFinal.setTextColor(colorNegativo)
+        } else {
+            binding.tvSaldoFinal.text = String.format(Locale.getDefault(), "%.2f €", saldo)
+            binding.tvSaldoFinal.setTextColor(colorPositivo)
+        }
+
+        binding.tvSpentValue.text = String.format(Locale.getDefault(), "%.2f €", abs(despesa))
         binding.tvPercentValue.text = String.format(Locale.getDefault(), "%d%%", percent)
-        binding.tvSpentValue.text = String.format(Locale.getDefault(), "%.2f €", kotlin.math.abs(despesa))
-        
-        binding.tvSaldoFinal.setTextColor(if (saldo < 0) colorNegativo else colorPositivo)
+
+        val colorPercent = when {
+            percent > 100 -> colorNegativo
+            percent >= 80 -> colorAlertaAviso
+            else -> colorPositivo
+        }
+        binding.tvPercentValue.setTextColor(colorPercent)
     }
 
     private suspend fun processarRecorrencia(db: MinhaBaseDados, email: String, mesAlvo: String, anoAlvo: Int) {
