@@ -268,10 +268,14 @@ class DetalhesPageActivity : AppCompatActivity() {
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         
         val isDarkMode = prefs.getBoolean("DARK_MODE", false)
+        binding.switchDarkMode.setOnCheckedChangeListener(null)
         binding.switchDarkMode.isChecked = isDarkMode
         atualizarTextoModoEscuro(isDarkMode)
 
         binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
+            val desiredMode = if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+            val currentMode = AppCompatDelegate.getDefaultNightMode()
+
             prefs.edit {
                 putBoolean("DARK_MODE", isChecked)
                 putBoolean("SHOULD_SHOW_THEME_TOAST", true)
@@ -281,15 +285,13 @@ class DetalhesPageActivity : AppCompatActivity() {
             // sincronizar PREFERÊNCIA NO FIREBASE
             atualizarPreferenciaUtilizador(isChecked, "DARK_MODE")
             
-            // Pequeno delay para a transição ser notada
-            binding.root.postDelayed({
-                AppCompatDelegate.setDefaultNightMode(
-                    if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO,
-                )
-            }, 200)
+            if (currentMode != desiredMode) {
+                AppCompatDelegate.setDefaultNightMode(desiredMode)
+            }
         }
 
         val notifAtivas = prefs.getBoolean("NOTIFICATIONS", false)
+        binding.switchNotifications.setOnCheckedChangeListener(null)
         binding.switchNotifications.isChecked = notifAtivas
         
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->

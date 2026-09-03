@@ -7,14 +7,15 @@
 ## ✨ Funcionalidades Principais
 
 *   **📊 Dashboards Visuais:** Gráficos circulares (Donut) para resumo mensal, cartões dinâmicos por categoria e gráficos de barras para evolução anual de rendas e despesas.
-*   **🎯 Destaque Visual do Período:** Seleção de mês e ano com destaque proeminente no cabeçalho para rápida identificação do filtro ativo.
+*   **🎯 Destaque Visual do Período:** Seleção compacta de mês e ano com destaque proeminente no cabeçalho para rápida identificação do filtro ativo.
+*   **🔔 Notificações Inteligentes de Vencimento:** Alertas automáticos via **WorkManager** sobre contas a vencer (hoje, nos próximos dias ou em atraso recente) com atalho direto ao resumo.
 *   **🔄 Sincronização em Tempo Real:** Integração total com **Firebase Firestore**, garantindo que transações e categorias personalizadas sejam atualizadas instantaneamente entre todos os telemóveis ligados à mesma conta.
 *   **🏷️ Gestão de Categorias Personalizadas:** Crie e gira as suas próprias categorias. Ao eliminar uma categoria em utilização, as transações associadas são reatribuídas em segurança para a categoria **"Geral"**.
 *   **🔐 Autenticação & Modo Convidado 100% Privado:** Sistema de login/registo via Firebase Auth. O modo "Convidado" guarda dados exclusivamente locais (Room DB), sem qualquer envio para a nuvem.
 *   **📅 Recorrência Inteligente:** Registe contas fixas uma única vez e o sistema gera automaticamente as transações para os meses futuros com controlo de parcelas (ex: `1/3`).
-*   **📄 Exportação PDF Avançada:** Gere relatórios profissionais em PDF com o logótipo da aplicação em alta definição, tabela de **Resumo de Despesas por Categoria (%)** e tabelas separadas para **Rendas (Entradas)** e **Despesas (Saídas)** ordenadas cronologicamente por **Data de Vencimento**.
+*   **📄 Exportação PDF Avançada:** Gere relatórios profissionais em PDF com o logótipo em alta definição, tabela de **Resumo de Despesas por Categoria (%)** e tabelas separadas para **Rendas (Entradas)** e **Despesas (Saídas)** ordenadas cronologicamente por **Data de Vencimento**.
 *   **📈 Evolução Anual:** Painel exclusivo para comparar o desempenho financeiro mês a mês ao longo do ano.
-*   **🌓 Modo Escuro Nativo:** Interface totalmente adaptada para os modos Light e Dark, respeitando as definições do sistema.
+*   **🌓 Modo Escuro Nativo:** Interface totalmente adaptada para os modos Light e Dark com alteração fluida de tema.
 *   **📱 UX & Teclado Fluido:** Ajuste dinâmico da interface ao abrir o teclado (`SOFT_INPUT_ADJUST_RESIZE`) e recolha automática ao adicionar dados.
 
 ---
@@ -56,7 +57,8 @@ O projeto foi construído com as melhores práticas de desenvolvimento Android:
 *   **Arquitetura:** MVVM (Model-View-ViewModel) com Coroutines & Flow.
 *   **Base de Dados Local:** [Room Database](https://developer.android.com/training/data-storage/room) para persistência offline rápida.
 *   **Backend & Nuvem:** [Firebase](https://firebase.google.com/) (Firestore em tempo real, Auth).
-*   **Gráficos & PDFs:** [MPAndroidChart](https://github.com/PhilJay/MPAndroidChart) e API nativa `PdfDocument` com renderização vetorial.
+*   **Notificações & Background:** [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) para agendamento de tarefas e notificações nativas.
+*   **Gráficos & PDFs:** [MPAndroidChart](https://github.com/PhilJay/MPAndroidChart) e API nativa `PdfDocument` com renderização vetorial de alta definição.
 *   **UI/UX:** Material Design 3, View Binding, Edge-to-Edge API, Inset Listeners.
 
 ---

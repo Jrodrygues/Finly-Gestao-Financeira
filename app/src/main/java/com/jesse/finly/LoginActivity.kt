@@ -163,10 +163,10 @@ class LoginActivity : AppCompatActivity() {
                                 putBoolean("DARK_MODE", u.darkMode)
                                 putBoolean("NOTIFICATIONS", u.notifications)
                             }
-                            // Aplicar tema imediatamente
-                            AppCompatDelegate.setDefaultNightMode(
-                                if (u.darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO,
-                            )
+                            val desiredMode = if (u.darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+                            if (AppCompatDelegate.getDefaultNightMode() != desiredMode) {
+                                AppCompatDelegate.setDefaultNightMode(desiredMode)
+                            }
                             if (u.notifications) {
                                 NotificationHelper.agendarWorkerNotificacoes(this@LoginActivity)
                             }

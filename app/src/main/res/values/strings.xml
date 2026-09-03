@@ -24,7 +24,7 @@
     <string name="guia_sec5_titulo">5. Recorrência</string>
     <string name="guia_sec5_desc">Ao registar um item, pode marcar para que este se repita automaticamente nos meses seguintes, ideal para contas fixas como Aluguer ou Internet.</string>
     <string name="guia_sec6_titulo">6. Exportar Relatórios PDF</string>
-    <string name="guia_sec6_desc">Gere um relatório PDF profissional com o logótipo da aplicação, totais consolidados, resumo de despesas por categoria (%) e extrato completo do mês.</string>
+    <string name="guia_sec6_desc">Gere um relatório PDF profissional com o logótipo em alta definição, cartão de resumo, tabelas separadas para Rendas e Despesas ordenadas por data de vencimento e percentagens por categoria.</string>
     <string name="guia_sec7_titulo">7. Sincronização em Tempo Real</string>
     <string name="guia_sec7_desc">Ao criar conta, as suas transações e categorias são salvas na nuvem (Firebase) e sincronizadas instantaneamente em tempo real entre todos os seus telemóveis.</string>
     <string name="guia_sec8_titulo">8. Segurança</string>
