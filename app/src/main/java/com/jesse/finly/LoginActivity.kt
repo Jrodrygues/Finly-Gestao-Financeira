@@ -2,13 +2,20 @@ package com.jesse.finly
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -81,8 +88,38 @@ class LoginActivity : AppCompatActivity() {
             entrarComoConvidado()
         }
 
+        formatarTextoCriarConta()
+
         // Carregar endereço eletrónico lembrado se existir
         carregarEmailLembrado()
+    }
+
+    private fun formatarTextoCriarConta() {
+        val textoCompleto = getString(R.string.criar_conta_link)
+        val spannable = SpannableString(textoCompleto)
+
+        val indexCrieAqui = textoCompleto.indexOf("Crie aqui")
+        if (indexCrieAqui != -1) {
+            spannable.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(this, R.color.textColorSecondary)),
+                0,
+                indexCrieAqui,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            spannable.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(this, R.color.colorPrimary)),
+                indexCrieAqui,
+                textoCompleto.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            spannable.setSpan(
+                StyleSpan(Typeface.BOLD),
+                indexCrieAqui,
+                textoCompleto.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        binding.btnRegistar.text = spannable
     }
 
     private fun carregarEmailLembrado() {
@@ -266,18 +303,35 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun entrarComoConvidado() {
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Aviso de Convidado")
-            .setMessage("Como convidado, os seus dados são locais. Deseja continuar?")
-            .setPositiveButton("Sim") { _, _ ->
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle("Modo Convidado")
+            .setMessage(getString(R.string.msg_modo_convidado_aviso))
+            .setPositiveButton(getString(R.string.btn_continuar_convidado)) { _, _ ->
                 getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                     putString(KEY_EMAIL, "CONVIDADO")
                     putLong(KEY_LAST_LOGIN, System.currentTimeMillis())
                 }
                 prosseguirParaApp()
             }
-            .setNegativeButton("Voltar", null)
-            .show()
+            .setNegativeButton("Cancelar", null)
+            .create()
+
+        dialog.show()
+
+        val btnPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        val btnNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+        btnPositive?.apply {
+            setBackgroundColor(ContextCompat.getColor(this@LoginActivity, R.color.colorPrimary))
+            setTextColor(ContextCompat.getColor(this@LoginActivity, R.color.white))
+            val dpHorizontal = (16 * resources.displayMetrics.density).toInt()
+            val dpVertical = (8 * resources.displayMetrics.density).toInt()
+            setPadding(dpHorizontal, dpVertical, dpHorizontal, dpVertical)
+        }
+
+        btnNegative?.apply {
+            setTextColor(ContextCompat.getColor(this@LoginActivity, R.color.textColorSecondary))
+        }
     }
 
     private fun prosseguirParaApp() {

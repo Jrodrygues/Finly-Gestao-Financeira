@@ -111,6 +111,8 @@ class RegistoActivity : AppCompatActivity() {
 
 
 
+        binding.btnBackRegisto.setOnClickListener { finish() }
+
         if (isNewUserRegistration) {
             configurarParaNovoUtilizador()
         } else if (isUserEditMode) {
@@ -448,6 +450,8 @@ class RegistoActivity : AppCompatActivity() {
         
         binding.senhaLayout.visibility = View.VISIBLE
         binding.senhaLayout.setStartIconDrawable(R.drawable.ic_lock)
+        binding.confirmarSenhaLayout.visibility = View.VISIBLE
+        binding.confirmarSenhaLayout.setStartIconDrawable(R.drawable.ic_lock)
         
         binding.categoriaLayout.visibility = View.GONE
         binding.rgTipo.visibility = View.GONE
@@ -482,6 +486,7 @@ class RegistoActivity : AppCompatActivity() {
 
         binding.senhaLayout.visibility = View.VISIBLE
         binding.senhaLayout.setStartIconDrawable(R.drawable.ic_lock)
+        binding.confirmarSenhaLayout.visibility = View.GONE
         binding.regSenhaText.setText(intent.getStringExtra("senha"))
 
         binding.categoriaLayout.visibility = View.GONE
@@ -496,6 +501,7 @@ class RegistoActivity : AppCompatActivity() {
 
     private fun configurarParaTransacao() {
         binding.senhaLayout.visibility = View.GONE
+        binding.confirmarSenhaLayout.visibility = View.GONE
         binding.itemLayout.setStartIconDrawable(R.drawable.ic_edit)
         binding.valorLayout.setStartIconDrawable(R.drawable.ic_attach_money)
         binding.dataLayout.setStartIconDrawable(R.drawable.ic_calendar)
@@ -679,9 +685,15 @@ class RegistoActivity : AppCompatActivity() {
         val emailInput = binding.regEmailText.text.toString().trim()
         val phone = binding.regPhoneText.text.toString().trim()
         val senha = binding.regSenhaText.text.toString().trim()
+        val confirmarSenha = binding.regConfirmarSenhaText.text.toString().trim()
 
-        if (nome.isEmpty() || emailInput.isEmpty() || senha.isEmpty()) {
+        if (nome.isEmpty() || emailInput.isEmpty() || senha.isEmpty() || confirmarSenha.isEmpty()) {
             showToast("Introduza todos os campos obrigatórios")
+            return
+        }
+
+        if (senha != confirmarSenha) {
+            showToast("As palavras-passe não coincidem")
             return
         }
 

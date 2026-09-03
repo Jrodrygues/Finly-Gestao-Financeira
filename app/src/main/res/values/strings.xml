@@ -41,16 +41,21 @@
     <string name="guia_sec13_desc">A sua privacidade é a nossa prioridade. O Finly utiliza encriptação de ponta fornecida pelo Google Firebase para garantir que apenas você tem acesso aos seus dados financeiros.</string>
     <string name="snackbar_item_removido">Item removido: %1$s</string>
     <string name="btn_desfazer">DESFAZER</string>
+    <string name="btn_voltar">Voltar</string>
 
 
 
     <!-- Login -->
-    <string name="lembrar_email">Lembrar o meu e-mail</string>
+    <string name="lembrar_email">Lembrar e-mail</string>
     <string name="entrar">ENTRAR</string>
-    <string name="entrar_convidado">ENTRAR COMO CONVIDADO</string>
+    <string name="entrar_convidado">Entrar como convidado</string>
+    <string name="ou_separador">OU</string>
     <string name="bem_vindo_finly">Bem-vindo ao Finly</string>
     <string name="criar_conta_link">Não tem conta? Crie aqui</string>
-    <string name="esqueceu_senha">Esqueceu-se da palavra-passe?</string>
+    <string name="esqueceu_senha">Esqueceu a palavra-passe?</string>
+    <string name="msg_modo_convidado_aviso">Como convidado, os seus dados não serão sincronizados na nuvem e podem ser perdidos se desinstalar a aplicação. Deseja continuar?</string>
+    <string name="btn_continuar_convidado">Continuar</string>
+    <string name="hint_confirmar_palavra_passe">Confirmar Palavra-passe</string>
     <string name="email_recuperacao_enviado">E-mail de recuperação enviado!</string>
     <string name="erro_recuperacao">Erro ao enviar e-mail de recuperação.</string>
     <string name="introduza_email_recuperacao">Introduza o seu e-mail para recuperar a palavra-passe.</string>
