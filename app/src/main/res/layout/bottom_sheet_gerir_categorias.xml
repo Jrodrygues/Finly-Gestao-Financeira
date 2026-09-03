@@ -8,7 +8,7 @@
     android:paddingStart="24dp"
     android:paddingTop="16dp"
     android:paddingEnd="24dp"
-    android:paddingBottom="24dp">
+    android:paddingBottom="32dp">
 
     <!-- Puxador Superior -->
     <View
@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/hint_nova_categoria"
-            app:startIconDrawable="@drawable/ic_edit"
+            app:startIconDrawable="@drawable/ic_tag"
             app:startIconTint="@color/colorPrimary"
             app:boxCornerRadiusBottomEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -155,7 +155,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:paddingBottom="12dp"
                 android:text="Ver mais categorias do sistema"
                 android:textAllCaps="false"
                 android:textColor="@color/colorPrimary"
