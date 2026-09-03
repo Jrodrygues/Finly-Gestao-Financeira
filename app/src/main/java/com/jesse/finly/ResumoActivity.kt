@@ -995,11 +995,11 @@ class ResumoActivity : AppCompatActivity() {
 
     private fun configurarSpinners() {
         val adapterMes = ArrayAdapter(this, R.layout.spinner_selected_item, meses)
-        adapterMes.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        adapterMes.setDropDownViewResource(R.layout.spinner_dropdown_item)
         binding.spinnerMes.adapter = adapterMes
 
         val adapterAno = ArrayAdapter(this, R.layout.spinner_selected_item, anos)
-        adapterAno.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        adapterAno.setDropDownViewResource(R.layout.spinner_dropdown_item)
         binding.spinnerAno.adapter = adapterAno
 
         val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
