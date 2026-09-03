@@ -8,6 +8,5 @@
     android:paddingHorizontal="16dp"
     android:paddingVertical="12dp"
     android:singleLine="true"
-    android:textColor="@color/colorPrimary"
-    android:textSize="15sp"
-    android:textStyle="bold" />
+    android:textColor="@color/textColorPrimary"
+    android:textSize="15sp" />

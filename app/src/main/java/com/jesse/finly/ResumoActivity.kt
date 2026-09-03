@@ -1,18 +1,21 @@
 package com.jesse.finly
 
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
@@ -993,13 +996,37 @@ class ResumoActivity : AppCompatActivity() {
         }
     }
 
+    private class HighlightSpinnerAdapter<T>(
+        context: Context,
+        objects: Array<T>,
+        private val getSelectedIndex: () -> Int
+    ) : ArrayAdapter<T>(context, R.layout.spinner_selected_item, objects) {
+
+        init {
+            setDropDownViewResource(R.layout.spinner_dropdown_item)
+        }
+
+        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view = super.getDropDownView(position, convertView, parent)
+            val textView = view.findViewById<TextView>(android.R.id.text1) ?: (view as? TextView)
+
+            val selectedIndex = getSelectedIndex()
+            if (position == selectedIndex) {
+                textView?.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                textView?.setTypeface(null, Typeface.BOLD)
+            } else {
+                textView?.setTextColor(ContextCompat.getColor(context, R.color.textColorPrimary))
+                textView?.setTypeface(null, Typeface.NORMAL)
+            }
+            return view
+        }
+    }
+
     private fun configurarSpinners() {
-        val adapterMes = ArrayAdapter(this, R.layout.spinner_selected_item, meses)
-        adapterMes.setDropDownViewResource(R.layout.spinner_dropdown_item)
+        val adapterMes = HighlightSpinnerAdapter(this, meses) { binding.spinnerMes.selectedItemPosition }
         binding.spinnerMes.adapter = adapterMes
 
-        val adapterAno = ArrayAdapter(this, R.layout.spinner_selected_item, anos)
-        adapterAno.setDropDownViewResource(R.layout.spinner_dropdown_item)
+        val adapterAno = HighlightSpinnerAdapter(this, anos) { binding.spinnerAno.selectedItemPosition }
         binding.spinnerAno.adapter = adapterAno
 
         val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
