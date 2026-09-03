@@ -1,63 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="10dp"
-    app:cardElevation="6dp"
-    app:cardBackgroundColor="@color/surfaceColor"
-    app:strokeColor="#33FFFFFF"
-    app:strokeWidth="1dp">
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardMarkerContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="8dp"
-        android:gravity="center_horizontal">
+        app:cardBackgroundColor="@color/surfaceColor"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="6dp"
+        app:strokeColor="@color/colorPrimary"
+        app:strokeWidth="1.5dp">
 
         <TextView
-            android:id="@+id/tvMarkerMes"
+            android:id="@+id/tvMarkerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
             android:textColor="@color/textColorPrimary"
-            android:textSize="12sp"
+            android:textSize="13sp"
             android:textStyle="bold"
-            tools:text="Janeiro" />
+            tools:text="Setembro: -72,35 €" />
+    </com.google.android.material.card.MaterialCardView>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="4dp">
+    <ImageView
+        android:id="@+id/ivMarkerArrow"
+        android:layout_width="12dp"
+        android:layout_height="6dp"
+        android:layout_marginTop="-1dp"
+        android:contentDescription="@null"
+        android:rotation="180"
+        android:src="@drawable/ic_chevron_left"
+        app:tint="@color/colorPrimary" />
 
-            <TextView
-                android:id="@+id/tvMarkerRenda"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorPositive"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                tools:text="0€" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/textColorSecondary"
-                android:textSize="11sp"
-                android:text="@string/marker_separator" />
-
-            <TextView
-                android:id="@+id/tvMarkerDespesa"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorNegative"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                tools:text="0€" />
-        </LinearLayout>
-
-    </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+</LinearLayout>

@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.card.MaterialCardView
 import com.github.mikephil.charting.components.MarkerView
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -109,6 +111,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
             isScaleXEnabled = false
             isScaleYEnabled = false
             isDoubleTapToZoomEnabled = false
+            setExtraOffsets(5f, 5f, 5f, 8f)
 
             val isDark = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
             val textColor = if (isDark) Color.WHITE else Color.BLACK
@@ -174,26 +177,46 @@ class EvolucaoAnualActivity : AppCompatActivity() {
     inner class ChartMarkerView(context: Context) :
         MarkerView(context, R.layout.layout_chart_marker) {
 
-        private val tvMes: TextView = findViewById(R.id.tvMarkerMes)
-        private val tvRenda: TextView = findViewById(R.id.tvMarkerRenda)
-        private val tvDespesa: TextView = findViewById(R.id.tvMarkerDespesa)
+        private val cardContainer: MaterialCardView? = findViewById(R.id.cardMarkerContainer)
+        private val tvMarkerText: TextView? = findViewById(R.id.tvMarkerText)
+        private val ivArrow: ImageView? = findViewById(R.id.ivMarkerArrow)
 
         override fun refreshContent(e: Entry?, highlight: Highlight?) {
             if (e != null) {
                 val index = e.x.toInt()
                 if (index in 0..11) {
-                    tvMes.text = mesesNomes[index]
-                    val renda = rendaPorMes[index]
-                    val despesa = despesaPorMes[index]
-                    tvRenda.text = String.format(Locale.getDefault(), "%.0f€", renda)
-                    tvDespesa.text = String.format(Locale.getDefault(), "%.0f€", despesa)
+                    val mesNome = mesesNomes[index]
+                    val renda = rendaPorMes[index].toDouble()
+                    val despesa = despesaPorMes[index].toDouble()
+                    val balanco = renda - despesa
+
+                    val corPositivo = ContextCompat.getColor(context, R.color.colorPositive)
+                    val corNegativo = ContextCompat.getColor(context, R.color.colorNegative)
+
+                    if (balanco < 0) {
+                        tvMarkerText?.text = String.format(Locale.getDefault(), "%s: -%.2f €", mesNome, abs(balanco))
+                        tvMarkerText?.setTextColor(corNegativo)
+                        cardContainer?.strokeColor = corNegativo
+                        ivArrow?.setColorFilter(corNegativo)
+                    } else {
+                        tvMarkerText?.text = String.format(Locale.getDefault(), "%s: +%.2f €", mesNome, balanco)
+                        tvMarkerText?.setTextColor(corPositivo)
+                        cardContainer?.strokeColor = corPositivo
+                        ivArrow?.setColorFilter(corPositivo)
+                    }
                 }
             }
             super.refreshContent(e, highlight)
         }
 
         override fun getOffset(): MPPointF {
-            return MPPointF(-(width / 2f), -height.toFloat() - 15f)
+            val entryY = chartView?.highlighted?.firstOrNull()?.y ?: 0f
+            val yOffset = if (entryY < 0f) {
+                -height.toFloat() - 35f
+            } else {
+                -height.toFloat() - 25f
+            }
+            return MPPointF(-(width / 2f), yOffset)
         }
     }
 
@@ -313,8 +336,8 @@ class EvolucaoAnualActivity : AppCompatActivity() {
             setDrawValues(true)
             valueTextColor = textColor
             valueTextSize = 10f
-            highLightColor = ContextCompat.getColor(this@EvolucaoAnualActivity, R.color.colorPrimary)
-            highLightAlpha = 150
+            highLightColor = Color.WHITE
+            highLightAlpha = 80
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
                     if (value == 0f) return ""

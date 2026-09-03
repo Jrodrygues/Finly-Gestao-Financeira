@@ -189,8 +189,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/cardDetalheMes"
         app:layout_constraintTop_toBottomOf="@+id/cardResumoAnual" />
 
@@ -205,7 +205,6 @@
         app:cardCornerRadius="16dp"
         app:cardElevation="2dp"
         app:cardBackgroundColor="@color/surfaceColor"
-        app:layout_constraintTop_toBottomOf="@+id/barChartAnual"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
