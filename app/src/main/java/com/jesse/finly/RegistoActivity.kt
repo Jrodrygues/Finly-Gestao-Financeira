@@ -8,6 +8,7 @@ import android.app.DatePickerDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
@@ -15,6 +16,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -53,6 +56,7 @@ class RegistoActivity : AppCompatActivity() {
     private var itemOriginal: String? = null
     private var userId = 0
     private var isNewUserRegistration = false
+    private var senhaStr = ""
 
     private val meses = arrayOf("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro")
 
@@ -71,8 +75,12 @@ class RegistoActivity : AppCompatActivity() {
 
         if (isNew) {
             binding.root.setBackgroundResource(R.drawable.login_background)
+            binding.mainLayoutRegisto.setBackgroundColor(Color.TRANSPARENT)
         } else {
-            binding.root.setBackgroundResource(R.color.backgroundColor)
+            val bgCol = ContextCompat.getColor(this, R.color.backgroundColor)
+            window.decorView.setBackgroundColor(bgCol)
+            binding.root.setBackgroundColor(bgCol)
+            binding.mainLayoutRegisto.setBackgroundColor(bgCol)
         }
 
         isNewUserRegistration = isNew
@@ -220,6 +228,15 @@ class RegistoActivity : AppCompatActivity() {
         }
         lista.add(getString(R.string.option_nova_categoria))
         return lista
+    }
+
+    private fun formatarTelemovel(phone: String): String {
+        val clean = phone.trim()
+        val digits = clean.filter { it.isDigit() }
+        if (digits.length == 9) {
+            return "${digits.substring(0, 3)} ${digits.substring(3, 6)} ${digits.substring(6)}"
+        }
+        return clean
     }
 
     private fun obterCategoriasCustomizadas(): MutableList<String> {
@@ -433,12 +450,17 @@ class RegistoActivity : AppCompatActivity() {
 
 
     private fun configurarParaNovoUtilizador() {
+        binding.btnAlterarSenhaPerfil.visibility = View.GONE
         binding.titleRegisto.text = getString(R.string.criar_nova_conta)
         binding.itemLayout.hint = getString(R.string.hint_nome_completo)
         binding.itemLayout.setStartIconDrawable(R.drawable.ic_person)
         
         binding.valorLayout.hint = getString(R.string.hint_email_input)
         binding.valorLayout.setStartIconDrawable(R.drawable.ic_email)
+        binding.valorLayout.alpha = 1.0f
+        binding.regEmailText.isEnabled = true
+        binding.regEmailText.isFocusable = true
+        binding.regEmailText.isFocusableInTouchMode = true
         binding.regEmailText.inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
         
         binding.dataLayout.hint = getString(R.string.hint_telemovel)
@@ -448,8 +470,10 @@ class RegistoActivity : AppCompatActivity() {
         binding.regPhoneText.isFocusable = true
         binding.regPhoneText.setOnClickListener(null)
         
+        binding.senhaLayout.hint = getString(R.string.hint_palavra_passe)
         binding.senhaLayout.visibility = View.VISIBLE
         binding.senhaLayout.setStartIconDrawable(R.drawable.ic_lock)
+        binding.confirmarSenhaLayout.hint = getString(R.string.hint_confirmar_palavra_passe)
         binding.confirmarSenhaLayout.visibility = View.VISIBLE
         binding.confirmarSenhaLayout.setStartIconDrawable(R.drawable.ic_lock)
         
@@ -473,21 +497,56 @@ class RegistoActivity : AppCompatActivity() {
         binding.valorLayout.hint = getString(R.string.hint_email_inalteravel)
         binding.valorLayout.setStartIconDrawable(R.drawable.ic_email)
         binding.regEmailText.setText(intent.getStringExtra("email"))
-        binding.regEmailText.isEnabled = false
-        binding.regEmailText.alpha = 0.6f
+        binding.regEmailText.isFocusable = false
+        binding.regEmailText.isFocusableInTouchMode = false
+        binding.regEmailText.isLongClickable = false
+        binding.valorLayout.alpha = 0.5f
+
+        val showToastEmailBlock = {
+            showToast("E-mail inalterável")
+        }
+
+        binding.regEmailText.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                showToastEmailBlock()
+                v.performClick()
+            }
+            true
+        }
+
+        binding.valorLayout.setOnClickListener {
+            showToastEmailBlock()
+        }
         
         binding.dataLayout.hint = getString(R.string.hint_telemovel)
         binding.dataLayout.setStartIconDrawable(R.drawable.ic_phone)
-        binding.regPhoneText.setText(intent.getStringExtra("phone"))
+        binding.regPhoneText.setText(formatarTelemovel(intent.getStringExtra("phone") ?: ""))
         binding.regPhoneText.inputType = android.text.InputType.TYPE_CLASS_PHONE
         binding.regPhoneText.isFocusableInTouchMode = true
         binding.regPhoneText.isFocusable = true
         binding.regPhoneText.setOnClickListener(null)
 
-        binding.senhaLayout.visibility = View.VISIBLE
-        binding.senhaLayout.setStartIconDrawable(R.drawable.ic_lock)
+        senhaStr = intent.getStringExtra("senha") ?: ""
+        binding.senhaLayout.visibility = View.GONE
         binding.confirmarSenhaLayout.visibility = View.GONE
-        binding.regSenhaText.setText(intent.getStringExtra("senha"))
+        binding.senhaLayout.hint = "Nova Palavra-passe"
+        binding.confirmarSenhaLayout.hint = "Confirmar Nova Palavra-passe"
+        binding.regSenhaText.setText("")
+        binding.regConfirmarSenhaText.setText("")
+
+        binding.btnAlterarSenhaPerfil.visibility = View.VISIBLE
+        binding.btnAlterarSenhaPerfil.setOnClickListener {
+            mostrarDialogValidarSenhaAtual()
+        }
+
+        binding.btnCancelarTrocaSenha.setOnClickListener {
+            binding.senhaLayout.visibility = View.GONE
+            binding.confirmarSenhaLayout.visibility = View.GONE
+            binding.btnCancelarTrocaSenha.visibility = View.GONE
+            binding.regSenhaText.setText("")
+            binding.regConfirmarSenhaText.setText("")
+            binding.btnAlterarSenhaPerfil.visibility = View.VISIBLE
+        }
 
         binding.categoriaLayout.visibility = View.GONE
         binding.rgTipo.visibility = View.GONE
@@ -499,9 +558,66 @@ class RegistoActivity : AppCompatActivity() {
         binding.btnFinalizarRegisto.text = getString(R.string.btn_atualizar_perfil)
     }
 
+    private fun mostrarDialogValidarSenhaAtual() {
+        val view = layoutInflater.inflate(R.layout.dialog_validar_senha_atual, binding.root as? ViewGroup, false)
+        val etSenhaAtual = view.findViewById<TextInputEditText>(R.id.etSenhaAtual)
+
+        val icon = ContextCompat.getDrawable(this, R.drawable.ic_lock)?.mutate()
+        icon?.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle("Palavra-passe Atual")
+            .setIcon(icon)
+            .setMessage("Por motivos de segurança, introduza a sua palavra-passe atual para definir uma nova.")
+            .setView(view)
+            .setPositiveButton("Confirmar") { d, _ ->
+                val digitada = etSenhaAtual?.text.toString().trim()
+                if (digitada == senhaStr) {
+                    showToast("Palavra-passe confirmada!")
+                    binding.btnAlterarSenhaPerfil.visibility = View.GONE
+                    binding.senhaLayout.visibility = View.VISIBLE
+                    binding.confirmarSenhaLayout.visibility = View.VISIBLE
+                    binding.btnCancelarTrocaSenha.visibility = View.VISIBLE
+                    binding.regSenhaText.requestFocus()
+                    d.dismiss()
+                } else {
+                    showToast("Palavra-passe atual incorreta!")
+                    binding.btnAlterarSenhaPerfil.visibility = View.VISIBLE
+                    binding.senhaLayout.visibility = View.GONE
+                    binding.confirmarSenhaLayout.visibility = View.GONE
+                    binding.btnCancelarTrocaSenha.visibility = View.GONE
+                    d.dismiss()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .create()
+
+        dialog.show()
+
+        val btnPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        val btnNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+        btnPositive?.apply {
+            setBackgroundColor(ContextCompat.getColor(this@RegistoActivity, R.color.colorPrimary))
+            setTextColor(ContextCompat.getColor(this@RegistoActivity, R.color.white))
+            val dpHorizontal = (16 * resources.displayMetrics.density).toInt()
+            val dpVertical = (8 * resources.displayMetrics.density).toInt()
+            setPadding(dpHorizontal, dpVertical, dpHorizontal, dpVertical)
+        }
+
+        btnNegative?.apply {
+            setTextColor(ContextCompat.getColor(this@RegistoActivity, R.color.textColorSecondary))
+        }
+    }
+
     private fun configurarParaTransacao() {
+        binding.btnAlterarSenhaPerfil.visibility = View.GONE
         binding.senhaLayout.visibility = View.GONE
         binding.confirmarSenhaLayout.visibility = View.GONE
+        binding.valorLayout.alpha = 1.0f
+        binding.regEmailText.isEnabled = true
+        binding.regEmailText.isFocusable = true
+        binding.regEmailText.isFocusableInTouchMode = true
         binding.itemLayout.setStartIconDrawable(R.drawable.ic_edit)
         binding.valorLayout.setStartIconDrawable(R.drawable.ic_attach_money)
         binding.dataLayout.setStartIconDrawable(R.drawable.ic_calendar)
@@ -734,29 +850,42 @@ class RegistoActivity : AppCompatActivity() {
         val emailInput = binding.regEmailText.text.toString().trim()
         val email = emailInput.lowercase()
         val phone = binding.regPhoneText.text.toString().trim()
-        val senha = binding.regSenhaText.text.toString().trim()
+        val novaSenha = binding.regSenhaText.text.toString().trim()
+        val confirmarSenha = binding.regConfirmarSenhaText.text.toString().trim()
 
         if (nome.isEmpty() || email.isEmpty()) {
             showToast("Nome e E-mail são obrigatórios")
             return
         }
 
+        val senhaFinal = if (binding.senhaLayout.visibility == View.VISIBLE && novaSenha.isNotEmpty()) {
+            if (novaSenha != confirmarSenha) {
+                showToast("As palavras-passe não coincidem")
+                return
+            }
+            novaSenha
+        } else {
+            senhaStr
+        }
+
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
             val dao = db.utilizadorDao()
-            
+
+            val userExistente = dao.buscarPorEmail(email)
             val utilizadorEditado = Utilizador(
-                id = userId,
+                id = if (userId > 0) userId else (userExistente?.id ?: 0),
                 nome = nome,
                 email = email,
                 telemovel = phone,
                 donoEmail = "SISTEMA",
-                senha = senha
+                senha = senhaFinal,
+                darkMode = userExistente?.darkMode ?: false,
+                notifications = userExistente?.notifications ?: false,
+                customCategories = userExistente?.customCategories ?: ""
             )
-            
-            // 1. Atualizar localmente sempre
+
             dao.atualizarUtilizador(utilizadorEditado)
-            
             FirebaseManager.salvarUtilizadorNoFirestore(utilizadorEditado)
 
             val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)

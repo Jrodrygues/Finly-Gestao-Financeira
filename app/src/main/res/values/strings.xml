@@ -32,13 +32,13 @@
     <string name="guia_sec9_titulo">9. Evolução Anual</string>
     <string name="guia_sec9_desc">Aceda ao menu lateral para ver o gráfico de barras anual. Permite comparar os seus ganhos e gastos reais mês a mês durante todo o ano.</string>
     <string name="guia_sec10_titulo">10. Sincronização em Tempo Real</string>
-    <string name="guia_sec10_desc">Ao criar conta, as suas transações, metas de poupança e categorias são salvas na nuvem (Firebase) e sincronizadas instantaneamente em tempo real entre todos os seus telemóveis.</string>
+    <string name="guia_sec10_desc">Ao criar conta, as suas transações, metas de poupança e categorias são sincronizadas com segurança na nuvem com criptografia de ponta a ponta entre todos os seus telemóveis.</string>
     <string name="guia_sec11_titulo">11. Modo Convidado (100% Local)</string>
-    <string name="guia_sec11_desc">Experimente todas as funcionalidades da aplicação sem criar conta. No Modo Convidado, os seus dados são guardados exclusivamente no dispositivo (Room DB) com total privacidade.</string>
+    <string name="guia_sec11_desc">Experimente todas as funcionalidades da aplicação sem criar conta. No Modo Convidado, os seus dados são guardados exclusivamente na memória do seu dispositivo com total privacidade.</string>
     <string name="guia_sec12_titulo">12. Modo Escuro / Claro</string>
     <string name="guia_sec12_desc">Adapte a interface às suas preferências visuais. Ative ou desative o Modo Escuro no seu perfil para uma experiência de utilização confortável a qualquer hora.</string>
     <string name="guia_sec13_titulo">13. Segurança &amp; Privacidade</string>
-    <string name="guia_sec13_desc">A sua privacidade é a nossa prioridade. O Finly utiliza encriptação de ponta fornecida pelo Google Firebase para garantir que apenas você tem acesso aos seus dados financeiros.</string>
+    <string name="guia_sec13_desc">A sua privacidade é a nossa prioridade. O Finly utiliza encriptação de ponta para garantir que apenas você tem acesso aos seus dados financeiros.</string>
     <string name="snackbar_item_removido">Item removido: %1$s</string>
     <string name="btn_desfazer">DESFAZER</string>
     <string name="btn_voltar">Voltar</string>
@@ -61,6 +61,7 @@
     <string name="introduza_email_recuperacao">Introduza o seu e-mail para recuperar a palavra-passe.</string>
     <string name="hint_email">E-mail</string>
     <string name="hint_palavra_passe">Palavra-passe</string>
+    <string name="hint_palavra_passe_atual">Palavra-passe Atual</string>
 
     <!-- Registo / Novo Item -->
     <string name="nova_transacao">Nova Transação</string>

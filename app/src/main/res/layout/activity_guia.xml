@@ -5,13 +5,14 @@
     android:layout_height="match_parent"
     android:background="@color/backgroundColor">
 
-    <!-- Cabeçalho Uniforme -->
+    <!-- Cabeçalho Uniforme com Sombra/Elevação -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/viewHeaderGuia"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="120dp"
-        android:background="@color/colorAccent"
+        android:background="@color/headerColor"
+        android:elevation="4dp"
         android:paddingBottom="16dp"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -21,17 +22,17 @@
             android:layout_height="48dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_chevron_left"
-            android:contentDescription="@string/guia_titulo"
+            android:contentDescription="@string/btn_voltar"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:tint="@color/white" />
+            app:tint="@color/colorPrimary" />
 
         <TextView
             android:id="@+id/tvTitleGuia"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/guia_titulo"
-            android:textColor="@color/white"
+            android:textColor="@color/textColorPrimary"
             android:textSize="@dimen/text_size_small_title"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -75,7 +76,7 @@
                         android:layout_height="32dp"
                         android:src="@drawable/ic_dashboard"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -87,7 +88,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec1_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -121,9 +122,9 @@
                     <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:src="@drawable/ic_attach_money"
+                        android:src="@drawable/ic_dashboard"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -135,7 +136,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec2_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -171,7 +172,7 @@
                         android:layout_height="32dp"
                         android:src="@drawable/ic_list"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -183,7 +184,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec3_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -219,7 +220,7 @@
                         android:layout_height="32dp"
                         android:src="@drawable/ic_add"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -231,7 +232,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec4_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -267,7 +268,7 @@
                         android:layout_height="32dp"
                         android:src="@drawable/ic_calendar"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -279,7 +280,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec5_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -315,7 +316,7 @@
                         android:layout_height="32dp"
                         android:src="@drawable/ic_edit"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -327,7 +328,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec6_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -363,7 +364,7 @@
                         android:layout_height="32dp"
                         android:src="@android:drawable/ic_popup_reminder"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -375,7 +376,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec7_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -390,7 +391,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Card 8: Exportação PDF -->
+            <!-- Card 8: Exportar Relatórios PDF -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -411,7 +412,7 @@
                         android:layout_height="32dp"
                         android:src="@drawable/ic_pdf"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -423,7 +424,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec8_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -457,9 +458,9 @@
                     <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:src="@drawable/ic_dashboard"
+                        android:src="@drawable/ic_calendar"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -471,7 +472,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec9_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -507,7 +508,7 @@
                         android:layout_height="32dp"
                         android:src="@drawable/ic_cloud_done"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -519,7 +520,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec10_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -555,7 +556,7 @@
                         android:layout_height="32dp"
                         android:src="@drawable/ic_person"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -567,7 +568,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec11_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -601,9 +602,9 @@
                     <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:src="@drawable/ic_help"
+                        android:src="@drawable/ic_theme"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -615,7 +616,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec12_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
@@ -651,7 +652,7 @@
                         android:layout_height="32dp"
                         android:src="@drawable/ic_lock"
                         android:contentDescription="@null"
-                        app:tint="@color/colorAccent" />
+                        app:tint="@color/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -663,7 +664,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/guia_sec13_titulo"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 

@@ -94,6 +94,7 @@ class DetalhesPageActivity : AppCompatActivity() {
 
         // VERIFICAR SE PRECISA MOSTRAR TOSTE DE TEMA APÓS RECREAÇÃO
         verificarToastTemaPendente()
+        atualizarAparenciaCabecalho()
 
         // CARREGAR ENDEREÇO ELETRÓNICO LOGO NO INÍCIO (Crucial para as funções de apagar)
         emailStr = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "") ?: ""
@@ -191,10 +192,34 @@ class DetalhesPageActivity : AppCompatActivity() {
         configurarConfiguracoes()
     }
 
+    private fun atualizarAparenciaCabecalho() {
+        val isDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        val headerBg = if (isDark) ContextCompat.getColor(this, R.color.surfaceColor) else ContextCompat.getColor(this, R.color.headerColor)
+        binding.headerView.setBackgroundColor(headerBg)
+
+        val textColor = ContextCompat.getColor(this, R.color.textColorPrimary)
+        binding.userName.setTextColor(textColor)
+        binding.btnBackProfile.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary))
+
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            isAppearanceLightStatusBars = !isDark
+            isAppearanceLightNavigationBars = !isDark
+        }
+    }
+
+    private fun formatarTelemovel(phone: String): String {
+        val clean = phone.trim()
+        val digits = clean.filter { it.isDigit() }
+        if (digits.length == 9) {
+            return "${digits.substring(0, 3)} ${digits.substring(3, 6)} ${digits.substring(6)}"
+        }
+        return clean
+    }
+
     private fun atualizarUIPerfil() {
         binding.userName.text = userNameStr
         binding.tvEmailDetail.text = emailStr
-        binding.tvPhoneDetail.text = phoneStr
+        binding.tvPhoneDetail.text = formatarTelemovel(phoneStr)
         binding.tvPhoneDetail.visibility = View.VISIBLE
 
         configurarVisualSemFoto(userNameStr)
@@ -217,8 +242,8 @@ class DetalhesPageActivity : AppCompatActivity() {
 
 
     private fun configurarCliques() {
+        binding.btnBackProfile.setOnClickListener { finish() }
         binding.btnVoltarPlanilha.setOnClickListener { finish() }
-        binding.btnVerContactos.setOnClickListener { finish() }
 
         binding.btnEditarTransacao.setOnClickListener {
             val intent = Intent(this, RegistoActivity::class.java)
@@ -557,22 +582,18 @@ class DetalhesPageActivity : AppCompatActivity() {
 
     private fun confirmarExclusaoConta() {
         val icon = ContextCompat.getDrawable(this, R.drawable.ic_delete)?.mutate()
-        icon?.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
+        icon?.setTint(ContextCompat.getColor(this, R.color.colorNegative))
 
         MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.dialog_eliminar_titulo))
+            .setTitle("Eliminar Conta")
             .setIcon(icon)
-            .setMessage(getString(R.string.dialog_eliminar_msg))
+            .setMessage("Esta ação é irreversível. A sua conta e todos os seus dados serão eliminados permanentemente da nuvem e do dispositivo. Deseja continuar?")
             .setPositiveButton("Sim, Eliminar") { _, _ ->
                 lifecycleScope.launch(Dispatchers.IO) {
-                    // 1. ELIMINAR DA NUVEM (FIRESTORE, STORAGE, AUTH)
                     val sucessoNuvem = FirebaseManager.excluirContaTotal(emailStr)
-                    
                     if (sucessoNuvem) {
                         val db = MinhaBaseDados.getDatabase(this@DetalhesPageActivity)
                         val dao = db.utilizadorDao()
-                        
-                        // 2. ELIMINAR LOCALMENTE
                         dao.apagarTodasTransacoesDoDono(emailStr)
                         val utilizador = dao.buscarPorEmail(emailStr)
                         utilizador?.let { dao.apagarUtilizador(it) }
@@ -587,14 +608,7 @@ class DetalhesPageActivity : AppCompatActivity() {
                         }
                     } else {
                         withContext(Dispatchers.Main) {
-                            MaterialAlertDialogBuilder(this@DetalhesPageActivity)
-                                .setTitle("Ação Necessária")
-                                .setMessage("Para sua segurança, a exclusão de conta requer um login recente. Por favor, saia e entre novamente na aplicação antes de tentar excluir a conta.")
-                                .setPositiveButton("Sair agora") { _, _ ->
-                                    mostrarDialogSair()
-                                }
-                                .setNegativeButton("Cancelar", null)
-                                .show()
+                            showToast("Erro ao eliminar conta da nuvem")
                         }
                     }
                 }
