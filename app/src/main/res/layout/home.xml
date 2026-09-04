@@ -284,7 +284,7 @@
             app:layout_constraintBottom_toTopOf="@+id/llSaldoFooter"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tabFilter">
+            app:layout_constraintTop_toBottomOf="@+id/cardHeaderControls">
 
             <ImageView
                 android:layout_width="64dp"
