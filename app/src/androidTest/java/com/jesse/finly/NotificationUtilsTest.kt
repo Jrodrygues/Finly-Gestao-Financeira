@@ -1,20 +1,25 @@
 package com.jesse.finly
 
 import android.content.Context
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.notifications.NotificationHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.junit.Test
+import org.junit.runner.RunWith
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+@RunWith(AndroidJUnit4::class)
 class NotificationUtilsTest {
 
-    fun inserirTransacoesTesteParaNotificacao(context: Context) {
+    @Test
+    fun testInserirTransacoesENotificar() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val sharedPref = context.getSharedPreferences("FinlyAppPrefs", Context.MODE_PRIVATE)
         val userEmail = sharedPref.getString("EMAIL", "teste@finly.com") ?: "teste@finly.com"
 
@@ -25,7 +30,7 @@ class NotificationUtilsTest {
 
         val dao = MinhaBaseDados.getDatabase(context).utilizadorDao()
 
-        CoroutineScope(Dispatchers.IO).launch {
+        runBlocking {
             // 1. Conta que vence HOJE (diff = 0)
             val hojeStr = fmt.format(cal.time)
             dao.inserirTransacao(
