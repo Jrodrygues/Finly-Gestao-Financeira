@@ -72,9 +72,12 @@ class MainActivity : AppCompatActivity() {
         val isDetalhesMode = intent.getBooleanExtra("IS_DETALHES_MODE", false) || intent.hasExtra("MES_SELECIONADO")
         if (isDetalhesMode) {
             binding.btnBackMain.visibility = View.VISIBLE
+            binding.tvScreenTitle.visibility = View.VISIBLE
             binding.btnBackMain.setOnClickListener { finish() }
+            binding.tvScreenTitle.setOnClickListener { finish() }
         } else {
             binding.btnBackMain.visibility = View.GONE
+            binding.tvScreenTitle.visibility = View.GONE
         }
 
         binding.btnMesAnterior.setOnClickListener { navegarMes(-1) }
