@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 import java.util.Locale
 import kotlin.math.abs
 
@@ -63,10 +64,18 @@ class MainActivity : AppCompatActivity() {
         // Configurar LayoutManager no onCreate apenas uma vez
         binding.rvTransacoes.layoutManager = LinearLayoutManager(this)
 
-        // Obter o mês e ano filtrado vindos do Resumo
-        val cal = java.util.Calendar.getInstance()
-        mesFiltro = intent.getStringExtra("MES_SELECIONADO") ?: meses[cal[java.util.Calendar.MONTH]]
-        anoFiltro = intent.getIntExtra("ANO_SELECIONADO", cal[java.util.Calendar.YEAR])
+        // Obter o mês e ano filtrado vindos do Resumo ou das preferências compartilhadas
+        val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val cal = Calendar.getInstance()
+        mesFiltro = intent.getStringExtra("MES_SELECIONADO")
+            ?: sharedPref.getString("ULTIMO_MES_SELECIONADO", null)
+            ?: meses[cal[Calendar.MONTH]]
+        anoFiltro = if (intent.hasExtra("ANO_SELECIONADO")) {
+            intent.getIntExtra("ANO_SELECIONADO", cal[Calendar.YEAR])
+        } else {
+            val anoSalvo = sharedPref.getInt("ULTIMO_ANO_SELECIONADO", 0)
+            if (anoSalvo != 0) anoSalvo else cal[Calendar.YEAR]
+        }
         atualizarTituloMes()
 
         val isDetalhesMode = intent.getBooleanExtra("IS_DETALHES_MODE", false) || intent.hasExtra("MES_SELECIONADO")
@@ -140,6 +149,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val ultimoMes = sharedPref.getString("ULTIMO_MES_SELECIONADO", null)
+        val ultimoAno = sharedPref.getInt("ULTIMO_ANO_SELECIONADO", 0)
+        if (ultimoMes != null && (ultimoMes != mesFiltro || (ultimoAno != 0 && ultimoAno != anoFiltro))) {
+            mesFiltro = ultimoMes
+            if (ultimoAno != 0) anoFiltro = ultimoAno
+            atualizarTituloMes()
+        }
         ativarSincronizacaoTempoReal()
         carregarLista()
     }

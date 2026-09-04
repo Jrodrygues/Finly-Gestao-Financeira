@@ -1194,6 +1194,7 @@ class ResumoActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         estilarMenuItemsDrawer()
+        sincronizarSelecaoDataComPrefs()
         ativarSincronizacaoTempoReal()
         val notifEnabled = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getBoolean("NOTIFICATIONS", false)
         if (notifEnabled) {
@@ -1201,6 +1202,26 @@ class ResumoActivity : AppCompatActivity() {
         }
         prosseguirComCarregamento()
         atualizarDrawerHeader()
+    }
+
+    private fun sincronizarSelecaoDataComPrefs() {
+        val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val ultimoMesSalvo = sharedPref.getString(KEY_LAST_MONTH, null)
+        val ultimoAnoSalvo = sharedPref.getInt(KEY_LAST_YEAR, 0)
+
+        if (ultimoMesSalvo != null) {
+            val indexMes = meses.indexOf(ultimoMesSalvo)
+            if (indexMes != -1 && indexMes != binding.spinnerMes.selectedItemPosition) {
+                binding.spinnerMes.setSelection(indexMes, false)
+            }
+        }
+
+        if (ultimoAnoSalvo != 0) {
+            val indexAno = anos.indexOf(ultimoAnoSalvo)
+            if (indexAno != -1 && indexAno != binding.spinnerAno.selectedItemPosition) {
+                binding.spinnerAno.setSelection(indexAno, false)
+            }
+        }
     }
 
     override fun onPause() {
