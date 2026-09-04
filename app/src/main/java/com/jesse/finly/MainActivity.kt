@@ -10,6 +10,11 @@ import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -91,6 +96,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnMesAnterior.setOnClickListener { navegarMes(-1) }
         binding.btnMesProximo.setOnClickListener { navegarMes(1) }
+        binding.cardMonthPill.setOnClickListener { mostrarDialogoSelecaoPeriodo() }
+        binding.tvMainTitle.setOnClickListener { mostrarDialogoSelecaoPeriodo() }
 
         binding.fabAddTransacao.setOnClickListener {
             val intent = Intent(this, RegistoActivity::class.java)
@@ -104,10 +111,6 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("MES_ATUAL", mesFiltro)
             intent.putExtra("ANO_ATUAL", anoFiltro)
             startActivity(intent)
-        }
-
-        binding.tvMainTitle.setOnClickListener {
-            finish()
         }
 
         binding.etSearch.addTextChangedListener(
@@ -204,6 +207,86 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun mostrarDialogoSelecaoPeriodo() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_selecionar_periodo, binding.root as? ViewGroup, false)
+        val cgAnos = dialogView.findViewById<ChipGroup>(R.id.cgAnos)
+        val cgMeses = dialogView.findViewById<ChipGroup>(R.id.cgMeses)
+        val btnCancelar = dialogView.findViewById<Button>(R.id.btnCancelarPeriodo)
+        val btnAplicar = dialogView.findViewById<Button>(R.id.btnAplicarPeriodo)
+
+        val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
+        dialog.setContentView(dialogView)
+
+        var anoTemp = anoFiltro
+        var mesTemp = mesFiltro ?: meses[0]
+
+        // Obter anos dinâmicos com base nas transações + ano atual + próximo ano
+        val anosDisponiveis = FinanceiroUtils.obterAnosDisponiveis(todasTransacoes)
+
+        cgAnos.removeAllViews()
+        anosDisponiveis.forEach { ano ->
+            val chip = Chip(this).apply {
+                text = ano.toString()
+                isCheckable = true
+                isChecked = (ano == anoTemp)
+                setChipBackgroundColorResource(if (isChecked) R.color.colorPrimary else R.color.surfaceColor)
+                setTextColor(ContextCompat.getColor(context, if (isChecked) R.color.white else R.color.textColorPrimary))
+                setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
+                        anoTemp = ano
+                        for (i in 0 until cgAnos.childCount) {
+                            val child = cgAnos.getChildAt(i) as? Chip
+                            val selected = child?.text.toString() == anoTemp.toString()
+                            child?.setChipBackgroundColorResource(if (selected) R.color.colorPrimary else R.color.surfaceColor)
+                            child?.setTextColor(ContextCompat.getColor(this@MainActivity, if (selected) R.color.white else R.color.textColorPrimary))
+                        }
+                    }
+                }
+            }
+            cgAnos.addView(chip)
+        }
+
+        cgMeses.removeAllViews()
+        meses.forEach { mes ->
+            val chip = Chip(this).apply {
+                text = mes
+                isCheckable = true
+                isChecked = mes.equals(mesTemp, ignoreCase = true)
+                setChipBackgroundColorResource(if (isChecked) R.color.colorPrimary else R.color.surfaceColor)
+                setTextColor(ContextCompat.getColor(context, if (isChecked) R.color.white else R.color.textColorPrimary))
+                setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
+                        mesTemp = mes
+                        for (i in 0 until cgMeses.childCount) {
+                            val child = cgMeses.getChildAt(i) as? Chip
+                            val selected = child?.text.toString().equals(mesTemp, ignoreCase = true)
+                            child?.setChipBackgroundColorResource(if (selected) R.color.colorPrimary else R.color.surfaceColor)
+                            child?.setTextColor(ContextCompat.getColor(this@MainActivity, if (selected) R.color.white else R.color.textColorPrimary))
+                        }
+                    }
+                }
+            }
+            cgMeses.addView(chip)
+        }
+
+        btnCancelar.setOnClickListener { dialog.dismiss() }
+
+        btnAplicar.setOnClickListener {
+            dialog.dismiss()
+            mesFiltro = mesTemp
+            anoFiltro = anoTemp
+            atualizarTituloMes()
+            carregarLista()
+
+            getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
+                putString("ULTIMO_MES_SELECIONADO", mesFiltro)
+                putInt("ULTIMO_ANO_SELECIONADO", anoFiltro)
+            }
+        }
+
+        dialog.show()
+    }
+
     private fun navegarMes(direcao: Int) {
         val indexAtual = meses.indexOf(mesFiltro)
         var novoIndex = indexAtual + direcao
@@ -265,7 +348,7 @@ class MainActivity : AppCompatActivity() {
             else -> null
         }
 
-        val filtrada = FinanceiroUtils.filtrarTransacoes(todasTransacoes, tipoFiltro, query)
+        val filtrada = FinanceiroUtils.filtrarTransacoes(todasTransacoes, query, tipoFiltro)
             .sortedBy { transacao ->
                 transacao.vencimento.split("/").firstOrNull()?.toIntOrNull() ?: 0
             }

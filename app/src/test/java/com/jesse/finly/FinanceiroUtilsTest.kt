@@ -3,9 +3,9 @@ package com.jesse.finly
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.utils.FinanceiroUtils
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.Calendar
 
 class FinanceiroUtilsTest {
 
@@ -45,7 +45,7 @@ class FinanceiroUtilsTest {
             Transacao(item = "Farmacia", valor = 20.0, tipo = "DESPESA", status = true, mes = "Janeiro", ano = 2026, vencimento = "01/01", donoEmail = "t@t.com")
         )
 
-        val resultado = FinanceiroUtils.filtrarTransacoes(transacoes, null, "Farm")
+        val resultado = FinanceiroUtils.filtrarTransacoes(transacoes, "Farm", null)
         assertEquals(1, resultado.size)
         assertEquals("Farmacia", resultado[0].item)
     }
@@ -79,5 +79,18 @@ class FinanceiroUtilsTest {
         val novas = FinanceiroUtils.gerarTransacoesRecorrentes(recorrentes, existentesEmFevereiro, "Fevereiro", 2026, meses)
         
         assertTrue(novas.isEmpty())
+    }
+
+    @Test
+    fun `Obter anos disponiveis deve incluir ano atual, proximo ano e anos com transacoes`() {
+        val anoAtual = Calendar.getInstance().get(Calendar.YEAR)
+        val transacoes = listOf(
+            Transacao(item = "Conta Antiga", valor = 100.0, tipo = "DESPESA", status = true, mes = "Janeiro", ano = 2023, vencimento = "01/01", donoEmail = "t@t.com")
+        )
+
+        val anos = FinanceiroUtils.obterAnosDisponiveis(transacoes)
+        assertTrue(anos.contains(2023))
+        assertTrue(anos.contains(anoAtual))
+        assertTrue(anos.contains(anoAtual + 1))
     }
 }

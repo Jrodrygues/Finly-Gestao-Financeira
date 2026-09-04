@@ -53,6 +53,8 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import android.widget.Button
 import androidx.annotation.RequiresApi
 import com.google.android.material.button.MaterialButton
@@ -1379,6 +1381,90 @@ class ResumoActivity : AppCompatActivity() {
         }
         binding.spinnerMes.onItemSelectedListener = itemSelectedListener
         binding.spinnerAno.onItemSelectedListener = itemSelectedListener
+
+        binding.llMesSelector.setOnClickListener {
+            mostrarDialogoSelecaoPeriodo()
+        }
+    }
+
+    private fun mostrarDialogoSelecaoPeriodo() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_selecionar_periodo, binding.root as? ViewGroup, false)
+        val cgAnos = dialogView.findViewById<ChipGroup>(R.id.cgAnos)
+        val cgMeses = dialogView.findViewById<ChipGroup>(R.id.cgMeses)
+        val btnCancelar = dialogView.findViewById<Button>(R.id.btnCancelarPeriodo)
+        val btnAplicar = dialogView.findViewById<Button>(R.id.btnAplicarPeriodo)
+
+        val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
+        dialog.setContentView(dialogView)
+
+        var anoTemp = binding.spinnerAno.selectedItem as? Int ?: anos[0]
+        var mesTemp = binding.spinnerMes.selectedItem?.toString() ?: meses[0]
+
+        val anosDisponiveis = FinanceiroUtils.obterAnosDisponiveis(transacoesAtuaisGrafico)
+
+        cgAnos.removeAllViews()
+        anosDisponiveis.forEach { ano ->
+            val chip = Chip(this).apply {
+                text = ano.toString()
+                isCheckable = true
+                isChecked = (ano == anoTemp)
+                setChipBackgroundColorResource(if (isChecked) R.color.colorPrimary else R.color.surfaceColor)
+                setTextColor(ContextCompat.getColor(context, if (isChecked) R.color.white else R.color.textColorPrimary))
+                setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
+                        anoTemp = ano
+                        for (i in 0 until cgAnos.childCount) {
+                            val child = cgAnos.getChildAt(i) as? Chip
+                            val selected = child?.text.toString() == anoTemp.toString()
+                            child?.setChipBackgroundColorResource(if (selected) R.color.colorPrimary else R.color.surfaceColor)
+                            child?.setTextColor(ContextCompat.getColor(this@ResumoActivity, if (selected) R.color.white else R.color.textColorPrimary))
+                        }
+                    }
+                }
+            }
+            cgAnos.addView(chip)
+        }
+
+        cgMeses.removeAllViews()
+        meses.forEach { mes ->
+            val chip = Chip(this).apply {
+                text = mes
+                isCheckable = true
+                isChecked = mes.equals(mesTemp, ignoreCase = true)
+                setChipBackgroundColorResource(if (isChecked) R.color.colorPrimary else R.color.surfaceColor)
+                setTextColor(ContextCompat.getColor(context, if (isChecked) R.color.white else R.color.textColorPrimary))
+                setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
+                        mesTemp = mes
+                        for (i in 0 until cgMeses.childCount) {
+                            val child = cgMeses.getChildAt(i) as? Chip
+                            val selected = child?.text.toString().equals(mesTemp, ignoreCase = true)
+                            child?.setChipBackgroundColorResource(if (selected) R.color.colorPrimary else R.color.surfaceColor)
+                            child?.setTextColor(ContextCompat.getColor(this@ResumoActivity, if (selected) R.color.white else R.color.textColorPrimary))
+                        }
+                    }
+                }
+            }
+            cgMeses.addView(chip)
+        }
+
+        btnCancelar.setOnClickListener { dialog.dismiss() }
+
+        btnAplicar.setOnClickListener {
+            dialog.dismiss()
+            val indexMes = meses.indexOf(mesTemp)
+            val indexAno = anos.indexOf(anoTemp)
+            if (indexMes != -1) binding.spinnerMes.setSelection(indexMes)
+            if (indexAno != -1) binding.spinnerAno.setSelection(indexAno)
+
+            getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
+                putString(KEY_LAST_MONTH, mesTemp)
+                putInt(KEY_LAST_YEAR, anoTemp)
+            }
+            carregarDados(mesTemp, anoTemp)
+        }
+
+        dialog.show()
     }
 
     private fun carregarDados(mesSelecionado: String, anoSelecionado: Int) {

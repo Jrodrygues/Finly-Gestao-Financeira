@@ -6,6 +6,7 @@ import android.view.HapticFeedbackConstants
 import com.jesse.finly.models.Transacao
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.util.Calendar
 import java.util.Locale
 import kotlin.math.abs
 
@@ -71,11 +72,23 @@ object FinanceiroUtils {
     /**
      * Filtra transações por tipo (RENDA/DESPESA) e termo de pesquisa.
      */
-    fun filtrarTransacoes(lista: List<Transacao>, tipo: String?, query: String): List<Transacao> {
+    fun filtrarTransacoes(lista: List<Transacao>, query: String, tipo: String? = null): List<Transacao> {
         return lista.filter { 
             (tipo == null || it.tipo == tipo) && 
             it.item.contains(query, ignoreCase = true)
         }
+    }
+
+    /**
+     * Calcula dinamicamente a lista de anos disponíveis para seleção com base nas transações do utilizador.
+     * Garante sempre o ano atual, o ano seguinte para planeamento e todos os anos com histórico de dados.
+     */
+    fun obterAnosDisponiveis(transacoes: List<Transacao>): Array<Int> {
+        val cal = Calendar.getInstance()
+        val anoAtual = cal.get(Calendar.YEAR)
+        val anosComDados = transacoes.map { it.ano }.filter { it in 2000..2100 }.toSet()
+        val todosAnos = (anosComDados + setOf(anoAtual, anoAtual + 1)).sorted()
+        return todosAnos.toTypedArray()
     }
 
     /**
