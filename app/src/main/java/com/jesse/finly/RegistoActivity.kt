@@ -359,7 +359,7 @@ class RegistoActivity : AppCompatActivity() {
             "educação" -> R.drawable.ic_school
             "compras" -> R.drawable.ic_list
             "assinaturas" -> R.drawable.ic_pdf
-            "investimentos" -> R.drawable.ic_attach_money
+            "investimentos" -> R.drawable.ic_euro
             "poupança" -> R.drawable.ic_lock
             "exterior" -> R.drawable.ic_flight
             else -> R.drawable.ic_tag
@@ -736,7 +736,7 @@ class RegistoActivity : AppCompatActivity() {
         binding.regEmailText.isFocusable = true
         binding.regEmailText.isFocusableInTouchMode = true
         binding.itemLayout.setStartIconDrawable(R.drawable.ic_edit)
-        binding.valorLayout.setStartIconDrawable(R.drawable.ic_attach_money)
+        binding.valorLayout.setStartIconDrawable(R.drawable.ic_euro)
         binding.dataLayout.setStartIconDrawable(R.drawable.ic_calendar)
 
         binding.regPhoneText.setOnClickListener { mostrarCalendario() }

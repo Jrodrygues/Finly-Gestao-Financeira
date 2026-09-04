@@ -529,7 +529,7 @@ class ResumoActivity : AppCompatActivity() {
             "educação" -> R.drawable.ic_school
             "compras" -> R.drawable.ic_list
             "assinaturas" -> R.drawable.ic_pdf
-            "investimentos" -> R.drawable.ic_attach_money
+            "investimentos" -> R.drawable.ic_euro
             "poupança" -> R.drawable.ic_lock
             "exterior" -> R.drawable.ic_flight
             else -> R.drawable.ic_tag

@@ -106,7 +106,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="@string/hint_valor"
-            app:startIconDrawable="@drawable/ic_attach_money"
+            app:startIconDrawable="@drawable/ic_euro"
             app:startIconTint="@color/colorPrimary"
             app:boxBackgroundColor="@color/surfaceColor"
             app:boxCornerRadiusBottomEnd="16dp"
