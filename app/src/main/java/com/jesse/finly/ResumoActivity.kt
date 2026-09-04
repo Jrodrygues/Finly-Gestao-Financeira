@@ -54,6 +54,7 @@ import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.widget.Button
+import androidx.annotation.RequiresApi
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -77,10 +78,17 @@ import java.io.FileOutputStream
 import java.util.Calendar
 import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
 class ResumoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityResumoBinding
     private val meses = arrayOf("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro")
-    private val anos = (2020..(Calendar.getInstance()[Calendar.YEAR] + 10)).toList().toTypedArray()
+
+    private val anos by lazy {
+        val anoAtual = java.time.Year.now().value
+        val anoInicio = anoAtual - 1 // Histórico recente
+        val anoFim = anoAtual + 4    // Projeções futuras
+        (anoInicio..anoFim).toList().toTypedArray()
+    }
     
     private val recurrenceMutex = Mutex()
     private var lastLoadedMonth: String? = null

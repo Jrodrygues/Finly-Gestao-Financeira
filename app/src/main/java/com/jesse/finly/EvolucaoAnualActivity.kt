@@ -3,11 +3,13 @@ package com.jesse.finly
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -39,11 +41,18 @@ import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.round
 
+@RequiresApi(Build.VERSION_CODES.O)
 class EvolucaoAnualActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEvolucaoAnualBinding
     private val mesesArray = arrayOf("Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez")
     private val mesesNomes = arrayOf("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro")
-    private val listaAnos = arrayOf("2024", "2025", "2026", "2027", "2028", "2029", "2030")
+
+    private val listaAnos by lazy {
+        val anoAtual = java.time.Year.now().value
+        val anoInicio = anoAtual - 1 // Histórico recente
+        val anoFim = anoAtual + 4    // Projeções futuras
+        (anoInicio..anoFim).toList().toTypedArray()
+    }
 
     private var rendaPorMes = FloatArray(12)
     private var despesaPorMes = FloatArray(12)
@@ -96,7 +105,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         binding.autoCompleteAno.setText(anoAtual, false)
 
         binding.autoCompleteAno.setOnItemClickListener { _, _, position, _ ->
-            val anoSelecionado = listaAnos[position].toInt()
+            val anoSelecionado = listaAnos[position]
             carregarDadosAnuais(anoSelecionado)
         }
     }
