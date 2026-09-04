@@ -152,8 +152,12 @@ class RegistoActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            // Aplicar o padding no ConstraintLayout interno para o ScrollView funcionar bem com teclado
-            binding.mainLayoutRegisto.updatePadding(top = systemBars.top, bottom = systemBars.bottom)
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val dpExtra = (32 * resources.displayMetrics.density).toInt()
+            binding.mainLayoutRegisto.updatePadding(
+                top = systemBars.top,
+                bottom = systemBars.bottom + ime.bottom + dpExtra
+            )
             insets
         }
     }
