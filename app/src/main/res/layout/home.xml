@@ -51,18 +51,16 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Card de Painel de Controlo Unificado: Seletor de Mês + Pesquisa + Adicionar -->
+        <!-- Card de Painel de Controlo Unificado: Seletor de Mês + Pesquisa + Adicionar + Abas (Full Width) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardHeaderControls"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             app:cardBackgroundColor="@color/surfaceColor"
-            app:cardCornerRadius="20dp"
+            app:cardCornerRadius="0dp"
             app:cardElevation="2dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="#1E222B"
+            app:strokeWidth="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/clHeader">
@@ -70,16 +68,18 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
+                android:orientation="vertical">
 
-                <!-- Seletor de Mês -->
+                <!-- 1. Seletor de Mês -->
                 <LinearLayout
                     android:id="@+id/llMesSelectorControls"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="10dp">
 
                     <ImageButton
                         android:id="@+id/btnMesAnterior"
@@ -113,19 +113,21 @@
 
                 </LinearLayout>
 
-                <!-- Divisor Sutil -->
+                <!-- Divisor Sutil 1 (Full Width) -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginVertical="10dp"
                     android:background="@color/dividerColor" />
 
-                <!-- Barra de Pesquisa e Botão Adicionar -->
+                <!-- 2. Barra de Pesquisa e Botão Adicionar -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/searchLayout"
@@ -167,36 +169,40 @@
 
                 </LinearLayout>
 
+                <!-- Divisor Sutil 2 (Full Width) -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/dividerColor" />
+
+                <!-- 3. Seletor de Tipo (Filtro por Abas Integrado) -->
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabFilter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    app:tabIndicatorColor="@color/colorPrimary"
+                    app:tabSelectedTextColor="@color/colorPrimary"
+                    app:tabTextColor="@color/textColorSecondary">
+
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tab_todas" />
+
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tab_despesas" />
+
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tab_rendas" />
+                </com.google.android.material.tabs.TabLayout>
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
-        <!-- Seletor de Tipo (Filtro) -->
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabFilter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@color/surfaceColor"
-            app:layout_constraintTop_toBottomOf="@+id/cardHeaderControls"
-            app:tabIndicatorColor="@color/colorPrimary"
-            app:tabSelectedTextColor="@color/colorPrimary"
-            app:tabTextColor="@color/textColorSecondary">
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_todas" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_despesas" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_rendas" />
-        </com.google.android.material.tabs.TabLayout>
 
         <!-- Cabeçalho de Colunas -->
         <LinearLayout
@@ -207,7 +213,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/tabFilter">
+            app:layout_constraintTop_toBottomOf="@+id/cardHeaderControls">
 
             <TextView
                 android:layout_width="0dp"
