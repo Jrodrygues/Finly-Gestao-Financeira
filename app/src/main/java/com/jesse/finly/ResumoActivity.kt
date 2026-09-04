@@ -15,8 +15,11 @@ import android.os.Bundle
 import android.content.res.Configuration
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -1311,27 +1314,44 @@ class ResumoActivity : AppCompatActivity() {
         val totalGastos = gastosPorCategoria.sumOf { it.second.toDouble() }
         val entries = itensGraficoELegenda.map { PieEntry(it.second, it.first) }
         
-        // Cores diversificadas
-        val colors = mutableListOf<Int>()
-        for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
-        for (c in ColorTemplate.VORDIPLOM_COLORS) colors.add(c)
+        // Cores diversificadas para despesas (sem verde, reservado para rendas/poupança)
+        val expenseColors = listOf(
+            Color.parseColor("#7E57C2"), // Roxo / Violeta
+            Color.parseColor("#00897B"), // Azul-petróleo (Teal)
+            Color.parseColor("#FB8C00"), // Laranja
+            Color.parseColor("#00ACC1"), // Ciano
+            Color.parseColor("#3F51B5"), // Índigo
+            Color.parseColor("#E91E63"), // Rosa
+            Color.parseColor("#FF5722"), // Laranja escuro / Coral
+            Color.parseColor("#2196F3")  // Azul
+        )
 
         val dataSet = PieDataSet(entries, "").apply {
-            this.colors = colors
+            colors = expenseColors
             setDrawValues(false)
+            isHighlightEnabled = false // Remove o ponto/artefato preto de destaque ao tocar
+            sliceSpace = 3f // Linha fina de separação (slice space) entre fatias
         }
+
+        val totalStr = String.format(Locale.getDefault(), "%.2f €", totalGastos)
+        val centerString = SpannableString("Total\n$totalStr")
+        val isDark = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
+        val textColor = if (isDark) Color.WHITE else Color.BLACK
+        val mutedColor = if (isDark) Color.parseColor("#B0B0B0") else Color.parseColor("#666666")
+
+        centerString.setSpan(ForegroundColorSpan(mutedColor), 0, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        centerString.setSpan(RelativeSizeSpan(0.75f), 0, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        centerString.setSpan(ForegroundColorSpan(textColor), 5, centerString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        centerString.setSpan(RelativeSizeSpan(1.15f), 5, centerString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        centerString.setSpan(StyleSpan(Typeface.BOLD), 5, centerString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         val pieData = PieData(dataSet)
         binding.pieChart.apply {
             data = pieData
             description.isEnabled = false
-            centerText = "Gastos"
-            setCenterTextSize(16f)
-            
-            val isDark = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
-            val textColor = if (isDark) Color.WHITE else Color.BLACK
-            
-            setCenterTextColor(textColor)
+            centerText = centerString
+            setCenterTextSize(15f)
+            setHighlightPerTapEnabled(false)
             legend.isEnabled = false
             
             setHoleColor(0) 
@@ -1341,7 +1361,6 @@ class ResumoActivity : AppCompatActivity() {
             setDrawEntryLabels(false) 
             setExtraOffsets(5f, 5f, 5f, 5f)
             
-            // Só anima na primeira vez ou quando mudar de mês
             if (binding.pieChart.data == null) animateY(1000)
             invalidate()
         }
@@ -1349,7 +1368,7 @@ class ResumoActivity : AppCompatActivity() {
         // PREENCHER A Lista DE LEGENDA DETALHADA ABAIXO DO GRÁFICO
         binding.llCategoryDetails.removeAllViews()
         itensGraficoELegenda.forEachIndexed { index, pair ->
-            val color = colors[index % colors.size]
+            val color = expenseColors[index % expenseColors.size]
             val percent = if (totalGastos > 0) (pair.second / totalGastos * 100).toInt() else 0
             adicionarItemCategoria(pair.first, pair.second.toDouble(), percent, color)
         }
