@@ -153,7 +153,7 @@ class RegistoActivity : AppCompatActivity() {
         }
 
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
             
@@ -175,6 +175,7 @@ class RegistoActivity : AppCompatActivity() {
             }
             insets
         }
+        ViewCompat.requestApplyInsets(binding.root)
     }
 
     // Lógica Global: Esconder teclado ao tocar fora de qualquer campo de texto
@@ -723,9 +724,24 @@ class RegistoActivity : AppCompatActivity() {
             if (checkedId == R.id.rbRecorrenteParcelada) {
                 binding.parcelasLayout.visibility = View.VISIBLE
                 binding.etParcelas.requestFocus()
+                binding.root.postDelayed({
+                    val targetY = binding.parcelasLayout.top
+                    binding.root.smoothScrollTo(0, targetY)
+                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.showSoftInput(binding.etParcelas, InputMethodManager.SHOW_IMPLICIT)
+                }, 300)
             } else {
                 binding.parcelasLayout.visibility = View.GONE
                 esconderTeclado()
+            }
+        }
+
+        binding.etParcelas.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.root.postDelayed({
+                    val targetY = binding.parcelasLayout.top
+                    binding.root.smoothScrollTo(0, targetY)
+                }, 300)
             }
         }
 
