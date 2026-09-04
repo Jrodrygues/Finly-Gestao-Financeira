@@ -190,7 +190,7 @@ class DetalhesPageActivity : AppCompatActivity() {
         binding.llField3.visibility = View.VISIBLE
         binding.divField2.visibility = View.VISIBLE
         binding.tvLabelField3.text = "Recorrência"
-        binding.ivIconField3.setImageResource(R.drawable.ic_tag)
+        binding.ivIconField3.setImageResource(R.drawable.ic_repeat)
         binding.tvValueField3.text = if (transIsRecorrente) {
             if (transParcelasTotais == -1) "Repetir Sempre" else "Repetir por $transParcelasTotais meses"
         } else {
