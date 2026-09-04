@@ -705,15 +705,24 @@ class RegistoActivity : AppCompatActivity() {
         binding.rgRecorrenciaTipo.setOnCheckedChangeListener { _, checkedId ->
             if (checkedId == R.id.rbRecorrenteParcelada) {
                 binding.parcelasLayout.visibility = View.VISIBLE
+                binding.etParcelas.requestFocus()
                 binding.root.postDelayed({
                     val scrollView = binding.root.parent as? ScrollView
-                    scrollView?.fullScroll(View.FOCUS_DOWN)
-                    binding.etParcelas.requestFocus()
+                    scrollView?.smoothScrollTo(0, binding.parcelasLayout.bottom + 200)
                     val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.showSoftInput(binding.etParcelas, InputMethodManager.SHOW_IMPLICIT)
-                }, 150)
+                }, 200)
             } else {
                 binding.parcelasLayout.visibility = View.GONE
+            }
+        }
+
+        binding.etParcelas.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.root.postDelayed({
+                    val scrollView = binding.root.parent as? ScrollView
+                    scrollView?.smoothScrollTo(0, binding.parcelasLayout.bottom + 200)
+                }, 200)
             }
         }
 
