@@ -51,11 +51,9 @@ import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.widget.Button
-import androidx.core.content.FileProvider
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -68,7 +66,6 @@ import com.jesse.finly.models.Transacao
 import com.jesse.finly.notifications.NotificationHelper
 import com.jesse.finly.utils.showToast
 import com.jesse.finly.utils.FinanceiroUtils
-import com.jesse.finly.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -79,7 +76,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
 import java.util.Locale
-import kotlin.math.abs
 
 class ResumoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityResumoBinding
@@ -215,7 +211,7 @@ class ResumoActivity : AppCompatActivity() {
         if (email.isEmpty() || email == "CONVIDADO") return
         val emailClean = email.trim().lowercase()
 
-        // Escuta em tempo real para o perfil (incluindo categorias customizadas)
+        // Escuta em tempo real para o perfil (incluindo categorias customizations)
         FirebaseManager.monitorarPerfil(emailClean) { perfilNuvem ->
             lifecycleScope.launch(Dispatchers.IO) {
                 val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
@@ -812,7 +808,7 @@ class ResumoActivity : AppCompatActivity() {
             c.drawText("Finly", 30f, 40f, titlePaint)
             c.drawText("Relatório Financeiro Mensal • $mes / $ano", 30f, 62f, subtitlePaint)
 
-            // Logo ícone vetorial de altíssima definição (Renderizado a 6x para nitidez cristalina ao fazer zoom no PDF)
+            // Logo ícone vetorial de altíssima definição (Renderizado a 6x para nitidez cristalina ao fazer ‘zoom’ no PDF)
             val logoVector = ContextCompat.getDrawable(this, R.drawable.ic_logo_finly_transp)
                 ?: ContextCompat.getDrawable(this, R.drawable.ic_logo_finly)
             logoVector?.let { drawable ->
@@ -1089,7 +1085,7 @@ class ResumoActivity : AppCompatActivity() {
             }
         }
 
-        // 3. Fallback no diretório de ficheiros externos da app
+        // 3. Fallback no diretório de ficheiros externos da ‘app’
         if (!sucesso) {
             try {
                 val appDownloadsDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
@@ -1166,7 +1162,7 @@ class ResumoActivity : AppCompatActivity() {
             val sb = StringBuilder()
             // Adiciona BOM (Byte Order Mark) UTF-8 para garantir abertura correta no Excel sem problemas de acentuação
             sb.append("\uFEFF")
-            // Cabeçalho CSV com separador ; (padrão europeu/português para Excel)
+            // Cabeçalho CSV com separador; (padrão europeu/português para Excel)
             sb.append("Vencimento;Tipo;Descrição;Categoria;Valor (€);Estado\n")
 
             transacoes.sortedBy { extrairOrdemData(it.vencimento) }.forEach { t ->
