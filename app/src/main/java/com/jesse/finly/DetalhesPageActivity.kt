@@ -25,6 +25,7 @@ import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.DetalhesBinding
 import com.jesse.finly.models.Transacao
+import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.notifications.NotificationHelper
 import com.jesse.finly.notifications.NotificationWorker
 import com.jesse.finly.utils.showToast
@@ -165,12 +166,12 @@ class DetalhesPageActivity : AppCompatActivity() {
         // Valor Prominente Grande
         binding.llValorHighlight.visibility = View.VISIBLE
         if (transTipo == "DESPESA") {
-            binding.tvValorHighlight.text = String.format(Locale.getDefault(), "-%.2f €", transValor)
+            binding.tvValorHighlight.text = FinanceiroUtils.formatarMoeda(transValor, isPositivo = false)
             binding.tvValorHighlight.setTextColor(corNegativa)
             binding.tvBadgeTipo.text = "Despesa"
             binding.tvBadgeTipo.setTextColor(corNegativa)
         } else {
-            binding.tvValorHighlight.text = String.format(Locale.getDefault(), "+%.2f €", transValor)
+            binding.tvValorHighlight.text = FinanceiroUtils.formatarMoeda(transValor, isPositivo = true)
             binding.tvValorHighlight.setTextColor(corPositiva)
             binding.tvBadgeTipo.text = "Renda"
             binding.tvBadgeTipo.setTextColor(corPositiva)
@@ -207,7 +208,8 @@ class DetalhesPageActivity : AppCompatActivity() {
 
         atualizarVisualStatusTransacao(transStatus, corPositiva, corNegativa)
 
-        binding.switchStatusTransacao.setOnCheckedChangeListener { _, isChecked ->
+        binding.switchStatusTransacao.setOnCheckedChangeListener { buttonView, isChecked ->
+            FinanceiroUtils.dispararHapticFeedback(buttonView)
             transStatus = isChecked
             atualizarVisualStatusTransacao(isChecked, corPositiva, corNegativa)
 

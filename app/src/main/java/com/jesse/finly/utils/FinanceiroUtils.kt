@@ -1,6 +1,13 @@
 package com.jesse.finly.utils
 
+import android.util.Patterns
+import android.view.View
+import android.view.HapticFeedbackConstants
 import com.jesse.finly.models.Transacao
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
+import kotlin.math.abs
 
 object FinanceiroUtils {
 
@@ -9,7 +16,33 @@ object FinanceiroUtils {
      */
     fun isEmailValido(email: String): Boolean {
         return email.isNotBlank() && 
-               android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+               Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    /**
+     * Formata um valor monetário no padrão europeu (ex: 2.157,23 € ou 600,00 €) com espaço antes do símbolo.
+     */
+    fun formatarMoeda(valor: Double, isPositivo: Boolean? = null): String {
+        val symbols = DecimalFormatSymbols(Locale("pt", "PT")).apply {
+            decimalSeparator = ','
+            groupingSeparator = '.'
+        }
+        val formatter = DecimalFormat("#,##0.00", symbols)
+        val formatado = formatter.format(abs(valor))
+        return when (isPositivo) {
+            true -> "+$formatado €"
+            false -> "-$formatado €"
+            null -> "$formatado €"
+        }
+    }
+
+    /**
+     * Dispara vibração tátil curta e subtil (Haptic Feedback).
+     */
+    fun dispararHapticFeedback(view: View) {
+        try {
+            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        } catch (_: Exception) {}
     }
 
     /**
@@ -79,7 +112,7 @@ object FinanceiroUtils {
 
                     if (podeGerar) {
                         val diaOriginal = rec.vencimento.split("/").firstOrNull() ?: "01"
-                        val novoVencimento = String.format(java.util.Locale.getDefault(), "%s/%02d", diaOriginal, mesAlvoIndex + 1)
+                        val novoVencimento = String.format(Locale.getDefault(), "%s/%02d", diaOriginal, mesAlvoIndex + 1)
                         
                         novasTransacoes.add(rec.copy(
                             id = 0,

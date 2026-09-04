@@ -11,6 +11,7 @@ import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.jesse.finly.R
 import com.jesse.finly.models.Transacao
+import com.jesse.finly.utils.FinanceiroUtils
 import java.util.Locale
 
 class TransacaoAdapter(
@@ -58,10 +59,10 @@ class TransacaoAdapter(
         val corNegativa = ContextCompat.getColor(holder.itemView.context, R.color.colorNegative)
 
         if (item.tipo == "DESPESA") {
-            holder.tvValor.text = String.format(Locale.getDefault(), "-%.2f €", item.valor)
+            holder.tvValor.text = FinanceiroUtils.formatarMoeda(item.valor, isPositivo = false)
             holder.tvValor.setTextColor(corNegativa)
         } else {
-            holder.tvValor.text = String.format(Locale.getDefault(), "+%.2f €", item.valor)
+            holder.tvValor.text = FinanceiroUtils.formatarMoeda(item.valor, isPositivo = true)
             holder.tvValor.setTextColor(corPositiva)
         }
 
@@ -87,7 +88,8 @@ class TransacaoAdapter(
         }
 
         // Clique no ícone de status
-        holder.ivStatus.setOnClickListener {
+        holder.ivStatus.setOnClickListener { view ->
+            FinanceiroUtils.dispararHapticFeedback(view)
             val currentPos = holder.bindingAdapterPosition
             if (currentPos != RecyclerView.NO_POSITION) {
                 onToggleStatus(lista[currentPos])

@@ -33,6 +33,7 @@ import kotlinx.coroutines.tasks.await
 import com.jesse.finly.databinding.ActivityRegistoBinding
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.models.Utilizador
+import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -144,7 +145,8 @@ class RegistoActivity : AppCompatActivity() {
 
 
 
-        binding.btnFinalizarRegisto.setOnClickListener {
+        binding.btnFinalizarRegisto.setOnClickListener { view ->
+            FinanceiroUtils.dispararHapticFeedback(view)
             when {
                 isNewUserRegistration -> registarNovoUtilizador()
                 isUserEditMode -> guardarEdicaoUtilizador()

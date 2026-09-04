@@ -1412,27 +1412,22 @@ class ResumoActivity : AppCompatActivity() {
         val colorPadrao = ContextCompat.getColor(this, R.color.textColorPrimary)
         val colorAlertaAviso = Color.parseColor("#FF9800")
 
-        binding.tvTotalRenda.text = String.format(Locale.getDefault(), "%.2f €", kotlin.math.abs(renda))
+        binding.tvTotalRenda.text = FinanceiroUtils.formatarMoeda(renda, isPositivo = true)
         binding.tvTotalRenda.setTextColor(colorPositivo)
 
-        binding.tvTotalDespesas.text = String.format(Locale.getDefault(), "%.2f €", kotlin.math.abs(despesa))
+        binding.tvTotalDespesas.text = FinanceiroUtils.formatarMoeda(despesa, isPositivo = false)
         binding.tvTotalDespesas.setTextColor(colorNegativo)
 
-        binding.tvTotalPoupanca.text = String.format(Locale.getDefault(), "%.2f €", kotlin.math.abs(poupanca))
+        binding.tvTotalPoupanca.text = FinanceiroUtils.formatarMoeda(poupanca)
         binding.tvTotalPoupanca.setTextColor(colorPadrao)
 
-        binding.tvTotalBrasil.text = String.format(Locale.getDefault(), "%.2f €", abs(exterior))
+        binding.tvTotalBrasil.text = FinanceiroUtils.formatarMoeda(exterior)
         binding.tvTotalBrasil.setTextColor(colorPadrao)
 
-        if (saldo < 0) {
-            binding.tvSaldoFinal.text = String.format(Locale.getDefault(), "-%.2f €", abs(saldo))
-            binding.tvSaldoFinal.setTextColor(colorNegativo)
-        } else {
-            binding.tvSaldoFinal.text = String.format(Locale.getDefault(), "%.2f €", saldo)
-            binding.tvSaldoFinal.setTextColor(colorPositivo)
-        }
+        binding.tvSaldoFinal.text = FinanceiroUtils.formatarMoeda(saldo, isPositivo = saldo >= 0)
+        binding.tvSaldoFinal.setTextColor(if (saldo < 0) colorNegativo else colorPositivo)
 
-        binding.tvSpentValue.text = String.format(Locale.getDefault(), "Gasto total: %.2f €", abs(despesa))
+        binding.tvSpentValue.text = "Gasto total: " + FinanceiroUtils.formatarMoeda(despesa)
         binding.tvPercentValue.text = String.format(Locale.getDefault(), "%d%%", percent)
 
         val colorPercent = when {
