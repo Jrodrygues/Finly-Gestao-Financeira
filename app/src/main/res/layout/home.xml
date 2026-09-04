@@ -51,11 +51,12 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Seletor de Mês Centralizado (Fora do cabeçalho principal, acima da barra de pesquisa) -->
+        <!-- Seletor de Mês (Preenche a largura total com margens horizontais) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMonthSelector"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
             android:layout_marginTop="20dp"
             app:cardBackgroundColor="@color/surfaceColor"
             app:cardCornerRadius="24dp"
@@ -67,17 +68,17 @@
             app:layout_constraintTop_toBottomOf="@+id/clHeader">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="8dp"
+                android:paddingHorizontal="4dp"
                 android:paddingVertical="4dp">
 
                 <ImageButton
                     android:id="@+id/btnMesAnterior"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_chevron_left"
                     android:contentDescription="@string/btn_voltar"
@@ -85,20 +86,20 @@
 
                 <TextView
                     android:id="@+id/tvMainTitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:minWidth="140dp"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:paddingHorizontal="12dp"
+                    android:paddingHorizontal="8dp"
                     android:text="Setembro 2026"
                     android:textColor="@color/textColorPrimary"
-                    android:textSize="15sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <ImageButton
                     android:id="@+id/btnMesProximo"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_chevron_right"
                     android:contentDescription="@string/btn_voltar"
