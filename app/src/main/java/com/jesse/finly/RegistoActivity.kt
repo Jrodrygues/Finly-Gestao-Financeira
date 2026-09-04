@@ -158,6 +158,15 @@ class RegistoActivity : AppCompatActivity() {
                 top = systemBars.top,
                 bottom = systemBars.bottom + ime.bottom + dpExtra
             )
+            if (ime.bottom > 0 && (binding.etParcelas.hasFocus() || binding.rbRecorrenteParcelada.isChecked)) {
+                binding.root.post {
+                    binding.root.requestChildRectangleOnScreen(
+                        binding.parcelasLayout,
+                        Rect(0, 0, binding.parcelasLayout.width, binding.parcelasLayout.height + dpExtra),
+                        true
+                    )
+                }
+            }
             insets
         }
     }
@@ -708,22 +717,9 @@ class RegistoActivity : AppCompatActivity() {
             if (checkedId == R.id.rbRecorrenteParcelada) {
                 binding.parcelasLayout.visibility = View.VISIBLE
                 binding.etParcelas.requestFocus()
-                binding.etParcelas.post {
-                    binding.root.smoothScrollTo(0, binding.parcelasLayout.bottom + 400)
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.showSoftInput(binding.etParcelas, InputMethodManager.SHOW_IMPLICIT)
-                }
             } else {
                 binding.parcelasLayout.visibility = View.GONE
                 esconderTeclado()
-            }
-        }
-
-        binding.etParcelas.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                binding.etParcelas.post {
-                    binding.root.smoothScrollTo(0, binding.parcelasLayout.bottom + 400)
-                }
             }
         }
 
