@@ -18,13 +18,13 @@
     <string name="guia_sec2_titulo">2. Meta de Poupança &amp; Progresso</string>
     <string name="guia_sec2_desc">Defina a sua meta mensal de poupança. A barra de progresso é preenchida automaticamente com as transações da categoria \'Poupança\' e sincroniza-se em tempo real entre os seus telemóveis.</string>
     <string name="guia_sec3_titulo">3. Listagem Detalhada &amp; Filtros</string>
-    <string name="guia_sec3_desc">Aceda à lista completa de transações. Pesquise por texto, filtre por tipo através das abas (Todas, Despesas ou Rendas) e navegue facilmente entre os meses.</string>
+    <string name="guia_sec3_desc">Aceda à lista completa de transações. Pesquise por texto, filtre por tipo através das abas e utilize o botão de voltar dedicado no cabeçalho para regressar rapidamente ao resumo.</string>
     <string name="guia_sec4_titulo">4. Adicionar &amp; Editar Transações</string>
-    <string name="guia_sec4_desc">Prima o botão \'+\' na Listagem para registar um novo item (Renda ou Despesa). Escolha o valor, a categoria e a data de vencimento. Pode editar qualquer item tocando sobre ele na lista.</string>
+    <string name="guia_sec4_desc">Prima o botão \'+\' na Listagem para registar um novo item (Renda ou Despesa) utilizando o seletor rápido (toggle group). Insira o valor com o símbolo oficial do Euro (€) e aproveite os ícones dinâmicos de categoria.</string>
     <string name="guia_sec5_titulo">5. Recorrência Inteligente</string>
-    <string name="guia_sec5_desc">Ao registar uma conta fixa (ex: Aluguer ou Internet), marque a opção de recorrência para que o sistema gere automaticamente as transações nos meses futuros com controlo de parcelas (ex: 1/3).</string>
+    <string name="guia_sec5_desc">Ative o switch de recorrência para revelar opções simplificadas de \'Repetir Sempre\' ou transações \'Parceladas\' com definição intuitiva da quantidade de meses.</string>
     <string name="guia_sec6_titulo">6. Categorias Personalizadas</string>
-    <string name="guia_sec6_desc">Crie e gira as suas categorias no menu \'Gerir Categorias\' ou ao registar itens. Ao eliminar uma categoria em uso, as transações associadas são reatribuídas em segurança para \'Geral\'.</string>
+    <string name="guia_sec6_desc">Crie e gira as suas categorias no menu \'Gerir Categorias\' ou ao registar itens. O campo de categoria herda automaticamente o ícone correspondente à categoria escolhida.</string>
     <string name="guia_sec7_titulo">7. Notificações de Vencimento</string>
     <string name="guia_sec7_desc">Receba lembretes automáticos sobre contas próximas do vencimento (hoje, nos próximos 3 dias ou em atraso recente). Ao tocar na notificação, a aplicação abre diretamente no Resumo. Pode ativar ou desativar no seu perfil.</string>
     <string name="guia_sec8_titulo">8. Exportar Relatórios PDF</string>

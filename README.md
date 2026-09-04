@@ -10,13 +10,15 @@
 *   **🎯 Destaque Visual do Período:** Seleção compacta de mês e ano com destaque proeminente no cabeçalho para rápida identificação do filtro ativo.
 *   **🔔 Notificações Inteligentes de Vencimento:** Alertas automáticos via **WorkManager** sobre contas a vencer (hoje, nos próximos dias ou em atraso recente) com atalho direto ao resumo.
 *   **🔄 Sincronização em Tempo Real:** Integração total com **Firebase Firestore**, garantindo que transações, metas de poupança e categorias personalizadas sejam atualizadas instantaneamente em tempo real entre todos os telemóveis ligados à mesma conta.
-*   **🏷️ Gestão de Categorias Personalizadas:** Crie e gira as suas próprias categorias. Ao eliminar uma categoria em utilização, as transações associadas são reatribuídas em segurança para a categoria **"Geral"**.
+*   **🏷️ Gestão de Categorias & Ícones Dinâmicos:** Crie e gira as suas próprias categorias. O seletor de categoria herda automaticamente o ícone correspondente à categoria selecionada. Ao eliminar uma categoria em utilização, as transações associadas são reatribuídas em segurança para a categoria **"Geral"**.
 *   **🔐 Autenticação & Modo Convidado 100% Privado:** Sistema de login/registo via Firebase Auth. O modo "Convidado" guarda dados exclusivamente locais (Room DB), sem qualquer envio para a nuvem.
-*   **📅 Recorrência Inteligente:** Registe contas fixas uma única vez e o sistema gera automaticamente as transações para os meses futuros com controlo de parcelas (ex: `1/3`).
+*   **📅 Recorrência Inteligente & Switch Unificado:** Registe contas fixas ("Repetir Sempre") ou parceladas com o novo switch de recorrência intuitivo e ícone de ciclo dedicado.
+*   **💶 Símbolo de Moeda Oficial (€):** Campos monetários atualizados com o vetor oficial do Euro (€) e ícones de investimento dedicados.
+*   **🔙 Navegação Otimizada:** Botão de voltar dedicado na listagem detalhada de transações para fácil retorno ao resumo mensal.
 *   **📄 Exportação PDF Avançada:** Gere relatórios profissionais em PDF com o logótipo em alta definição, tabela de **Resumo de Despesas por Categoria (%)** e tabelas separadas para **Rendas (Entradas)** e **Despesas (Saídas)** ordenadas cronologicamente por **Data de Vencimento**.
 *   **📈 Evolução Anual:** Painel exclusivo para comparar o desempenho financeiro mês a mês ao longo do ano.
 *   **🌓 Modo Escuro Nativo:** Interface totalmente adaptada para os modos Light e Dark com alteração fluida de tema.
-*   **📱 UX & Teclado Fluido:** Ajuste dinâmico da interface ao abrir o teclado (`SOFT_INPUT_ADJUST_RESIZE`) e recolha automática ao adicionar dados.
+*   **📱 UX & Teclado Fluido:** Seletor de tipo de transação com botões em toggle (`MaterialButtonToggleGroup`), ajuste dinâmico ao abrir o teclado (`adjustResize`), foco automático e ação de conclusão rápida.
 
 ---
 
