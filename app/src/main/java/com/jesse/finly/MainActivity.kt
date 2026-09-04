@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import androidx.activity.enableEdgeToEdge
@@ -210,15 +211,52 @@ class MainActivity : AppCompatActivity() {
     private fun mostrarDialogoSelecaoPeriodo() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_selecionar_periodo, binding.root as? ViewGroup, false)
         val cgAnos = dialogView.findViewById<ChipGroup>(R.id.cgAnos)
-        val cgMeses = dialogView.findViewById<ChipGroup>(R.id.cgMeses)
         val btnCancelar = dialogView.findViewById<Button>(R.id.btnCancelarPeriodo)
         val btnAplicar = dialogView.findViewById<Button>(R.id.btnAplicarPeriodo)
+
+        val botoesMeses = mapOf(
+            "Janeiro" to dialogView.findViewById<MaterialButton>(R.id.btnMesJan),
+            "Fevereiro" to dialogView.findViewById<MaterialButton>(R.id.btnMesFev),
+            "Março" to dialogView.findViewById<MaterialButton>(R.id.btnMesMar),
+            "Abril" to dialogView.findViewById<MaterialButton>(R.id.btnMesAbr),
+            "Maio" to dialogView.findViewById<MaterialButton>(R.id.btnMesMai),
+            "Junho" to dialogView.findViewById<MaterialButton>(R.id.btnMesJun),
+            "Julho" to dialogView.findViewById<MaterialButton>(R.id.btnMesJul),
+            "Agosto" to dialogView.findViewById<MaterialButton>(R.id.btnMesAgo),
+            "Setembro" to dialogView.findViewById<MaterialButton>(R.id.btnMesSet),
+            "Outubro" to dialogView.findViewById<MaterialButton>(R.id.btnMesOut),
+            "Novembro" to dialogView.findViewById<MaterialButton>(R.id.btnMesNov),
+            "Dezembro" to dialogView.findViewById<MaterialButton>(R.id.btnMesDez)
+        )
 
         val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
         dialog.setContentView(dialogView)
 
         var anoTemp = anoFiltro
         var mesTemp = mesFiltro ?: meses[0]
+
+        fun atualizarEstiloBotoesMes() {
+            botoesMeses.forEach { (nomeMes, btn) ->
+                val selected = nomeMes.equals(mesTemp, ignoreCase = true)
+                if (selected) {
+                    btn?.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                    btn?.setTextColor(ContextCompat.getColor(this, R.color.white))
+                    btn?.setStrokeColorResource(R.color.colorPrimary)
+                } else {
+                    btn?.setBackgroundColor(ContextCompat.getColor(this, R.color.surfaceColor))
+                    btn?.setTextColor(ContextCompat.getColor(this, R.color.textColorPrimary))
+                    btn?.setStrokeColorResource(android.R.color.transparent)
+                }
+            }
+        }
+
+        botoesMeses.forEach { (nomeMes, btn) ->
+            btn?.setOnClickListener {
+                mesTemp = nomeMes
+                atualizarEstiloBotoesMes()
+            }
+        }
+        atualizarEstiloBotoesMes()
 
         // Obter anos dinâmicos com base nas transações + ano atual + próximo ano
         val anosDisponiveis = FinanceiroUtils.obterAnosDisponiveis(todasTransacoes)
@@ -244,29 +282,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             cgAnos.addView(chip)
-        }
-
-        cgMeses.removeAllViews()
-        meses.forEach { mes ->
-            val chip = Chip(this).apply {
-                text = mes
-                isCheckable = true
-                isChecked = mes.equals(mesTemp, ignoreCase = true)
-                setChipBackgroundColorResource(if (isChecked) R.color.colorPrimary else R.color.surfaceColor)
-                setTextColor(ContextCompat.getColor(context, if (isChecked) R.color.white else R.color.textColorPrimary))
-                setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) {
-                        mesTemp = mes
-                        for (i in 0 until cgMeses.childCount) {
-                            val child = cgMeses.getChildAt(i) as? Chip
-                            val selected = child?.text.toString().equals(mesTemp, ignoreCase = true)
-                            child?.setChipBackgroundColorResource(if (selected) R.color.colorPrimary else R.color.surfaceColor)
-                            child?.setTextColor(ContextCompat.getColor(this@MainActivity, if (selected) R.color.white else R.color.textColorPrimary))
-                        }
-                    }
-                }
-            }
-            cgMeses.addView(chip)
         }
 
         btnCancelar.setOnClickListener { dialog.dismiss() }
