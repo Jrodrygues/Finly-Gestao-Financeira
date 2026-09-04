@@ -105,7 +105,7 @@
     <string name="tab_rendas">RENDAS</string>
     <string name="col_item">Item</string>
     <string name="col_valor">Valor</string>
-    <string name="col_vencimento">Vencimento</string>
+    <string name="col_vencimento">Data</string>
     <string name="col_pago">Pago</string>
     <string name="col_ver">Ver</string>
 
