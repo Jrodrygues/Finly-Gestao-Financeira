@@ -707,8 +707,7 @@ class RegistoActivity : AppCompatActivity() {
                 binding.parcelasLayout.visibility = View.VISIBLE
                 binding.etParcelas.requestFocus()
                 binding.root.postDelayed({
-                    val scrollView = binding.root.parent as? ScrollView
-                    scrollView?.smoothScrollTo(0, binding.parcelasLayout.bottom + 200)
+                    binding.root.smoothScrollTo(0, binding.parcelasLayout.bottom + 300)
                     val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.showSoftInput(binding.etParcelas, InputMethodManager.SHOW_IMPLICIT)
                 }, 200)
@@ -720,8 +719,7 @@ class RegistoActivity : AppCompatActivity() {
         binding.etParcelas.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 binding.root.postDelayed({
-                    val scrollView = binding.root.parent as? ScrollView
-                    scrollView?.smoothScrollTo(0, binding.parcelasLayout.bottom + 200)
+                    binding.root.smoothScrollTo(0, binding.parcelasLayout.bottom + 300)
                 }, 200)
             }
         }
