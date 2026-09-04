@@ -10,17 +10,17 @@
         android:layout_height="match_parent"
         android:background="@color/backgroundColor">
 
-        <!-- Cabeçalho com Navegação de Meses e Sombra -->
+        <!-- Cabeçalho com Título e Sombra -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/clHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/headerColor"
             android:elevation="4dp"
-            android:paddingBottom="16dp"
+            android:paddingBottom="12dp"
             app:layout_constraintTop_toTopOf="parent">
 
-            <!-- 1. Cabeçalho Principal (Top Bar): Botão Voltar + Título da Tela -->
+            <!-- Cabeçalho Principal (Top Bar): Botão Voltar + Título da Tela -->
             <ImageButton
                 android:id="@+id/btnBackMain"
                 android:layout_width="48dp"
@@ -51,63 +51,63 @@
                 app:layout_constraintStart_toEndOf="@+id/btnBackMain"
                 app:layout_constraintTop_toTopOf="@+id/btnBackMain" />
 
-            <!-- 2. Seletor de Mês Centralizado (numa "pílula" / card sutil) -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardMonthSelector"
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Seletor de Mês Centralizado (Fora do cabeçalho principal, acima da barra de pesquisa) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardMonthSelector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/surfaceColor"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#1E222B"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/clHeader">
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:cardBackgroundColor="@color/surfaceColor"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="#1E222B"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnBackMain">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp">
 
-                <LinearLayout
+                <ImageButton
+                    android:id="@+id/btnMesAnterior"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_chevron_left"
+                    android:contentDescription="@string/btn_voltar"
+                    app:tint="@color/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/tvMainTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp">
+                    android:minWidth="140dp"
+                    android:gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:text="Setembro 2026"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
-                    <ImageButton
-                        android:id="@+id/btnMesAnterior"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="?android:attr/selectableItemBackgroundBorderless"
-                        android:src="@drawable/ic_chevron_left"
-                        android:contentDescription="@string/btn_voltar"
-                        app:tint="@color/colorPrimary" />
+                <ImageButton
+                    android:id="@+id/btnMesProximo"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_chevron_right"
+                    android:contentDescription="@string/btn_voltar"
+                    app:tint="@color/colorPrimary" />
 
-                    <TextView
-                        android:id="@+id/tvMainTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minWidth="140dp"
-                        android:gravity="center"
-                        android:paddingHorizontal="12dp"
-                        android:text="Setembro 2026"
-                        android:textColor="@color/textColorPrimary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <ImageButton
-                        android:id="@+id/btnMesProximo"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="?android:attr/selectableItemBackgroundBorderless"
-                        android:src="@drawable/ic_chevron_right"
-                        android:contentDescription="@string/btn_voltar"
-                        app:tint="@color/colorPrimary" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Container com Barra de Pesquisa e Botão Adicionar -->
         <LinearLayout
@@ -118,7 +118,7 @@
             android:layout_marginTop="16dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/clHeader">
+            app:layout_constraintTop_toBottomOf="@+id/cardMonthSelector">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/searchLayout"
