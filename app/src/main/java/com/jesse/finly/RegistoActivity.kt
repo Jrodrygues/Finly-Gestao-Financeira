@@ -21,6 +21,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
@@ -73,6 +74,7 @@ class RegistoActivity : AppCompatActivity() {
             delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
         }
 
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityRegistoBinding.inflate(layoutInflater)
@@ -159,9 +161,8 @@ class RegistoActivity : AppCompatActivity() {
                 bottom = systemBars.bottom + ime.bottom + dpExtra
             )
             if (ime.bottom > 0 && (binding.etParcelas.hasFocus() || binding.rbRecorrenteParcelada.isChecked)) {
-                binding.root.post {
-                    binding.root.requestChildRectangleOnScreen(
-                        binding.parcelasLayout,
+                binding.parcelasLayout.post {
+                    binding.parcelasLayout.requestRectangleOnScreen(
                         Rect(0, 0, binding.parcelasLayout.width, binding.parcelasLayout.height + dpExtra),
                         true
                     )
