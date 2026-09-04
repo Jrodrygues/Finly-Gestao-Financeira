@@ -12,12 +12,12 @@
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground">
 
-    <!-- Descrição (Item) - Alinhado com o cabeçalho (weight 1.8) e permite até 2 linhas -->
+    <!-- Nome - Alinhado com o cabeçalho (weight 1.5) e permite até 2 linhas -->
     <TextView
         android:id="@+id/tvItem"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.8"
+        android:layout_weight="1.5"
         android:text="Item"
         android:textColor="@color/textColorPrimary"
         android:textSize="14sp"
@@ -25,12 +25,12 @@
         android:maxLines="2"
         android:ellipsize="end" />
 
-    <!-- Valor - Alinhado com o cabeçalho (weight 1.2) -->
+    <!-- Valor - Alinhado com o cabeçalho (weight 1.3) -->
     <TextView
         android:id="@+id/tvValor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.2"
+        android:layout_weight="1.3"
         android:gravity="end"
         android:paddingEnd="8dp"
         android:fontFeatureSettings="tnum"
@@ -39,23 +39,23 @@
         android:textSize="14sp"
         android:textStyle="bold" />
 
-    <!-- Vencimento - Alinhado com o cabeçalho (weight 1.2) -->
+    <!-- Data - Alinhado com o cabeçalho (weight 1.0) -->
     <TextView
         android:id="@+id/tvVencimento"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.2"
+        android:layout_weight="1.0"
         android:gravity="center"
         android:text="01/01"
         android:textColor="@color/textColorSecondary"
         android:textSize="14sp" />
 
-    <!-- Status (CheckBox) - Alinhado com o cabeçalho (weight 0.8) -->
+    <!-- Pago (CheckBox) - Alinhado com o cabeçalho (weight 0.7) -->
     <ImageView
         android:id="@+id/ivStatus"
         android:layout_width="0dp"
         android:layout_height="24dp"
-        android:layout_weight="0.8"
+        android:layout_weight="0.7"
         android:scaleType="centerInside"
         android:src="@android:drawable/checkbox_off_background"
         android:contentDescription="@string/col_pago"

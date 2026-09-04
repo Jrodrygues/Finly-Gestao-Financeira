@@ -58,7 +58,7 @@
             android:id="@+id/cardMonthSelector"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             app:cardBackgroundColor="@color/surfaceColor"
             app:cardCornerRadius="24dp"
             app:cardElevation="2dp"
@@ -146,6 +146,7 @@
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:layout_marginStart="8dp"
+                android:layout_gravity="center_vertical"
                 android:insetLeft="0dp"
                 android:insetTop="0dp"
                 android:insetRight="0dp"
@@ -201,7 +202,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.8"
+                android:layout_weight="1.5"
                 android:text="@string/col_item"
                 android:textColor="@color/textColorPrimary"
                 android:textStyle="bold" />
@@ -209,7 +210,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.2"
+                android:layout_weight="1.3"
                 android:gravity="end"
                 android:paddingEnd="8dp"
                 android:text="@string/col_valor"
@@ -219,7 +220,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.2"
+                android:layout_weight="1.0"
                 android:gravity="center"
                 android:text="@string/col_vencimento"
                 android:textColor="@color/textColorPrimary"
@@ -229,7 +230,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.8"
+                android:layout_weight="0.7"
                 android:gravity="center"
                 android:text="@string/col_pago"
                 android:textColor="@color/textColorPrimary"
