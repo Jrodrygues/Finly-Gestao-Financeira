@@ -3,6 +3,7 @@ package com.jesse.finly
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -15,6 +16,7 @@ import android.os.Bundle
 import android.content.res.Configuration
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -28,6 +30,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import kotlin.math.abs
+import kotlin.math.roundToInt
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -51,6 +55,7 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.widget.Button
+import androidx.core.content.FileProvider
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -69,6 +74,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
@@ -141,10 +147,6 @@ class ResumoActivity : AppCompatActivity() {
         binding.btnMenu.setOnClickListener {
             binding.navigationView.setCheckedItem(R.id.nav_resumo)
             binding.drawerLayout.openDrawer(androidx.core.view.GravityCompat.START)
-        }
-
-        binding.btnExportarPDF.setOnClickListener {
-            exportarParaPDF()
         }
 
         binding.btnDefinirMeta.setOnClickListener {
@@ -236,6 +238,8 @@ class ResumoActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                         putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
+                        putBoolean("DARK_MODE", perfilNuvem.darkMode)
+                        putBoolean("pref_biometric_ativa", perfilNuvem.biometricAtiva)
                         putStringSet("CUSTOM_CATEGORIES_$emailClean", HashSet(setUnido))
                     }
                     atualizarDrawerHeader()
@@ -267,6 +271,8 @@ class ResumoActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                         putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
+                        putBoolean("DARK_MODE", perfilNuvem.darkMode)
+                        putBoolean("pref_biometric_ativa", perfilNuvem.biometricAtiva)
                         putStringSet("CUSTOM_CATEGORIES_$emailClean", HashSet(setUnido))
                     }
                     atualizarDrawerHeader()
@@ -379,7 +385,7 @@ class ResumoActivity : AppCompatActivity() {
                     mostrarBottomSheetGerirCategorias()
                 }
                 R.id.nav_exportar -> {
-                    exportarParaPDF()
+                    mostrarOpcoesExportacao()
                 }
                 R.id.nav_sair -> {
                     mostrarDialogSair()
@@ -533,7 +539,7 @@ class ResumoActivity : AppCompatActivity() {
             "compras" -> R.drawable.ic_list
             "assinaturas" -> R.drawable.ic_pdf
             "investimentos" -> R.drawable.ic_euro
-            "poupança" -> R.drawable.ic_lock
+            "poupança" -> R.drawable.ic_poupanca
             "exterior" -> R.drawable.ic_flight
             else -> R.drawable.ic_tag
         }
@@ -855,24 +861,34 @@ class ResumoActivity : AppCompatActivity() {
             c.drawText("Valor", 555f, headerY, tableHeaderCellRightPaint)
         }
 
-        fun extrairOrdemData(vencimento: String): Int {
-            val partes = vencimento.split("/")
-            val dia = partes.getOrNull(0)?.toIntOrNull() ?: 1
-            val mesNum = partes.getOrNull(1)?.toIntOrNull() ?: 1
-            val anoNum = partes.getOrNull(2)?.toIntOrNull() ?: 2026
-            return anoNum * 10000 + mesNum * 100 + dia
-        }
-
         drawHeaderAndFooter(canvas, pageNumber)
 
         // Card de Resumo no topo
         canvas.drawRoundRect(30f, 100f, 565f, 190f, 10f, 10f, cardBgPaint)
         canvas.drawRoundRect(30f, 100f, 565f, 190f, 10f, 10f, cardBorderPaint)
 
-        val rendaText = binding.tvTotalRenda.text.toString()
-        val despesaText = binding.tvTotalDespesas.text.toString()
-        val poupancaText = binding.tvTotalPoupanca.text.toString()
-        val saldoText = binding.tvSaldoFinal.text.toString()
+        val totalRendaVal = transacoes.filter { it.tipo == "RENDA" && it.categoria != "Poupança" && it.categoria != "Exterior" }.sumOf { it.valor }
+        val despesas = transacoes.filter { it.tipo == "DESPESA" }
+        val totalDespesasVal = despesas.sumOf { it.valor }
+        val saldoVal = FinanceiroUtils.calcularSaldoPago(transacoes)
+
+        val isRendaZero = abs(totalRendaVal) < 0.005
+        val rendaText = FinanceiroUtils.formatarMoeda(totalRendaVal, isPositivo = if (isRendaZero) null else true)
+
+        val isDespesaZero = abs(totalDespesasVal) < 0.005
+        val despesaText = FinanceiroUtils.formatarMoeda(totalDespesasVal, isPositivo = if (isDespesaZero) null else false)
+
+        val isSaldoZero = abs(saldoVal) < 0.005
+        val saldoText = FinanceiroUtils.formatarMoeda(saldoVal, isPositivo = if (isSaldoZero) null else (saldoVal >= 0))
+
+        val despesasPendentes = despesas.filter { !it.status }
+        val totalDespesasPendentes = despesasPendentes.sumOf { it.valor }
+        val statusPrevisao = if (saldoVal >= 0) "No Verde" else "No Vermelho"
+        val detalhePrevisao = if (despesasPendentes.isNotEmpty()) {
+            "${despesasPendentes.size} pendentes: " + FinanceiroUtils.formatarMoeda(totalDespesasPendentes)
+        } else {
+            "Contas em dia"
+        }
 
         canvas.drawText("TOTAL RENDAS", 50f, 122f, labelPaint)
         canvas.drawText(rendaText, 50f, 142f, valueRendaPaint)
@@ -882,18 +898,15 @@ class ResumoActivity : AppCompatActivity() {
 
         canvas.drawText("SALDO FINAL", 380f, 122f, labelPaint)
         val isSaldoNegativo = binding.tvSaldoFinal.currentTextColor == ContextCompat.getColor(this, R.color.colorNegative)
-        val saldoPaint = if (isSaldoNegativo) valueDespesaPaint else valueRendaPaint
+        val saldoPaint = if (isSaldoZero) labelPaint else if (isSaldoNegativo) valueDespesaPaint else valueRendaPaint
         canvas.drawText(saldoText, 380f, 142f, saldoPaint)
 
         canvas.drawLine(50f, 157f, 545f, 157f, linePaint)
-        val metaFormatada = String.format(Locale.getDefault(), "%.2f €", metaAtual)
-        canvas.drawText("Poupança Real: $poupancaText   |   Meta do Mês: $metaFormatada", 50f, 175f, textPaint)
+        canvas.drawText("Previsão Fim de Mês: $statusPrevisao ($detalhePrevisao)", 50f, 175f, textPaint)
 
         currentY = 210f
 
         // 1. Resumo de Despesas por Categoria
-        val despesas = transacoes.filter { it.tipo == "DESPESA" }
-        val totalDespesasVal = despesas.sumOf { it.valor }
         val gastosPorCategoria = despesas.groupBy { it.categoria }
             .mapValues { entry -> entry.value.sumOf { it.valor } }
             .toList()
@@ -1016,40 +1029,165 @@ class ResumoActivity : AppCompatActivity() {
 
         val nomeFicheiro = "Relatorio_${mes}_$ano.pdf"
         try {
-            val resolver = contentResolver
-
-            val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, nomeFicheiro)
-                put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
-                }
-            }
-
-            val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-            } else {
-                resolver.insert(MediaStore.Files.getContentUri("external"), contentValues)
-            }
-
-            if (uri != null) {
-                resolver.openOutputStream(uri)?.use { outputStream ->
-                    pdfDocument.writeTo(outputStream)
-                }
+            val baos = ByteArrayOutputStream()
+            pdfDocument.writeTo(baos)
+            val bytes = baos.toByteArray()
+            val ok = guardarFicheiroEmDownloads(nomeFicheiro, "application/pdf", bytes)
+            if (ok) {
                 showToast("Relatório salvo em Downloads!", isLong = true)
             } else {
-                // Fallback para gravação direta
-                val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                val file = File(downloadsDir, nomeFicheiro)
-                FileOutputStream(file).use { outputStream ->
-                    pdfDocument.writeTo(outputStream)
-                }
-                showToast("Relatório salvo em Downloads!", isLong = true)
+                showToast("Erro ao guardar o relatório PDF.")
             }
         } catch (e: Exception) {
             showToast("Erro ao gerar PDF: ${e.message}")
         } finally {
             pdfDocument.close()
+        }
+    }
+
+    private fun guardarFicheiroEmDownloads(nomeFicheiro: String, mimeType: String, bytes: ByteArray): Boolean {
+        val resolver = contentResolver
+        var sucesso = false
+
+        // 1. Tentar MediaStore (Android 10+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            try {
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, nomeFicheiro)
+                    put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                }
+
+                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                if (uri != null) {
+                    resolver.openOutputStream(uri)?.use { os ->
+                        os.write(bytes)
+                        os.flush()
+                    }
+                    sucesso = true
+                }
+            } catch (e: Exception) {
+                Log.e("ResumoActivity", "Erro MediaStore Q+: ${e.message}")
+            }
+        }
+
+        // 2. Gravação direta na pasta Downloads pública
+        if (!sucesso) {
+            try {
+                val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                if (!downloadsDir.exists()) {
+                    downloadsDir.mkdirs()
+                }
+                val file = File(downloadsDir, nomeFicheiro)
+                FileOutputStream(file).use { os ->
+                    os.write(bytes)
+                    os.flush()
+                }
+                sucesso = true
+            } catch (e: Exception) {
+                Log.e("ResumoActivity", "Erro Fallback Downloads: ${e.message}")
+            }
+        }
+
+        // 3. Fallback no diretório de ficheiros externos da app
+        if (!sucesso) {
+            try {
+                val appDownloadsDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+                if (appDownloadsDir != null) {
+                    if (!appDownloadsDir.exists()) appDownloadsDir.mkdirs()
+                    val file = File(appDownloadsDir, nomeFicheiro)
+                    FileOutputStream(file).use { os ->
+                        os.write(bytes)
+                        os.flush()
+                    }
+                    sucesso = true
+                }
+            } catch (e: Exception) {
+                Log.e("ResumoActivity", "Erro App External Files: ${e.message}")
+            }
+        }
+
+        return sucesso
+    }
+
+    private fun extrairOrdemData(vencimento: String): Int {
+        val partes = vencimento.split("/")
+        val dia = partes.getOrNull(0)?.toIntOrNull() ?: 1
+        val mesNum = partes.getOrNull(1)?.toIntOrNull() ?: 1
+        val anoNum = partes.getOrNull(2)?.toIntOrNull() ?: 2026
+        return anoNum * 10000 + mesNum * 100 + dia
+    }
+
+    private fun mostrarOpcoesExportacao() {
+        val mes = binding.spinnerMes.selectedItem?.toString() ?: ""
+        val ano = binding.spinnerAno.selectedItem as? Int ?: 2026
+
+        val dialogView = layoutInflater.inflate(R.layout.dialog_exportar_relatorio, binding.root as? ViewGroup, false)
+        val tvTitulo = dialogView.findViewById<TextView>(R.id.tvTituloExportar)
+        val cardPDF = dialogView.findViewById<View>(R.id.cardExportarPDF)
+        val cardCSV = dialogView.findViewById<View>(R.id.cardExportarCSV)
+        val btnCancelar = dialogView.findViewById<View>(R.id.btnCancelarExportar)
+
+        tvTitulo.text = getString(R.string.dialog_exportar_titulo, mes, ano)
+
+        val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
+        dialog.setContentView(dialogView)
+
+        cardPDF.setOnClickListener {
+            dialog.dismiss()
+            exportarParaPDF()
+        }
+
+        cardCSV.setOnClickListener {
+            dialog.dismiss()
+            exportarParaCSV()
+        }
+
+        btnCancelar.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun exportarParaCSV() {
+        val mes = binding.spinnerMes.selectedItem?.toString() ?: ""
+        val ano = binding.spinnerAno.selectedItem?.toString() ?: ""
+        val transacoes = transacoesAtuaisGrafico
+
+        if (transacoes.isEmpty()) {
+            showToast("Sem transações para exportar em $mes/$ano")
+            return
+        }
+
+        val nomeFicheiro = "Relatorio_${mes}_$ano.csv"
+
+        try {
+            val sb = StringBuilder()
+            // Adiciona BOM (Byte Order Mark) UTF-8 para garantir abertura correta no Excel sem problemas de acentuação
+            sb.append("\uFEFF")
+            // Cabeçalho CSV com separador ; (padrão europeu/português para Excel)
+            sb.append("Vencimento;Tipo;Descrição;Categoria;Valor (€);Estado\n")
+
+            transacoes.sortedBy { extrairOrdemData(it.vencimento) }.forEach { t ->
+                val itemEscaped = t.item.replace("\"", "\"\"")
+                val catEscaped = t.categoria.replace("\"", "\"\"")
+                val valorFmt = String.format(Locale.getDefault(), "%.2f", t.valor)
+                val estado = if (t.status) "Pago" else "Pendente"
+
+                sb.append("\"${t.vencimento}\";\"${t.tipo}\";\"$itemEscaped\";\"$catEscaped\";\"$valorFmt\";\"$estado\"\n")
+            }
+
+            val csvText = sb.toString()
+            val bytes = csvText.toByteArray(Charsets.UTF_8)
+            val ok = guardarFicheiroEmDownloads(nomeFicheiro, "text/csv", bytes)
+            if (ok) {
+                showToast("Ficheiro CSV salvo em Downloads!", isLong = true)
+            } else {
+                showToast("Erro ao guardar o ficheiro CSV.")
+            }
+        } catch (e: Exception) {
+            showToast("Erro ao exportar CSV: ${e.message}")
         }
     }
 
@@ -1249,8 +1387,38 @@ class ResumoActivity : AppCompatActivity() {
             val saldoPaga = FinanceiroUtils.calcularSaldoPago(transacoes)
             val percentagemGasta = FinanceiroUtils.calcularPercentagemGasta(totalRenda, totalDespesas)
 
+            // Cálculos para Previsão de Fim de Mês
+            val despesasPendentes = transacoes.filter { it.tipo == "DESPESA" && !it.status }
+            val totalDespesasPendentes = despesasPendentes.sumOf { it.valor }
+            val rendasPendentes = transacoes.filter { it.tipo == "RENDA" && !it.status }
+            val totalRendasPendentes = rendasPendentes.sumOf { it.valor }
+            val saldoProjetado = saldoPaga - totalDespesasPendentes + totalRendasPendentes
+
+            // Comparativo com o Mês Anterior
+            val mesIndexAtual = meses.indexOf(mesSelecionado)
+            val (prevMesNome, prevAno) = if (mesIndexAtual > 0) {
+                Pair(meses[mesIndexAtual - 1], anoSelecionado)
+            } else {
+                Pair(meses[11], anoSelecionado - 1)
+            }
+
+            val transacoesAnteriores = db.utilizadorDao().obterTransacoesPorMes(email, prevMesNome, prevAno)
+            val despesasAnteriores = transacoesAnteriores.asSequence().filter { it.tipo == "DESPESA" }.sumOf { it.valor }
+
             withContext(Dispatchers.Main) {
-                atualizarInterface(totalRenda, totalDespesas, totalPoupanca, totalExterior, saldoPaga, percentagemGasta)
+                atualizarInterface(
+                    renda = totalRenda,
+                    despesa = totalDespesas,
+                    poupanca = totalPoupanca,
+                    exterior = totalExterior,
+                    saldo = saldoPaga,
+                    percent = percentagemGasta,
+                    prevMesNome = prevMesNome,
+                    despesaAnterior = despesasAnteriores,
+                    totalDespesasPendentes = totalDespesasPendentes,
+                    numDespesasPendentes = despesasPendentes.size,
+                    saldoProjetado = saldoProjetado,
+                )
                 configurarGrafico(transacoes)
                 // A barra de meta continua baseada no que foi poupado (geralmente absoluto, mas mantendo lógica de categoria)
                 atualizarBarraMeta(totalPoupanca)
@@ -1289,11 +1457,13 @@ class ResumoActivity : AppCompatActivity() {
             .sortedByDescending { it.second }
 
         if (gastosPorCategoria.isEmpty()) {
+            binding.cardResumoCategoria.visibility = View.GONE
             binding.pieChart.visibility = View.GONE
             binding.llCategoryDetails.visibility = View.GONE
             binding.btnVerMaisCategorias.visibility = View.GONE
             return
         }
+        binding.cardResumoCategoria.visibility = View.VISIBLE
         binding.pieChart.visibility = View.VISIBLE
         binding.llCategoryDetails.visibility = View.VISIBLE
 
@@ -1380,7 +1550,7 @@ class ResumoActivity : AppCompatActivity() {
         
         itemView.findViewById<View>(R.id.vColorIndicator).background.setTint(cor)
         itemView.findViewById<TextView>(R.id.tvCategoryName).text = nome
-        itemView.findViewById<TextView>(R.id.tvCategoryValue).text = String.format(Locale.getDefault(), "%.2f €", valor)
+        itemView.findViewById<TextView>(R.id.tvCategoryValue).text = FinanceiroUtils.formatarMoeda(valor)
         itemView.findViewById<TextView>(R.id.tvCategoryPercent).text = String.format(Locale.getDefault(), "(%d%%)", percent)
         
         binding.llCategoryDetails.addView(itemView)
@@ -1404,28 +1574,40 @@ class ResumoActivity : AppCompatActivity() {
         }
     }
 
-    private fun atualizarInterface(renda: Double, despesa: Double, poupanca: Double, exterior: Double, saldo: Double, percent: Int) {
+    private fun atualizarInterface(
+        renda: Double,
+        despesa: Double,
+        poupanca: Double,
+        exterior: Double,
+        saldo: Double,
+        percent: Int,
+        prevMesNome: String,
+        despesaAnterior: Double,
+        totalDespesasPendentes: Double,
+        numDespesasPendentes: Int,
+        saldoProjetado: Double,
+    ) {
         atualizarAparenciaCabecalho()
 
         val colorPositivo = ContextCompat.getColor(this, R.color.colorPositive)
         val colorNegativo = ContextCompat.getColor(this, R.color.colorNegative)
-        val colorPadrao = ContextCompat.getColor(this, R.color.textColorPrimary)
+        val colorPadrao = ContextCompat.getColor(this, R.color.textColorSecondary)
         val colorAlertaAviso = Color.parseColor("#FF9800")
 
-        binding.tvTotalRenda.text = FinanceiroUtils.formatarMoeda(renda, isPositivo = true)
-        binding.tvTotalRenda.setTextColor(colorPositivo)
+        val isRendaZero = abs(renda) < 0.005
+        binding.tvTotalRenda.text = FinanceiroUtils.formatarMoeda(renda, isPositivo = if (isRendaZero) null else true)
+        binding.tvTotalRenda.setTextColor(if (isRendaZero) colorPadrao else colorPositivo)
 
-        binding.tvTotalDespesas.text = FinanceiroUtils.formatarMoeda(despesa, isPositivo = false)
-        binding.tvTotalDespesas.setTextColor(colorNegativo)
+        val isDespesaZero = abs(despesa) < 0.005
+        binding.tvTotalDespesas.text = FinanceiroUtils.formatarMoeda(despesa, isPositivo = if (isDespesaZero) null else false)
+        binding.tvTotalDespesas.setTextColor(if (isDespesaZero) colorPadrao else colorNegativo)
 
         binding.tvTotalPoupanca.text = FinanceiroUtils.formatarMoeda(poupanca)
         binding.tvTotalPoupanca.setTextColor(colorPadrao)
 
-        binding.tvTotalBrasil.text = FinanceiroUtils.formatarMoeda(exterior)
-        binding.tvTotalBrasil.setTextColor(colorPadrao)
-
-        binding.tvSaldoFinal.text = FinanceiroUtils.formatarMoeda(saldo, isPositivo = saldo >= 0)
-        binding.tvSaldoFinal.setTextColor(if (saldo < 0) colorNegativo else colorPositivo)
+        val isSaldoZero = abs(saldo) < 0.005
+        binding.tvSaldoFinal.text = FinanceiroUtils.formatarMoeda(saldo, isPositivo = if (isSaldoZero) null else (saldo >= 0))
+        binding.tvSaldoFinal.setTextColor(if (isSaldoZero) colorPadrao else if (saldo < 0) colorNegativo else colorPositivo)
 
         binding.tvSpentValue.text = "Gasto total: " + FinanceiroUtils.formatarMoeda(despesa)
         binding.tvPercentValue.text = String.format(Locale.getDefault(), "%d%%", percent)
@@ -1436,6 +1618,75 @@ class ResumoActivity : AppCompatActivity() {
             else -> colorPositivo
         }
         binding.tvPercentValue.setTextColor(colorPercent)
+
+        // 1. Alerta de teto orçamental (> 100%)
+        if (percent > 100) {
+            binding.cardRendaGasta.strokeColor = colorNegativo
+            binding.cardRendaGasta.strokeWidth = (2 * resources.displayMetrics.density).toInt()
+        } else {
+            binding.cardRendaGasta.strokeWidth = 0
+        }
+
+        // 2. Comparativo com o mês anterior
+        if (despesaAnterior > 0) {
+            val diff = ((despesa - despesaAnterior) / despesaAnterior) * 100
+            val diffAbs = abs(diff).roundToInt()
+            val abrevMes = if (prevMesNome.length >= 3) prevMesNome.substring(0, 3) else prevMesNome
+
+            when {
+                diff < -0.5 -> {
+                    binding.tvTagComparativoMes.text = "↓ $diffAbs% vs. $abrevMes"
+                    binding.tvTagComparativoMes.setTextColor(colorPositivo)
+                    binding.tvTagComparativoMes.background = ContextCompat.getDrawable(this, R.drawable.badge_padrao_background)
+                    binding.tvTagComparativoMes.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E8F5E9"))
+                    binding.tvTagComparativoMes.visibility = View.VISIBLE
+                }
+                diff > 0.5 -> {
+                    binding.tvTagComparativoMes.text = "↑ $diffAbs% vs. $abrevMes"
+                    binding.tvTagComparativoMes.setTextColor(colorNegativo)
+                    binding.tvTagComparativoMes.background = ContextCompat.getDrawable(this, R.drawable.badge_padrao_background)
+                    binding.tvTagComparativoMes.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FFEBEE"))
+                    binding.tvTagComparativoMes.visibility = View.VISIBLE
+                }
+                else -> {
+                    binding.tvTagComparativoMes.text = "0% vs. $abrevMes"
+                    binding.tvTagComparativoMes.setTextColor(colorPadrao)
+                    binding.tvTagComparativoMes.background = ContextCompat.getDrawable(this, R.drawable.badge_padrao_background)
+                    binding.tvTagComparativoMes.backgroundTintList = null
+                    binding.tvTagComparativoMes.visibility = View.VISIBLE
+                }
+            }
+        } else {
+            binding.tvTagComparativoMes.visibility = View.GONE
+        }
+
+        // 3. Previsão de final de mês
+        val valorDespesasPendentesFmt = FinanceiroUtils.formatarMoeda(totalDespesasPendentes)
+        val isSaldoProjetadoZero = abs(saldoProjetado) < 0.005
+        val saldoFmt = FinanceiroUtils.formatarMoeda(
+            saldoProjetado,
+            isPositivo = if (isSaldoProjetadoZero) null else (saldoProjetado >= 0)
+        )
+
+        if (saldoProjetado >= 0) {
+            binding.tvTagPrevisao.text = "🟢 No Verde"
+            binding.tvTagPrevisao.setTextColor(colorPositivo)
+            binding.ivIconPrevisao.setColorFilter(colorPositivo)
+            binding.tvPrevisaoDetalhes.text = if (numDespesasPendentes > 0) {
+                "Saldo estimado: $saldoFmt ($numDespesasPendentes pendência(s): $valorDespesasPendentesFmt)"
+            } else {
+                "Saldo estimado: $saldoFmt (Contas em dia)"
+            }
+        } else {
+            binding.tvTagPrevisao.text = "🔴 No Vermelho"
+            binding.tvTagPrevisao.setTextColor(colorNegativo)
+            binding.ivIconPrevisao.setColorFilter(colorNegativo)
+            binding.tvPrevisaoDetalhes.text = if (numDespesasPendentes > 0) {
+                "Saldo estimado: $saldoFmt ($numDespesasPendentes pendência(s): $valorDespesasPendentesFmt)"
+            } else {
+                "Saldo estimado: $saldoFmt"
+            }
+        }
     }
 
     private suspend fun processarRecorrencia(db: MinhaBaseDados, email: String, mesAlvo: String, anoAlvo: Int) {

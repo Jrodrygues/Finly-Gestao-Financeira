@@ -12,10 +12,12 @@
 *   **🔄 Sincronização em Tempo Real:** Integração total com **Firebase Firestore**, garantindo que transações, metas de poupança e categorias personalizadas sejam atualizadas instantaneamente em tempo real entre todos os telemóveis ligados à mesma conta.
 *   **🏷️ Gestão de Categorias & Ícones Dinâmicos:** Crie e gira as suas próprias categorias. O seletor de categoria herda automaticamente o ícone correspondente à categoria selecionada. Ao eliminar uma categoria em utilização, as transações associadas são reatribuídas em segurança para a categoria **"Geral"**.
 *   **🔐 Autenticação & Modo Convidado 100% Privado:** Sistema de login/registo via Firebase Auth. O modo "Convidado" guarda dados exclusivamente locais (Room DB), sem qualquer envio para a nuvem.
+*   **👆 Bloqueio por Biometria / Impressão Digital:** Proteção da aplicação através de impressão digital ou PIN com a API nativa `BiometricPrompt`. As preferências de biometria são guardadas no perfil do utilizador no **Firebase Firestore** e **Room DB**, sendo restauradas automaticamente ao iniciar sessão em qualquer dispositivo.
 *   **📅 Recorrência Inteligente & Switch Unificado:** Registe contas fixas ("Repetir Sempre") ou parceladas com o novo switch de recorrência intuitivo e ícone de ciclo dedicado.
 *   **💶 Símbolo de Moeda Oficial (€):** Campos monetários atualizados com o vetor oficial do Euro (€) e ícones de investimento dedicados.
 *   **🔙 Navegação Otimizada:** Botão de voltar dedicado na listagem detalhada de transações para fácil retorno ao resumo mensal.
-*   **📄 Exportação PDF Avançada:** Gere relatórios profissionais em PDF com o logótipo em alta definição, tabela de **Resumo de Despesas por Categoria (%)** e tabelas separadas para **Rendas (Entradas)** e **Despesas (Saídas)** ordenadas cronologicamente por **Data de Vencimento**.
+*   **💡 Inteligência & Insights Financeiros:** Alertas visuais de teto orçamental quando despesas superam 100% da renda, badges dinâmicas de variação vs. mês anterior (`↓ X%` em verde ou `↑ X%` em vermelho), e card dedicado de **Previsão de Fim de Mês** (`🟢 No Verde` / `🔴 Risco de Vermelho`).
+*   **📤 Exportação Multiformato (PDF & CSV / Excel):** Modal no menu lateral com seleção de relatório em PDF (vetorial com gráficos) ou CSV (tabela estruturada pronta para Microsoft Excel e Google Sheets com codificação UTF-8 BOM e separador europeu `;`).
 *   **📈 Evolução Anual:** Painel exclusivo para comparar o desempenho financeiro mês a mês ao longo do ano.
 *   **🌓 Modo Escuro Nativo:** Interface totalmente adaptada para os modos Light e Dark com alteração fluida de tema.
 *   **📱 UX & Teclado Fluido:** Seletor de tipo de transação com botões em toggle (`MaterialButtonToggleGroup`), ajuste dinâmico ao abrir o teclado (`adjustResize`), foco automático e ação de conclusão rápida.
@@ -60,6 +62,7 @@ O projeto foi construído com as melhores práticas de desenvolvimento Android:
 *   **Base de Dados Local:** [Room Database](https://developer.android.com/training/data-storage/room) para persistência offline rápida.
 *   **Backend & Nuvem:** [Firebase](https://firebase.google.com/) (Firestore em tempo real, Auth).
 *   **Notificações & Background:** [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) para agendamento de tarefas e notificações nativas.
+*   **Segurança & Biometria:** [AndroidX Biometric API](https://developer.android.com/training/sign-in/biometric-auth) para autenticação segura por impressão digital e PIN.
 *   **Gráficos & PDFs:** [MPAndroidChart](https://github.com/PhilJay/MPAndroidChart) e API nativa `PdfDocument` com renderização vetorial de alta definição.
 *   **UI/UX:** Material Design 3, View Binding, Edge-to-Edge API, Inset Listeners.
 

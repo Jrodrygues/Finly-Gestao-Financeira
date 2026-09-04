@@ -195,11 +195,12 @@ class LoginActivity : AppCompatActivity() {
 
                     withContext(Dispatchers.Main) {
                         setLoading(false)
-                        // APLICAR PREFERÊNCIAS Baixadas (TEMA E NOTIFICAÇÕES)
+                        // APLICAR PREFERÊNCIAS Baixadas (TEMA, NOTIFICAÇÕES E BIOMETRIA)
                         utilizador?.let { u ->
                             getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                                 putBoolean("DARK_MODE", u.darkMode)
                                 putBoolean("NOTIFICATIONS", u.notifications)
+                                putBoolean("pref_biometric_ativa", u.biometricAtiva)
                             }
                             val currentMode = AppCompatDelegate.getDefaultNightMode()
                             val isSystemDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
@@ -224,6 +225,11 @@ class LoginActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     setLoading(false)
                     if (utilizadorLocal != null) {
+                        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
+                            putBoolean("DARK_MODE", utilizadorLocal.darkMode)
+                            putBoolean("NOTIFICATIONS", utilizadorLocal.notifications)
+                            putBoolean("pref_biometric_ativa", utilizadorLocal.biometricAtiva)
+                        }
                         finalizarSessaoLogin(email, utilizadorLocal.nome)
                     } else {
                         // Se não encontrou nem localmente, nem na nuvem, dar erro original

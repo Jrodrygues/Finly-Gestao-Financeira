@@ -26,6 +26,7 @@ import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.DetalhesBinding
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.utils.FinanceiroUtils
+import com.jesse.finly.utils.BiometricUtils
 import com.jesse.finly.notifications.NotificationHelper
 import com.jesse.finly.notifications.NotificationWorker
 import com.jesse.finly.utils.showToast
@@ -125,7 +126,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             "compras" -> R.drawable.ic_list
             "assinaturas" -> R.drawable.ic_pdf
             "investimentos" -> R.drawable.ic_euro
-            "poupança" -> R.drawable.ic_lock
+            "poupança" -> R.drawable.ic_poupanca
             "exterior" -> R.drawable.ic_flight
             else -> R.drawable.ic_tag
         }
@@ -414,6 +415,42 @@ class DetalhesPageActivity : AppCompatActivity() {
                 cancelarNotificacoes()
             }
         }
+
+        val biometriaAtiva = prefs.getBoolean("pref_biometric_ativa", false)
+        binding.switchBiometria.setOnCheckedChangeListener(null)
+        binding.switchBiometria.isChecked = biometriaAtiva
+
+        binding.switchBiometria.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                if (BiometricUtils.isBiometricAvailable(this)) {
+                    BiometricUtils.promptBiometria(
+                        this,
+                        title = "Ativar Biometria",
+                        subtitle = "Confirme a sua identidade para ativar o bloqueio por biometria",
+                        onSuccess = {
+                            prefs.edit { putBoolean("pref_biometric_ativa", true) }
+                            atualizarPreferenciaUtilizador(true, "BIOMETRIA")
+                            showToast("Bloqueio com biometria ativado!")
+                        },
+                        onError = {
+                            buttonView.isChecked = false
+                            prefs.edit { putBoolean("pref_biometric_ativa", false) }
+                            atualizarPreferenciaUtilizador(false, "BIOMETRIA")
+                            showToast("Autenticação cancelada ou indisponível")
+                        }
+                    )
+                } else {
+                    buttonView.isChecked = false
+                    prefs.edit { putBoolean("pref_biometric_ativa", false) }
+                    atualizarPreferenciaUtilizador(false, "BIOMETRIA")
+                    showToast("Biometria não disponível ou configurada neste dispositivo")
+                }
+            } else {
+                prefs.edit { putBoolean("pref_biometric_ativa", false) }
+                atualizarPreferenciaUtilizador(false, "BIOMETRIA")
+                showToast("Bloqueio com biometria desativado")
+            }
+        }
     }
 
     private fun atualizarTextoModoEscuro(isAtivo: Boolean) {
@@ -472,6 +509,7 @@ class DetalhesPageActivity : AppCompatActivity() {
                 val updatedUser = when(tipo) {
                     "DARK_MODE" -> it.copy(darkMode = valor)
                     "NOTIFICATIONS" -> it.copy(notifications = valor)
+                    "BIOMETRIA" -> it.copy(biometricAtiva = valor)
                     else -> it
                 }
                 db.utilizadorDao().atualizarUtilizador(updatedUser)

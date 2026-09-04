@@ -11,8 +11,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
+import com.jesse.finly.utils.BiometricUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -57,24 +59,55 @@ class SplashActivity : AppCompatActivity() {
         val lastLogin = sharedPref.getLong(KEY_LAST_LOGIN, 0L)
         val currentTime = System.currentTimeMillis()
         val email = sharedPref.getString(KEY_EMAIL, "") ?: ""
+        val biometriaAtiva = sharedPref.getBoolean("pref_biometric_ativa", false)
+
+        val navigateToMain = {
+            if (biometriaAtiva && BiometricUtils.isBiometricAvailable(this)) {
+                BiometricUtils.promptBiometria(
+                    this,
+                    title = "Desbloquear Finly",
+                    subtitle = "Autentique-se com a sua biometria ou PIN",
+                    onSuccess = {
+                        startActivity(Intent(this, ResumoActivity::class.java))
+                        finish()
+                    },
+                    onError = {
+                        MaterialAlertDialogBuilder(this)
+                            .setTitle("Autenticação Requerida")
+                            .setMessage("É necessário autenticar para aceder à sua conta.")
+                            .setPositiveButton("Tentar Novamente") { _, _ ->
+                                checkSessionAndNavigate()
+                            }
+                            .setNegativeButton("Sair") { _, _ ->
+                                finish()
+                            }
+                            .setCancelable(false)
+                            .show()
+                    }
+                )
+            } else {
+                startActivity(Intent(this, ResumoActivity::class.java))
+                finish()
+            }
+        }
 
         if ((lastLogin != 0L) && (currentTime - lastLogin < SESSION_TIMEOUT) && (email.isNotEmpty())) {
             if (email == "CONVIDADO") {
-                // Convidado entra diretamente
-                startActivity(Intent(this, ResumoActivity::class.java))
-                finish()
+                navigateToMain()
             } else {
-                // Verificar se o utilizador real ainda existe na base de dados
                 lifecycleScope.launch(Dispatchers.IO) {
                     val db = MinhaBaseDados.getDatabase(applicationContext)
                     val user = db.utilizadorDao().buscarPorEmail(email)
                     
                     withContext(Dispatchers.Main) {
                         if (user != null) {
-                            startActivity(Intent(this@SplashActivity, ResumoActivity::class.java))
-                            finish()
+                            sharedPref.edit {
+                                putBoolean("DARK_MODE", user.darkMode)
+                                putBoolean("NOTIFICATIONS", user.notifications)
+                                putBoolean("pref_biometric_ativa", user.biometricAtiva)
+                            }
+                            navigateToMain()
                         } else {
-                            // Utilizador não existe ou sessão inválida, limpa dados de "sessão"
                             sharedPref.edit {
                                 remove(KEY_EMAIL)
                                 remove(KEY_LAST_LOGIN)
@@ -86,7 +119,6 @@ class SplashActivity : AppCompatActivity() {
                 }
             }
         } else {
-            // Primeira vez ou sessão expirada, vai para o "Ecrã de ‘Login’"
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }

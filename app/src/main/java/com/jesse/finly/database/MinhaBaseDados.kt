@@ -9,7 +9,7 @@ import com.jesse.finly.models.MetaPoupanca
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.models.Utilizador
 
-@Database(entities = [Utilizador::class, Transacao::class, MetaPoupanca::class], version = 21)
+@Database(entities = [Utilizador::class, Transacao::class, MetaPoupanca::class], version = 22)
 abstract class MinhaBaseDados: RoomDatabase() {
     abstract fun utilizadorDao(): UtilizadorDAO
 

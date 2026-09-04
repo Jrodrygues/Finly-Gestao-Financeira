@@ -90,6 +90,13 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.btnEmptyAdd.setOnClickListener {
+            val intent = Intent(this, RegistoActivity::class.java)
+            intent.putExtra("MES_ATUAL", mesFiltro)
+            intent.putExtra("ANO_ATUAL", anoFiltro)
+            startActivity(intent)
+        }
+
         binding.tvMainTitle.setOnClickListener {
             finish()
         }
@@ -251,13 +258,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun atualizarRecycler(lista: List<Transacao>) {
-        // Toggle Empty State
+        // Toggle Empty State & Column Headers
         if (lista.isEmpty()) {
             binding.llEmptyState.visibility = View.VISIBLE
             binding.rvTransacoes.visibility = View.GONE
+            binding.llColumnHeaders.visibility = View.GONE
         } else {
             binding.llEmptyState.visibility = View.GONE
             binding.rvTransacoes.visibility = View.VISIBLE
+            binding.llColumnHeaders.visibility = View.VISIBLE
         }
 
         if (adapter == null) {
@@ -325,37 +334,40 @@ class MainActivity : AppCompatActivity() {
 
         val colorPositivo = ContextCompat.getColor(this, R.color.colorPositive)
         val colorNegativo = ContextCompat.getColor(this, R.color.colorNegative)
+        val colorPadrao = ContextCompat.getColor(this, R.color.textColorSecondary)
 
-        val progressoPercent = if (despesaTotal > 0) ((despesasPagas / despesaTotal) * 100).toInt().coerceIn(0, 100) else 100
+        val progressoPercent = if (despesaTotal > 0) ((despesasPagas / despesaTotal) * 100).toInt().coerceIn(0, 100) else 0
         binding.pbProgressoPagamento.progress = progressoPercent
 
         when (posicaoTab) {
             1 -> {
                 // Aba Despesas
-                setSaldoColorido("Total Despesas: ", despesaTotal, colorNegativo)
+                val corDespesa = if (abs(despesaTotal) < 0.005) colorPadrao else colorNegativo
+                setSaldoColorido("Total Despesas: ", despesaTotal, corDespesa)
                 binding.tvDetalheSaldo.text = String.format(
                     Locale.getDefault(),
-                    "Pagas: %.2f€  |  A Pagar: %.2f€  (%d%% pagas)",
+                    "Pagas: %.2f €  |  A Pagar: %.2f €  (%d%% pagas)",
                     despesasPagas, despesasAPagar, progressoPercent
                 )
                 binding.tvDetalheSaldo.visibility = View.VISIBLE
             }
             2 -> {
                 // Aba Rendas
-                setSaldoColorido("Total Rendas: ", rendaTotal, colorPositivo)
+                val corRenda = if (abs(rendaTotal) < 0.005) colorPadrao else colorPositivo
+                setSaldoColorido("Total Rendas: ", rendaTotal, corRenda)
                 binding.tvDetalheSaldo.visibility = View.GONE
             }
             else -> {
                 // Aba Todas: Saldo Disponível (ou Défice / A Descoberto se negativo)
-                if (saldoDisponivel < 0) {
-                    setSaldoColorido("Défice / A Descoberto: -", abs(saldoDisponivel), colorNegativo)
-                } else {
-                    setSaldoColorido("Saldo Disponível: ", saldoDisponivel, colorPositivo)
+                when {
+                    abs(saldoDisponivel) < 0.005 -> setSaldoColorido("Saldo Disponível: ", 0.0, colorPadrao)
+                    saldoDisponivel < 0 -> setSaldoColorido("Défice / A Descoberto: -", abs(saldoDisponivel), colorNegativo)
+                    else -> setSaldoColorido("Saldo Disponível: ", saldoDisponivel, colorPositivo)
                 }
 
                 binding.tvDetalheSaldo.text = String.format(
                     Locale.getDefault(),
-                    "Inicial: %.2f€  |  Pago: %.2f€ (%d%%)  |  A Pagar: %.2f€",
+                    "Inicial: %.2f €  |  Pago: %.2f € (%d%%)  |  A Pagar: %.2f €",
                     rendaTotal, despesasPagas, progressoPercent, despesasAPagar
                 )
                 binding.tvDetalheSaldo.visibility = View.VISIBLE

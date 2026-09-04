@@ -24,10 +24,15 @@ import java.util.Locale
 
 class NotificationWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
 
     data class ItemVencimento(val transacao: Transacao, val diffDias: Int)
+
+    private val mesesNomes = arrayOf(
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+    )
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val sharedPref = applicationContext.getSharedPreferences("FinlyAppPrefs", Context.MODE_PRIVATE)
@@ -47,20 +52,23 @@ class NotificationWorker(
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
-        val anoAtual = calHoje.get(Calendar.YEAR)
-        val mesAtual = calHoje.get(Calendar.MONTH)
+        val anoAtual = calHoje[Calendar.YEAR]
+        val mesAtual = calHoje[Calendar.MONTH]
 
         val despesasVencendo = mutableListOf<ItemVencimento>()
         val seenIds = mutableSetOf<Int>()
 
         transacoes.forEach { trans ->
-            if (trans.tipo != "DESPESA" || trans.status) return@forEach
+            if ((trans.tipo != "DESPESA") || trans.status) return@forEach
             if (!seenIds.add(trans.id)) return@forEach
 
             val partes = trans.vencimento.split("/")
             val dia = partes.getOrNull(0)?.toIntOrNull() ?: return@forEach
-            val mes = partes.getOrNull(1)?.toIntOrNull() ?: (mesAtual + 1)
-            val ano = partes.getOrNull(2)?.toIntOrNull() ?: anoAtual
+            val mes = partes.getOrNull(1)?.toIntOrNull() ?: run {
+                val idx = mesesNomes.indexOfFirst { it.equals(trans.mes.trim(), ignoreCase = true) }
+                if (idx != -1) idx + 1 else (mesAtual + 1)
+            }
+            val ano = partes.getOrNull(2)?.toIntOrNull() ?: if (trans.ano > 0) trans.ano else anoAtual
 
             val calVenc = Calendar.getInstance().apply {
                 set(Calendar.YEAR, ano)
@@ -75,7 +83,7 @@ class NotificationWorker(
             val diffMillis = calVenc.timeInMillis - calHoje.timeInMillis
             val diffDias = (diffMillis / (1000 * 60 * 60 * 24)).toInt()
 
-            if (diffDias in -5..3) {
+            if ((diffDias >= -5) && (diffDias <= 3)) {
                 despesasVencendo.add(ItemVencimento(trans, diffDias))
             }
         }
@@ -95,7 +103,7 @@ class NotificationWorker(
             val channel = NotificationChannel(
                 channelId,
                 "Lembrete de Vencimento",
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_HIGH,
             ).apply {
                 description = "Notificações para contas a vencer ou em atraso"
             }
@@ -110,39 +118,42 @@ class NotificationWorker(
             applicationContext,
             0,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        // Ordenar por urgência: Hoje (0) > Atrasado (<0) > Amanhã (1) > Outros
-        val itensOrdenados = itens.sortedWith(compareBy {
-            when (it.diffDias) {
-                0 -> 0
-                in -5..-1 -> 1
-                1 -> 2
-                else -> 3
-            }
-        })
+        // Ordenar por urgência: Hoje (0) > Atrasado (<0) > Amanhã (1) > 2 Dias (2) > Outros
+        val itensOrdenados = itens.sortedWith(
+            compareBy { item ->
+                when (item.diffDias) {
+                    0 -> 0
+                    in -5..-1 -> 1
+                    1 -> 2
+                    2 -> 3
+                    else -> 4
+                }
+            },
+        )
 
         val topItem = itensOrdenados.first()
         val t = topItem.transacao
         val diff = topItem.diffDias
         val valorFormatado = String.format(Locale.getDefault(), "%.2f €", t.valor)
 
-        val titulo = when {
-            diff == 0 -> "Finly: Conta a vencer hoje!"
-            diff == 1 -> "Finly: Conta a vencer amanhã!"
-            diff < 0 -> "Finly: Conta em atraso!"
+        val titulo = when (diff) {
+            0 -> "Finly: Conta a vencer hoje!"
+            1 -> "Finly: Conta a vencer amanhã!"
+            2 -> "Finly: Conta a vencer em 2 dias"
+            in -5..-1 -> "Finly: Conta em atraso!"
             else -> "Finly: Lembrete de Pagamento"
         }
 
-        val estadoStr = when {
-            diff == 0 -> "vence hoje"
-            diff == 1 -> "vence amanhã"
-            diff < 0 -> "${-diff}d em atraso"
-            else -> "vence em ${diff}d"
+        val textoPrincipal = when (diff) {
+            0 -> "O seu ${t.item} ($valorFormatado) vence hoje."
+            1 -> "O seu ${t.item} ($valorFormatado) vence amanhã."
+            2 -> "O seu ${t.item} ($valorFormatado) vence em 2 dias."
+            in -5..-1 -> "O seu ${t.item} ($valorFormatado) está em atraso há ${-diff} dia(s)."
+            else -> "O seu ${t.item} ($valorFormatado) vence em $diff dias."
         }
-
-        val textoPrincipal = "\"${t.item}\" ($valorFormatado) - $estadoStr"
 
         val builder = NotificationCompat.Builder(applicationContext, channelId)
             .setSmallIcon(R.drawable.ic_calendar)
@@ -160,13 +171,14 @@ class NotificationWorker(
 
             itensOrdenados.take(5).forEach { item ->
                 val vFmt = String.format(Locale.getDefault(), "%.2f €", item.transacao.valor)
-                val infoDias = when {
-                    item.diffDias == 0 -> "Hoje"
-                    item.diffDias == 1 -> "Amanhã"
-                    item.diffDias < 0 -> "${-item.diffDias}d atraso"
-                    else -> "${item.diffDias}d"
+                val infoDias = when (item.diffDias) {
+                    0 -> "vence hoje"
+                    1 -> "vence amanhã"
+                    2 -> "vence em 2d"
+                    in -5..-1 -> "${-item.diffDias}d atraso"
+                    else -> "vence em ${item.diffDias}d"
                 }
-                inbox.addLine("• ${item.transacao.item}: $vFmt ($infoDias)")
+                inbox.addLine("• O seu ${item.transacao.item} ($vFmt): $infoDias")
             }
 
             if (itens.size > 5) {

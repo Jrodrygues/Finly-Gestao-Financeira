@@ -22,7 +22,7 @@ object NotificationHelper {
         }
 
         val constraints = Constraints.Builder()
-            .setRequiresBatteryNotLow(true)
+            .setRequiresBatteryNotLow(requiresBatteryNotLow = true)
             .build()
 
         // Calcula o atraso para disparar exatamente às 09:00 locais
@@ -36,7 +36,7 @@ object NotificationHelper {
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             WORK_NAME,
             ExistingPeriodicWorkPolicy.UPDATE,
-            workRequest
+            workRequest,
         )
     }
 

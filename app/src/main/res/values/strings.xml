@@ -6,7 +6,7 @@
     <string name="menu_perfil">O meu Perfil</string>
     <string name="menu_guia">Guia do Utilizador</string>
     <string name="menu_evolucao">Evolução Anual</string>
-    <string name="menu_exportar">Exportar PDF</string>
+    <string name="menu_exportar">Exportar Relatório</string>
 
     <string name="menu_sair">Terminar sessão</string>
     <string name="accoes">Ações</string>
@@ -27,8 +27,8 @@
     <string name="guia_sec6_desc">Crie e gira as suas categorias no menu \'Gerir Categorias\' ou ao registar itens. O campo de categoria herda automaticamente o ícone correspondente à categoria escolhida.</string>
     <string name="guia_sec7_titulo">7. Notificações de Vencimento</string>
     <string name="guia_sec7_desc">Receba lembretes automáticos sobre contas próximas do vencimento (hoje, nos próximos 3 dias ou em atraso recente). Ao tocar na notificação, a aplicação abre diretamente no Resumo. Pode ativar ou desativar no seu perfil.</string>
-    <string name="guia_sec8_titulo">8. Exportar Relatórios PDF</string>
-    <string name="guia_sec8_desc">Gere um relatório PDF profissional em alta definição com o logótipo da marca, cartão de resumo, tabelas separadas para Rendas e Despesas ordenadas por data de vencimento e gráfico de percentagens.</string>
+    <string name="guia_sec8_titulo">8. Exportar Relatórios (PDF / CSV)</string>
+    <string name="guia_sec8_desc">Exporte os seus relatórios mensais no menu lateral. Escolha entre o formato PDF (com gráficos e tabelas) ou ficheiro CSV (pronto para Excel/Google Sheets).</string>
     <string name="guia_sec9_titulo">9. Evolução Anual</string>
     <string name="guia_sec9_desc">Aceda ao menu lateral para ver o gráfico de barras anual. Permite comparar os seus ganhos e gastos reais mês a mês durante todo o ano.</string>
     <string name="guia_sec10_titulo">10. Sincronização em Tempo Real</string>
@@ -39,6 +39,10 @@
     <string name="guia_sec12_desc">Adapte a interface às suas preferências visuais. Ative ou desative o Modo Escuro no seu perfil para uma experiência de utilização confortável a qualquer hora.</string>
     <string name="guia_sec13_titulo">13. Segurança &amp; Privacidade</string>
     <string name="guia_sec13_desc">A sua privacidade é a nossa prioridade. O Finly utiliza encriptação de ponta para garantir que apenas você tem acesso aos seus dados financeiros.</string>
+    <string name="guia_sec14_titulo">14. Bloqueio por Biometria / Impressão Digital</string>
+    <string name="guia_sec14_desc">Proteja a sua aplicação contra acessos não autorizados. Ative o bloqueio por biometria no seu perfil para exigir a confirmação da sua identidade (impressão digital ou PIN) sempre que abrir o Finly. O estado da biometria é sincronizado no seu perfil no Firebase.</string>
+    <string name="guia_sec15_titulo">15. Inteligência &amp; Insights Financeiros</string>
+    <string name="guia_sec15_desc">Consulte alertas automáticos de teto orçamental quando os gastos ultrapassarem 100% da renda, badges de comparação percentual em relação ao mês anterior e a previsão de saldo ao final do mês com base em pendências.</string>
     <string name="snackbar_item_removido">Item removido: %1$s</string>
     <string name="btn_desfazer">DESFAZER</string>
     <string name="btn_voltar">Voltar</string>
@@ -96,6 +100,14 @@
     <string name="label_total_exterior">Total exterior: </string>
     <string name="label_saldo">SALDO EM CONTA: </string>
     <string name="btn_exportar_pdf">EXPORTAR RELATÓRIO PDF</string>
+    <string name="dialog_exportar_titulo">Exportar Relatório - %1$s de %2$d</string>
+    <string name="exportar_btn_pdf">Exportar como PDF</string>
+    <string name="exportar_btn_csv">Exportar como CSV</string>
+    <string name="exportar_sub_pdf">Documento formatado em alta definição com gráficos</string>
+    <string name="exportar_sub_csv">Tabela estruturada pronta para Excel ou Google Sheets</string>
+    <string name="btn_cancelar">Cancelar</string>
+    <string name="aviso_teto_orcamental">⚠️ Atenção: despesas superiores às receitas</string>
+    <string name="previsao_fim_mes_titulo">Previsão de Fim de Mês</string>
 
     <!-- Listagem (Home) -->
     <string name="hint_pesquisar">Pesquisar&#8230;</string>
@@ -155,6 +167,8 @@
     <string name="pdf_meta_definida">Meta de Poupança Definida: %1$.2f €</string>
     <string name="pdf_saldo_final">Saldo Final: %1$s</string>
     <string name="empty_list_message">Nenhuma transação encontrada</string>
+    <string name="empty_list_subtext">Toque no botão abaixo para adicionar a sua primeira conta deste mês.</string>
+    <string name="btn_registar_transacao_cta">+ Registar Transação</string>
     <string name="dialog_eliminar_recorrencia_titulo">Eliminar Recorrência</string>
     <string name="dialog_eliminar_recorrencia_msg">Deseja apagar \'%1$s\' apenas este mês ou todos os meses futuros?</string>
     <string name="btn_apagar_apenas_este">Apagar apenas este mês</string>

@@ -144,14 +144,32 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
-                            <TextView
-                                android:id="@+id/tvSpentValue"
+                            <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Gasto total: 0,00 €"
-                                android:textColor="@color/textColorSecondary"
-                                android:textSize="14sp" />
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvSpentValue"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Gasto total: 0,00 €"
+                                    android:textColor="@color/textColorSecondary"
+                                    android:textSize="14sp" />
+
+                                <TextView
+                                    android:id="@+id/tvTagComparativoMes"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:paddingHorizontal="8dp"
+                                    android:paddingVertical="3dp"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    android:visibility="gone"
+                                    tools:text="↓ 5% vs. Ago" />
+                            </LinearLayout>
 
                             <TextView
                                 android:id="@+id/tvPercentValue"
@@ -320,19 +338,15 @@
 
                             <TableRow android:paddingVertical="8dp">
                                 <TextView android:text="@string/label_total_renda" android:layout_weight="1" android:textColor="@color/textColorPrimary" />
-                                <TextView android:id="@+id/tvTotalRenda" android:text="0,00 €" android:textStyle="bold" android:textColor="@color/colorPositive" />
+                                <TextView android:id="@+id/tvTotalRenda" android:text="0,00 €" android:gravity="end" android:fontFeatureSettings="tnum" android:textStyle="bold" android:textColor="@color/colorPositive" />
                             </TableRow>
                             <TableRow android:paddingVertical="8dp">
                                 <TextView android:text="@string/label_total_despesas" android:layout_weight="1" android:textColor="@color/textColorPrimary" />
-                                <TextView android:id="@+id/tvTotalDespesas" android:text="0,00 €" android:textStyle="bold" android:textColor="@color/colorNegative" />
+                                <TextView android:id="@+id/tvTotalDespesas" android:text="0,00 €" android:gravity="end" android:fontFeatureSettings="tnum" android:textStyle="bold" android:textColor="@color/colorNegative" />
                             </TableRow>
                             <TableRow android:paddingVertical="8dp">
                                 <TextView android:text="@string/label_total_poupanca" android:layout_weight="1" android:textColor="@color/textColorPrimary" />
-                                <TextView android:id="@+id/tvTotalPoupanca" android:text="0,00 €" android:textStyle="bold" android:textColor="@color/textColorPrimary" />
-                            </TableRow>
-                            <TableRow android:paddingVertical="8dp">
-                                <TextView android:text="@string/label_total_exterior" android:layout_weight="1" android:textColor="@color/textColorPrimary" />
-                                <TextView android:id="@+id/tvTotalBrasil" android:text="0,00 €" android:textStyle="bold" android:textColor="@color/textColorPrimary" />
+                                <TextView android:id="@+id/tvTotalPoupanca" android:text="0,00 €" android:gravity="end" android:fontFeatureSettings="tnum" android:textStyle="bold" android:textColor="@color/textColorPrimary" />
                             </TableRow>
                         </TableLayout>
 
@@ -361,6 +375,8 @@
                                 android:id="@+id/tvSaldoFinal"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:fontFeatureSettings="tnum"
                                 android:text="0,00 €"
                                 android:textColor="@color/colorPositive"
                                 android:textSize="18sp"
@@ -369,43 +385,89 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Botões de Ação do Rodapé -->
+                <!-- Card 5: Previsão de Final do Mês -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardPrevisaoFinalMes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/surfaceColor"
+                    app:layout_constraintTop_toBottomOf="@+id/cardBalançoESaldo">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/ivIconPrevisao"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginEnd="8dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_dashboard"
+                                app:tint="@color/colorPrimary" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/previsao_fim_mes_titulo"
+                                android:textColor="@color/textColorPrimary"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvTagPrevisao"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="4dp"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                tools:text="🟢 No Verde" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvPrevisaoDetalhes"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:maxLines="3"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="13sp"
+                            tools:text="Saldo estimado: 0,00 € (Contas em dia)" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Botão de Ação do Rodapé -->
                 <Button
                     android:id="@+id/btnVerDetalhes"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="24dp"
+                    android:layout_marginBottom="32dp"
                     android:text="@string/ver_listagem_detalhada"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:backgroundTint="@color/colorPrimary"
                     android:textColor="@color/white"
                     app:cornerRadius="28dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cardBalançoESaldo" />
-
-                <Button
-                    android:id="@+id/btnExportarPDF"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="32dp"
-                    android:text="@string/btn_exportar_pdf"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="28dp"
-                    app:strokeColor="@color/colorPrimary"
-                    android:textColor="@color/colorPrimary"
-                    app:icon="@drawable/ic_pdf"
-                    app:iconTint="@color/colorPrimary"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btnVerDetalhes" />
+                    app:layout_constraintTop_toBottomOf="@+id/cardPrevisaoFinalMes" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>

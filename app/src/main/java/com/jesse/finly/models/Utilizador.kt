@@ -14,5 +14,6 @@ data class Utilizador (
     val senha: String = "",
     val darkMode: Boolean = false,
     val notifications: Boolean = false,
+    val biometricAtiva: Boolean = false,
     @ColumnInfo(name = "custom_categories") val customCategories: String = ""
 )

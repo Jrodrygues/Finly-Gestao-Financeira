@@ -29,6 +29,12 @@ object FinanceiroUtils {
         }
         val formatter = DecimalFormat("#,##0.00", symbols)
         val formatado = formatter.format(abs(valor))
+
+        // Se o valor for zero, nunca carregar sinal positivo nem negativo
+        if (abs(valor) < 0.005) {
+            return "$formatado €"
+        }
+
         return when (isPositivo) {
             true -> "+$formatado €"
             false -> "-$formatado €"

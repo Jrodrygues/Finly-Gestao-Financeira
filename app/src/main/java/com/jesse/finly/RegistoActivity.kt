@@ -33,6 +33,7 @@ import kotlinx.coroutines.tasks.await
 import com.jesse.finly.databinding.ActivityRegistoBinding
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.models.Utilizador
+import com.jesse.finly.notifications.NotificationHelper
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.showToast
 import kotlinx.coroutines.Dispatchers
@@ -379,7 +380,7 @@ class RegistoActivity : AppCompatActivity() {
             "compras" -> R.drawable.ic_list
             "assinaturas" -> R.drawable.ic_pdf
             "investimentos" -> R.drawable.ic_euro
-            "poupança" -> R.drawable.ic_lock
+            "poupança" -> R.drawable.ic_poupanca
             "exterior" -> R.drawable.ic_flight
             else -> R.drawable.ic_tag
         }
@@ -984,6 +985,10 @@ class RegistoActivity : AppCompatActivity() {
             }
 
             withContext(Dispatchers.Main) {
+                val notifEnabled = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getBoolean("NOTIFICATIONS", false)
+                if (notifEnabled) {
+                    NotificationHelper.agendarWorkerNotificacoes(this@RegistoActivity)
+                }
                 showToast("Dados guardados!")
                 finish()
             }
@@ -1076,6 +1081,7 @@ class RegistoActivity : AppCompatActivity() {
                 senha = senhaFinal,
                 darkMode = userExistente?.darkMode ?: false,
                 notifications = userExistente?.notifications ?: false,
+                biometricAtiva = userExistente?.biometricAtiva ?: false,
                 customCategories = userExistente?.customCategories ?: ""
             )
 
