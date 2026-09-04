@@ -212,6 +212,7 @@
                 android:layout_weight="1.3"
                 android:gravity="end"
                 android:paddingEnd="8dp"
+                android:fontFeatureSettings="tnum"
                 android:text="@string/col_valor"
                 android:textColor="@color/textColorPrimary"
                 android:textStyle="bold" />
