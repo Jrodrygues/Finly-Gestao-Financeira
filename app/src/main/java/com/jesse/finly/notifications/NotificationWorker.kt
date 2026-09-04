@@ -47,9 +47,12 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
 
         // Filtra despesas não pagas cujo vencimento está hoje, nos próximos 3 dias ou em atraso recente (-5..3)
         val despesasVencendo = mutableListOf<ItemVencimento>()
+        val seenIds = mutableSetOf<Int>()
 
         transacoes.forEach { trans ->
             if (trans.tipo != "DESPESA" || trans.status) return@forEach
+            if (seenIds.contains(trans.id)) return@forEach
+            seenIds.add(trans.id)
 
             val partes = trans.vencimento.split("/")
             val dia = partes.getOrNull(0)?.toIntOrNull() ?: return@forEach
@@ -108,7 +111,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        val (titulo, textoCurto, textoDetalhado) = if (itens.size == 1) {
+        val builder = if (itens.size == 1) {
             val item = itens[0]
             val t = item.transacao
             val diff = item.diffDias
@@ -128,39 +131,49 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
                 else -> "\"${t.item}\" ($valorFormatado) está pendente e em atraso!"
             }
 
-            Triple(tit, msg, msg)
+            NotificationCompat.Builder(applicationContext, channelId)
+                .setSmallIcon(R.drawable.ic_logo_finly)
+                .setContentTitle(tit)
+                .setContentText(msg)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(msg))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
         } else {
             val tit = "Finly: ${itens.size} Contas Próximas do Vencimento"
-            val curto = "Você tem ${itens.size} contas pendentes próximas do vencimento!"
+            val curto = "Tem ${itens.size} contas pendentes próximas do vencimento."
 
-            val detalhadoBuilder = StringBuilder()
-            itens.take(5).forEach { item ->
+            val inboxStyle = NotificationCompat.InboxStyle()
+                .setBigContentTitle(tit)
+
+            itens.take(4).forEach { item ->
                 val t = item.transacao
                 val diff = item.diffDias
                 val valorFormatado = String.format(Locale.getDefault(), "%.2f €", t.valor)
-                val estadoStr = when (diff) {
-                    0 -> "vence HOJE"
-                    1 -> "vence amanhã"
-                    in 2..3 -> "vence em $diff dias"
-                    else -> "em atraso"
+                val estadoStr = when {
+                    diff == 0 -> "Hoje"
+                    diff == 1 -> "Amanhã"
+                    diff > 1 -> "Em $diff dias"
+                    else -> "Em atraso"
                 }
-                detalhadoBuilder.append("• \"${t.item}\" ($valorFormatado) - $estadoStr\n")
-            }
-            if (itens.size > 5) {
-                detalhadoBuilder.append("...e mais ${itens.size - 5} conta(s).")
+                inboxStyle.addLine("• ${t.item}: $valorFormatado ($estadoStr)")
             }
 
-            Triple(tit, curto, detalhadoBuilder.toString().trim())
+            if (itens.size > 4) {
+                inboxStyle.setSummaryText("+ ${itens.size - 4} outras contas")
+            } else {
+                inboxStyle.setSummaryText("Toque para ver no Finly")
+            }
+
+            NotificationCompat.Builder(applicationContext, channelId)
+                .setSmallIcon(R.drawable.ic_logo_finly)
+                .setContentTitle(tit)
+                .setContentText(curto)
+                .setStyle(inboxStyle)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
         }
-
-        val builder = NotificationCompat.Builder(applicationContext, channelId)
-            .setSmallIcon(R.drawable.ic_logo_finly)
-            .setContentTitle(titulo)
-            .setContentText(textoCurto)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(textoDetalhado))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
