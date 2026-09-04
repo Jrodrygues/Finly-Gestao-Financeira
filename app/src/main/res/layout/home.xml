@@ -51,15 +51,15 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Seletor de Mês (Preenche a largura total com margens horizontais) -->
+        <!-- Card de Painel de Controlo Unificado: Seletor de Mês + Pesquisa + Adicionar -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardMonthSelector"
+            android:id="@+id/cardHeaderControls"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             app:cardBackgroundColor="@color/surfaceColor"
-            app:cardCornerRadius="24dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="2dp"
             app:strokeWidth="1dp"
             app:strokeColor="#1E222B"
@@ -70,94 +70,105 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="4dp"
-                android:paddingVertical="4dp">
+                android:orientation="vertical"
+                android:padding="12dp">
 
-                <ImageButton
-                    android:id="@+id/btnMesAnterior"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_chevron_left"
-                    android:contentDescription="@string/btn_voltar"
-                    app:tint="@color/colorPrimary" />
-
-                <TextView
-                    android:id="@+id/tvMainTitle"
-                    android:layout_width="0dp"
+                <!-- Seletor de Mês -->
+                <LinearLayout
+                    android:id="@+id/llMesSelectorControls"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:paddingHorizontal="8dp"
-                    android:text="Setembro 2026"
-                    android:textColor="@color/textColorPrimary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/btnMesProximo"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_chevron_right"
-                    android:contentDescription="@string/btn_voltar"
-                    app:tint="@color/colorPrimary" />
+                    <ImageButton
+                        android:id="@+id/btnMesAnterior"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_chevron_left"
+                        android:contentDescription="@string/btn_voltar"
+                        app:tint="@color/colorPrimary" />
+
+                    <TextView
+                        android:id="@+id/tvMainTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:paddingHorizontal="8dp"
+                        android:text="Setembro 2026"
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <ImageButton
+                        android:id="@+id/btnMesProximo"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="@string/btn_voltar"
+                        app:tint="@color/colorPrimary" />
+
+                </LinearLayout>
+
+                <!-- Divisor Sutil -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="10dp"
+                    android:background="@color/dividerColor" />
+
+                <!-- Barra de Pesquisa e Botão Adicionar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/searchLayout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/hint_pesquisar"
+                        app:startIconDrawable="@drawable/ic_search"
+                        app:startIconTint="@color/colorPrimary">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etSearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="14sp" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/fabAddTransacao"
+                        style="@style/Widget.MaterialComponents.Button.Icon"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_gravity="center_vertical"
+                        android:insetLeft="0dp"
+                        android:insetTop="0dp"
+                        android:insetRight="0dp"
+                        android:insetBottom="0dp"
+                        app:backgroundTint="@color/colorPrimary"
+                        app:icon="@drawable/ic_add"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconTint="@color/white"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MaterialComponents.Button.Circle" />
+
+                </LinearLayout>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
-        <!-- Container com Barra de Pesquisa e Botão Adicionar -->
-        <LinearLayout
-            android:id="@+id/llSearchAndAdd"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="12dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/cardMonthSelector">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/searchLayout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/hint_pesquisar"
-                app:startIconDrawable="@drawable/ic_search"
-                app:startIconTint="@color/colorPrimary">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etSearch"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:textColor="@color/textColorPrimary"
-                    android:textSize="14sp" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/fabAddTransacao"
-                style="@style/Widget.MaterialComponents.Button.Icon"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_marginStart="8dp"
-                android:layout_gravity="center_vertical"
-                android:insetLeft="0dp"
-                android:insetTop="0dp"
-                android:insetRight="0dp"
-                android:insetBottom="0dp"
-                app:backgroundTint="@color/colorPrimary"
-                app:icon="@drawable/ic_add"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconTint="@color/white"
-                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MaterialComponents.Button.Circle" />
-
-        </LinearLayout>
 
         <!-- Seletor de Tipo (Filtro) -->
         <com.google.android.material.tabs.TabLayout
@@ -166,7 +177,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@color/surfaceColor"
-            app:layout_constraintTop_toBottomOf="@+id/llSearchAndAdd"
+            app:layout_constraintTop_toBottomOf="@+id/cardHeaderControls"
             app:tabIndicatorColor="@color/colorPrimary"
             app:tabSelectedTextColor="@color/colorPrimary"
             app:tabTextColor="@color/textColorSecondary">
