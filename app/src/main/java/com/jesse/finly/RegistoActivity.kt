@@ -1,6 +1,7 @@
 package com.jesse.finly
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.MotionEvent
 import android.graphics.Rect
 import android.widget.EditText
@@ -74,8 +75,8 @@ class RegistoActivity : AppCompatActivity() {
             delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
         }
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
         binding = ActivityRegistoBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -155,12 +156,16 @@ class RegistoActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            
+            Log.d("TECLADO_DEBUG", "ime.bottom=${ime.bottom} systemBars.bottom=${systemBars.bottom} etParcelasFocus=${binding.etParcelas.hasFocus()}")
+
             val dpExtra = (32 * resources.displayMetrics.density).toInt()
             binding.mainLayoutRegisto.updatePadding(
                 top = systemBars.top,
                 bottom = systemBars.bottom + ime.bottom + dpExtra
             )
             if (ime.bottom > 0 && (binding.etParcelas.hasFocus() || binding.rbRecorrenteParcelada.isChecked)) {
+                Log.d("TECLADO_DEBUG", "A tentar scroll: parcelasLayout.height=${binding.parcelasLayout.height}")
                 binding.parcelasLayout.post {
                     binding.parcelasLayout.requestRectangleOnScreen(
                         Rect(0, 0, binding.parcelasLayout.width, binding.parcelasLayout.height + dpExtra),
