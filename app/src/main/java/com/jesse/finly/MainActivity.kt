@@ -69,6 +69,14 @@ class MainActivity : AppCompatActivity() {
         anoFiltro = intent.getIntExtra("ANO_SELECIONADO", cal[java.util.Calendar.YEAR])
         atualizarTituloMes()
 
+        val isDetalhesMode = intent.getBooleanExtra("IS_DETALHES_MODE", false) || intent.hasExtra("MES_SELECIONADO")
+        if (isDetalhesMode) {
+            binding.btnBackMain.visibility = View.VISIBLE
+            binding.btnBackMain.setOnClickListener { finish() }
+        } else {
+            binding.btnBackMain.visibility = View.GONE
+        }
+
         binding.btnMesAnterior.setOnClickListener { navegarMes(-1) }
         binding.btnMesProximo.setOnClickListener { navegarMes(1) }
 

@@ -9,7 +9,6 @@
     android:focusableInTouchMode="true"
     android:background="@color/backgroundColor">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainLayoutRegisto"
         android:layout_width="match_parent"
@@ -18,8 +17,6 @@
         android:background="@color/backgroundColor"
         android:focusable="true"
         android:focusableInTouchMode="true">
-
-
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineStart"
@@ -47,26 +44,40 @@
             app:layout_constraintStart_toStartOf="@+id/guidelineStart"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <ImageButton
+            android:id="@+id/btnEliminarTop"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="36dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/btn_eliminar_este_item"
+            android:src="@drawable/ic_delete"
+            android:visibility="gone"
+            app:tint="@color/colorNegative"
+            app:layout_constraintEnd_toEndOf="@+id/guidelineEnd"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/titleRegisto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="48dp"
             android:text="@string/nova_transacao"
-            android:textSize="24sp"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="@color/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Descrição -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/itemLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:hint="@string/hint_descricao"
+            android:layout_marginTop="28dp"
+            android:hint="Descrição"
             app:startIconDrawable="@drawable/ic_edit"
             app:startIconTint="@color/colorPrimary"
             app:boxBackgroundColor="@color/surfaceColor"
@@ -78,18 +89,16 @@
             app:layout_constraintStart_toStartOf="@+id/guidelineStart"
             app:layout_constraintTop_toBottomOf="@+id/titleRegisto">
 
-
-
-
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/regNameText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/textColorPrimary"
                 android:imeOptions="flagNoExtractUi"
-                android:inputType="text" />
+                android:inputType="textCapWords" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Valor Monetário -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/valorLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -99,7 +108,6 @@
             android:hint="@string/hint_valor"
             app:startIconDrawable="@drawable/ic_attach_money"
             app:startIconTint="@color/colorPrimary"
-
             app:boxBackgroundColor="@color/surfaceColor"
             app:boxCornerRadiusBottomEnd="16dp"
             app:boxCornerRadiusBottomStart="16dp"
@@ -118,16 +126,16 @@
                 android:inputType="numberDecimal" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Data de Vencimento -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/dataLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="@string/hint_vencimento"
+            android:hint="Data de Vencimento"
             app:startIconDrawable="@drawable/ic_calendar"
             app:startIconTint="@color/colorPrimary"
-
             app:boxBackgroundColor="@color/surfaceColor"
             app:boxCornerRadiusBottomEnd="16dp"
             app:boxCornerRadiusBottomStart="16dp"
@@ -147,6 +155,7 @@
                 android:clickable="true" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Campos de Senha do Perfil -->
         <Button
             android:id="@+id/btnAlterarSenhaPerfil"
             style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -234,7 +243,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/confirmarSenhaLayout" />
 
-        <!-- Seleção de Categoria -->
+        <!-- Seleção de Categoria (Etiqueta) -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/categoriaLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -242,7 +251,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="@string/label_categoria"
-            app:startIconDrawable="@drawable/ic_list"
+            app:startIconDrawable="@drawable/ic_tag"
             app:startIconTint="@color/colorPrimary"
             app:boxBackgroundColor="@color/surfaceColor"
             app:boxCornerRadiusBottomEnd="16dp"
@@ -266,89 +275,124 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-
-        <RadioGroup
-            android:id="@+id/rgTipo"
+        <!-- Seleção de Tipo (Segmented Toggle Control) -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleTipoTransacao"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginTop="16dp"
-            android:orientation="horizontal"
+            app:singleSelection="true"
+            app:selectionRequired="true"
             app:layout_constraintEnd_toEndOf="@+id/guidelineEnd"
             app:layout_constraintStart_toStartOf="@+id/guidelineStart"
             app:layout_constraintTop_toBottomOf="@+id/categoriaLayout">
 
-
-            <RadioButton
-                android:id="@+id/rbDespesa"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnToggleDespesa"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="true"
-                android:buttonTint="#F44336"
-                android:text="@string/rb_despesa"
-                android:textColor="@color/textColorPrimary" />
+                android:text="DESPESA"
+                android:textColor="@color/colorNegative"
+                android:textStyle="bold"
+                app:strokeColor="@color/colorNegative" />
 
-            <RadioButton
-                android:id="@+id/rbRenda"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnToggleRenda"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:buttonTint="#4CAF50"
-                android:text="@string/rb_renda"
-                android:textColor="@color/textColorPrimary" />
-        </RadioGroup>
+                android:text="RENDA"
+                android:textColor="@color/colorPositive"
+                android:textStyle="bold"
+                app:strokeColor="@color/colorPositive" />
 
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <!-- Lógica de Recorrência com Único Switch -->
         <LinearLayout
             android:id="@+id/llRecorrenciaOpcoes"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:orientation="vertical"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@+id/guidelineEnd"
             app:layout_constraintStart_toStartOf="@+id/guidelineStart"
-            app:layout_constraintTop_toBottomOf="@+id/rgTipo">
+            app:layout_constraintTop_toBottomOf="@+id/toggleTipoTransacao">
 
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/cbRepetirSempre"
-                android:layout_width="wrap_content"
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchRecorrente"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/cb_repetir_sempre"
-                app:buttonTint="@color/colorPrimary"
-                android:textColor="@color/textColorPrimary" />
+                android:text="Repetir Transação (Recorrente)"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="15sp"
+                app:useMaterialThemeColors="true" />
 
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/cbRepetirVezes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/cb_repetir_vezes"
-                app:buttonTint="@color/colorPrimary"
-                android:textColor="@color/textColorPrimary" />
-
-            <!-- Opção de parcelas -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/parcelasLayout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <!-- Sub-container de escolhas ao ativar o Switch -->
+            <LinearLayout
+                android:id="@+id/llSubRecorrencia"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="@string/hint_parcelas"
-                app:boxBackgroundColor="@color/surfaceColor"
-                app:boxCornerRadiusBottomEnd="16dp"
-                app:boxCornerRadiusBottomStart="16dp"
-                app:boxCornerRadiusTopEnd="16dp"
-                app:boxCornerRadiusTopStart="16dp"
+                android:orientation="vertical"
                 android:visibility="gone">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etParcelas"
+                <RadioGroup
+                    android:id="@+id/rgRecorrenciaTipo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/textColorPrimary"
-                    android:inputType="number"
-                    android:imeOptions="flagNoExtractUi"
-                    android:text="1" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/rbRecorrenteFixa"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="Fixa (Mensal)"
+                        android:textColor="@color/textColorPrimary"
+                        app:buttonTint="@color/colorPrimary" />
+
+                    <RadioButton
+                        android:id="@+id/rbRecorrenteParcelada"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Parcelada"
+                        android:textColor="@color/textColorPrimary"
+                        app:buttonTint="@color/colorPrimary" />
+                </RadioGroup>
+
+                <!-- Opção de parcelas -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/parcelasLayout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="Quantidade de Parcelas (Meses)"
+                    app:boxBackgroundColor="@color/surfaceColor"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusTopStart="16dp"
+                    android:visibility="gone">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etParcelas"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/textColorPrimary"
+                        android:inputType="number"
+                        android:imeOptions="flagNoExtractUi"
+                        android:text="2" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
         </LinearLayout>
 
         <Button
@@ -356,6 +400,7 @@
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_marginTop="24dp"
+            android:layout_marginBottom="32dp"
             android:text="@string/guardar_na_listagem"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -368,4 +413,3 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
-

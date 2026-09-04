@@ -131,6 +131,7 @@ class ResumoActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra("MES_SELECIONADO", binding.spinnerMes.selectedItem.toString())
             intent.putExtra("ANO_SELECIONADO", binding.spinnerAno.selectedItem as Int)
+            intent.putExtra("IS_DETALHES_MODE", true)
             startActivity(intent)
         }
 

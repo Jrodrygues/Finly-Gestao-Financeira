@@ -92,32 +92,6 @@ class RegistoActivity : AppCompatActivity() {
 
         configurarSpinners()
 
-        binding.cbRepetirSempre.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                binding.cbRepetirVezes.isChecked = false
-                binding.parcelasLayout.visibility = View.GONE
-            }
-        }
-
-        // Lógica para Parcelas ser visível e rolar ao fundo
-        binding.cbRepetirVezes.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                binding.cbRepetirSempre.isChecked = false
-                binding.parcelasLayout.visibility = View.VISIBLE
-                
-                binding.root.postDelayed({
-                    // Scroll para o fim absoluto do ScrollView
-                    binding.root.fullScroll(View.FOCUS_DOWN)
-                    
-                    binding.etParcelas.requestFocus()
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.showSoftInput(binding.etParcelas, InputMethodManager.SHOW_IMPLICIT)
-                }, 300)
-            } else {
-                binding.parcelasLayout.visibility = View.GONE
-            }
-        }
-
 
 
 
@@ -276,6 +250,7 @@ class RegistoActivity : AppCompatActivity() {
         sincronizarCategoriasNuvem(customSet)
         configurarSpinners()
         binding.autoCompleteCategoria.setText(catClean, false)
+        atualizarIconeCategoria(catClean)
         showToast(getString(R.string.toast_categoria_adicionada, catClean))
     }
 
@@ -293,6 +268,7 @@ class RegistoActivity : AppCompatActivity() {
         val lista = obterCategoriasDisponiveis()
         val primeiraValida = lista.firstOrNull { it != getString(R.string.option_nova_categoria) } ?: "Geral"
         binding.autoCompleteCategoria.setText(primeiraValida, false)
+        atualizarIconeCategoria(primeiraValida)
         showToast(getString(R.string.toast_categoria_removida, categoria))
     }
 
@@ -386,6 +362,11 @@ class RegistoActivity : AppCompatActivity() {
             "exterior" -> R.drawable.ic_flight
             else -> R.drawable.ic_tag
         }
+    }
+
+    private fun atualizarIconeCategoria(nome: String) {
+        val iconeRes = obterIconeParaCategoria(nome)
+        binding.categoriaLayout.setStartIconDrawable(iconeRes)
     }
 
     private fun mostrarBottomSheetGerirCategorias() {
@@ -506,12 +487,23 @@ class RegistoActivity : AppCompatActivity() {
         val adapterCat = ArrayAdapter(this, R.layout.dropdown_item, listaCategorias)
         binding.autoCompleteCategoria.setAdapter(adapterCat)
 
+        if (binding.autoCompleteCategoria.text.isNullOrEmpty()) {
+            val primeiraValida = listaCategorias.firstOrNull { it != getString(R.string.option_nova_categoria) } ?: "Geral"
+            binding.autoCompleteCategoria.setText(primeiraValida, false)
+            atualizarIconeCategoria(primeiraValida)
+        } else {
+            atualizarIconeCategoria(binding.autoCompleteCategoria.text.toString())
+        }
+
         binding.autoCompleteCategoria.setOnItemClickListener { _, _, position, _ ->
             val selecionada = adapterCat.getItem(position)
             if (selecionada == getString(R.string.option_nova_categoria)) {
                 val primeiraValida = listaCategorias.firstOrNull { it != getString(R.string.option_nova_categoria) } ?: "Geral"
                 binding.autoCompleteCategoria.setText(primeiraValida, false)
+                atualizarIconeCategoria(primeiraValida)
                 mostrarBottomSheetGerirCategorias()
+            } else if (selecionada != null) {
+                atualizarIconeCategoria(selecionada)
             }
         }
     }
@@ -547,12 +539,11 @@ class RegistoActivity : AppCompatActivity() {
         binding.confirmarSenhaLayout.setStartIconDrawable(R.drawable.ic_lock)
         
         binding.categoriaLayout.visibility = View.GONE
-        binding.rgTipo.visibility = View.GONE
+        binding.toggleTipoTransacao.visibility = View.GONE
         binding.llRecorrenciaOpcoes.visibility = View.GONE
         binding.parcelasLayout.visibility = View.GONE
         
-        binding.cbRepetirSempre.isChecked = false
-        binding.cbRepetirVezes.isChecked = false
+        binding.switchRecorrente.isChecked = false
         binding.btnFinalizarRegisto.text = getString(R.string.btn_criar_conta)
     }
 
@@ -618,12 +609,11 @@ class RegistoActivity : AppCompatActivity() {
         }
 
         binding.categoriaLayout.visibility = View.GONE
-        binding.rgTipo.visibility = View.GONE
+        binding.toggleTipoTransacao.visibility = View.GONE
         binding.llRecorrenciaOpcoes.visibility = View.GONE
         binding.parcelasLayout.visibility = View.GONE
         
-        binding.cbRepetirSempre.isChecked = false
-        binding.cbRepetirVezes.isChecked = false
+        binding.switchRecorrente.isChecked = false
         binding.btnFinalizarRegisto.text = getString(R.string.btn_atualizar_perfil)
     }
 
@@ -679,6 +669,46 @@ class RegistoActivity : AppCompatActivity() {
         }
     }
 
+    private fun configurarTipoTransacaoToggle() {
+        val corPositiva = ContextCompat.getColor(this, R.color.colorPositive)
+        val corNegativa = ContextCompat.getColor(this, R.color.colorNegative)
+
+        binding.toggleTipoTransacao.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                if (checkedId == R.id.btnToggleDespesa) {
+                    binding.btnToggleDespesa.setBackgroundColor(corNegativa)
+                    binding.btnToggleDespesa.setTextColor(Color.WHITE)
+                    binding.btnToggleRenda.setBackgroundColor(Color.TRANSPARENT)
+                    binding.btnToggleRenda.setTextColor(corPositiva)
+                } else if (checkedId == R.id.btnToggleRenda) {
+                    binding.btnToggleRenda.setBackgroundColor(corPositiva)
+                    binding.btnToggleRenda.setTextColor(Color.WHITE)
+                    binding.btnToggleDespesa.setBackgroundColor(Color.TRANSPARENT)
+                    binding.btnToggleDespesa.setTextColor(corNegativa)
+                }
+            }
+        }
+        binding.toggleTipoTransacao.check(R.id.btnToggleDespesa)
+    }
+
+    private fun configurarRecorrenciaSwitch() {
+        binding.switchRecorrente.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                binding.llSubRecorrencia.visibility = View.VISIBLE
+            } else {
+                binding.llSubRecorrencia.visibility = View.GONE
+            }
+        }
+
+        binding.rgRecorrenciaTipo.setOnCheckedChangeListener { _, checkedId ->
+            if (checkedId == R.id.rbRecorrenteParcelada) {
+                binding.parcelasLayout.visibility = View.VISIBLE
+            } else {
+                binding.parcelasLayout.visibility = View.GONE
+            }
+        }
+    }
+
     private fun configurarParaTransacao() {
         binding.btnAlterarSenhaPerfil.visibility = View.GONE
         binding.senhaLayout.visibility = View.GONE
@@ -690,20 +720,22 @@ class RegistoActivity : AppCompatActivity() {
         binding.itemLayout.setStartIconDrawable(R.drawable.ic_edit)
         binding.valorLayout.setStartIconDrawable(R.drawable.ic_attach_money)
         binding.dataLayout.setStartIconDrawable(R.drawable.ic_calendar)
-        
+
         binding.regPhoneText.setOnClickListener { mostrarCalendario() }
 
         binding.llRecorrenciaOpcoes.visibility = View.VISIBLE
-        
+        configurarTipoTransacaoToggle()
+        configurarRecorrenciaSwitch()
+
         if (!isEditMode) {
             val cal = Calendar.getInstance()
             val diaAtual = cal[Calendar.DAY_OF_MONTH]
             val mesAtualIndex = cal[Calendar.MONTH]
             val mesAtualNome = meses[mesAtualIndex]
-            
+
             val mesVindoDaApp = intent.getStringExtra("MES_ATUAL") ?: mesAtualNome
             val mesParaData = meses.indexOf(mesVindoDaApp) + 1
-            
+
             binding.regPhoneText.setText(String.format(Locale.getDefault(), "%02d/%02d", diaAtual, mesParaData))
         }
     }
@@ -712,32 +744,83 @@ class RegistoActivity : AppCompatActivity() {
         transacaoId = intent.getIntExtra("id", 0)
         itemOriginal = intent.getStringExtra("item")
         binding.titleRegisto.text = getString(R.string.editar_item)
+        binding.btnEliminarTop.visibility = View.VISIBLE
+        binding.btnEliminarTop.setOnClickListener { confirmarEliminacaoTransacaoFromEdit() }
+
         binding.regNameText.setText(itemOriginal)
-        binding.regEmailText.setText(intent.getDoubleExtra("valor", 0.0).toString())
+
+        val valEdit = intent.getDoubleExtra("valor", 0.0)
+        binding.regEmailText.setText(String.format(Locale.US, "%.2f", valEdit))
         binding.regPhoneText.setText(intent.getStringExtra("vencimento"))
 
         val tipo = intent.getStringExtra("tipo")
-        if (tipo == "RENDA") binding.rbRenda.isChecked = true else binding.rbDespesa.isChecked = true
+        if (tipo == "RENDA") {
+            binding.toggleTipoTransacao.check(R.id.btnToggleRenda)
+        } else {
+            binding.toggleTipoTransacao.check(R.id.btnToggleDespesa)
+        }
 
         val catSalva = intent.getStringExtra("categoria")
         if (catSalva != null) {
             binding.autoCompleteCategoria.setText(catSalva, false)
+            atualizarIconeCategoria(catSalva)
+        } else {
+            val primeiraValida = obterCategoriasDisponiveis().firstOrNull { it != getString(R.string.option_nova_categoria) } ?: "Geral"
+            atualizarIconeCategoria(primeiraValida)
         }
 
         val isRec = intent.getBooleanExtra("isRecorrente", false)
         val tot = intent.getIntExtra("parcelasTotais", 0)
 
         if (isRec) {
+            binding.switchRecorrente.isChecked = true
+            binding.llSubRecorrencia.visibility = View.VISIBLE
             if (tot == -1) {
-                binding.cbRepetirSempre.isChecked = true
+                binding.rbRecorrenteFixa.isChecked = true
+                binding.parcelasLayout.visibility = View.GONE
             } else if (tot > 0) {
-                binding.cbRepetirVezes.isChecked = true
+                binding.rbRecorrenteParcelada.isChecked = true
                 binding.etParcelas.setText(tot.toString())
                 binding.parcelasLayout.visibility = View.VISIBLE
             }
+        } else {
+            binding.switchRecorrente.isChecked = false
+            binding.llSubRecorrencia.visibility = View.GONE
         }
 
         binding.btnFinalizarRegisto.text = getString(R.string.atualizar_item)
+    }
+
+    private fun confirmarEliminacaoTransacaoFromEdit() {
+        val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_eliminar_simples, binding.root as? ViewGroup, false)
+
+        view.findViewById<TextView>(R.id.tvMensagemSimples).text =
+            getString(R.string.dialog_eliminar_item_msg, itemOriginal ?: "")
+
+        view.findViewById<View>(R.id.btnConfirmarEliminar).setOnClickListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
+                val trans = db.utilizadorDao().obterTransacaoPorId(transacaoId)
+                trans?.let {
+                    db.utilizadorDao().apagarTransacao(it)
+                    FirebaseManager.eliminarTransacaoDoFirestore(it)
+                }
+                withContext(Dispatchers.Main) {
+                    showToast("Item removido com sucesso!")
+                    finish()
+                }
+            }
+            dialog.dismiss()
+        }
+
+        view.findViewById<View>(R.id.btnCancelarSimples).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.setContentView(view)
+        dialog.window?.setDimAmount(0.90f)
+        dialog.show()
     }
 
     private fun mostrarCalendario() {
@@ -759,11 +842,9 @@ class RegistoActivity : AppCompatActivity() {
         val item = binding.regNameText.text.toString().trim()
         val valorStr = binding.regEmailText.text.toString().trim()
         var venc = binding.regPhoneText.text.toString().trim()
-        val tipo = if (binding.rbRenda.isChecked) "RENDA" else "DESPESA"
+        val tipo = if (binding.toggleTipoTransacao.checkedButtonId == R.id.btnToggleRenda) "RENDA" else "DESPESA"
         val categoria = binding.autoCompleteCategoria.text.toString()
 
-        // Obter o mês: primeiro tenta o mês da transação (se for edição), 
-        // depois o mês atual da tela, e por fim o mês do sistema.
         val mes = intent.getStringExtra("mes") ?: intent.getStringExtra("MES_ATUAL") ?: meses[Calendar.getInstance()[Calendar.MONTH]]
 
         if (item.isEmpty() || valorStr.isEmpty() || venc.isEmpty()) {
@@ -782,18 +863,17 @@ class RegistoActivity : AppCompatActivity() {
             }
         }
 
-        val isSempre = binding.cbRepetirSempre.isChecked
-        val isVezes = binding.cbRepetirVezes.isChecked
-        val inputParcelas = binding.etParcelas.text.toString().toIntOrNull() ?: 1
+        val isRecorrente = binding.switchRecorrente.isChecked
+        val isParcelada = binding.rbRecorrenteParcelada.isChecked
+        val inputParcelas = binding.etParcelas.text.toString().toIntOrNull() ?: 2
 
-        val isRecorrente = isSempre || isVezes
         val numParcelas = when {
-            isSempre -> -1
-            isVezes -> if (inputParcelas > 0) inputParcelas else 0
-            else -> 0
+            !isRecorrente -> 0
+            isParcelada -> if (inputParcelas > 0) inputParcelas else 2
+            else -> -1
         }
 
-        val valor = valorStr.toDoubleOrNull() ?: 0.0
+        val valor = valorStr.replace(",", ".").toDoubleOrNull() ?: 0.0
         val email = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "CONVIDADO") ?: "CONVIDADO"
 
         val anoIntent = if (isEditMode) {
