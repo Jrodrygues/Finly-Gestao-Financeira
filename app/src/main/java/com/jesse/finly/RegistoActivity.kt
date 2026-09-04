@@ -706,11 +706,11 @@ class RegistoActivity : AppCompatActivity() {
             if (checkedId == R.id.rbRecorrenteParcelada) {
                 binding.parcelasLayout.visibility = View.VISIBLE
                 binding.etParcelas.requestFocus()
-                binding.root.postDelayed({
-                    binding.root.smoothScrollTo(0, binding.parcelasLayout.bottom + 300)
+                binding.etParcelas.post {
+                    binding.root.smoothScrollTo(0, binding.parcelasLayout.y.toInt() + 300)
                     val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.showSoftInput(binding.etParcelas, InputMethodManager.SHOW_IMPLICIT)
-                }, 200)
+                }
             } else {
                 binding.parcelasLayout.visibility = View.GONE
             }
@@ -718,9 +718,9 @@ class RegistoActivity : AppCompatActivity() {
 
         binding.etParcelas.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                binding.root.postDelayed({
-                    binding.root.smoothScrollTo(0, binding.parcelasLayout.bottom + 300)
-                }, 200)
+                binding.etParcelas.post {
+                    binding.root.smoothScrollTo(0, binding.parcelasLayout.y.toInt() + 300)
+                }
             }
         }
 
