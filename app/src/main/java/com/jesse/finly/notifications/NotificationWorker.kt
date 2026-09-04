@@ -10,26 +10,32 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.jesse.finly.R
 import com.jesse.finly.ResumoActivity
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.models.Transacao
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Locale
 
-class NotificationWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class NotificationWorker(
+    context: Context,
+    params: WorkerParameters
+) : CoroutineWorker(context, params) {
 
     data class ItemVencimento(val transacao: Transacao, val diffDias: Int)
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val sharedPref = applicationContext.getSharedPreferences("FinlyAppPrefs", Context.MODE_PRIVATE)
         val notificationsEnabled = sharedPref.getBoolean("NOTIFICATIONS", false)
         val userEmail = sharedPref.getString("EMAIL", "") ?: ""
 
         if (!notificationsEnabled || FirebaseManager.isGuestEmail(userEmail)) {
-            return Result.success()
+            return@withContext Result.success()
         }
 
         val db = MinhaBaseDados.getDatabase(applicationContext)
@@ -44,14 +50,12 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
         val anoAtual = calHoje.get(Calendar.YEAR)
         val mesAtual = calHoje.get(Calendar.MONTH)
 
-        // Filtra despesas não pagas cujo vencimento está hoje, nos próximos 3 dias ou em atraso recente (-5..3)
         val despesasVencendo = mutableListOf<ItemVencimento>()
         val seenIds = mutableSetOf<Int>()
 
         transacoes.forEach { trans ->
             if (trans.tipo != "DESPESA" || trans.status) return@forEach
-            if (seenIds.contains(trans.id)) return@forEach
-            seenIds.add(trans.id)
+            if (!seenIds.add(trans.id)) return@forEach
 
             val partes = trans.vencimento.split("/")
             val dia = partes.getOrNull(0)?.toIntOrNull() ?: return@forEach
@@ -71,7 +75,6 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
             val diffMillis = calVenc.timeInMillis - calHoje.timeInMillis
             val diffDias = (diffMillis / (1000 * 60 * 60 * 24)).toInt()
 
-            // Filtra contas a vencer nos próximos 3 dias ou em atraso de até 5 dias
             if (diffDias in -5..3) {
                 despesasVencendo.add(ItemVencimento(trans, diffDias))
             }
@@ -81,7 +84,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
             enviarNotificacao(despesasVencendo)
         }
 
-        return Result.success()
+        Result.success()
     }
 
     private fun enviarNotificacao(itens: List<ItemVencimento>) {
@@ -92,7 +95,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
             val channel = NotificationChannel(
                 channelId,
                 "Lembrete de Vencimento",
-                NotificationManager.IMPORTANCE_HIGH,
+                NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = "Notificações para contas a vencer ou em atraso"
             }
@@ -107,7 +110,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
             applicationContext,
             0,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         // Ordenar por urgência: Hoje (0) > Atrasado (<0) > Amanhã (1) > Outros
@@ -135,22 +138,44 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
         val estadoStr = when {
             diff == 0 -> "vence hoje"
             diff == 1 -> "vence amanhã"
-            diff < 0 -> "em atraso"
-            else -> "vence em $diff dias"
+            diff < 0 -> "${-diff}d em atraso"
+            else -> "vence em ${diff}d"
         }
 
         val textoPrincipal = "\"${t.item}\" ($valorFormatado) - $estadoStr"
 
         val builder = NotificationCompat.Builder(applicationContext, channelId)
-            .setSmallIcon(android.R.drawable.ic_menu_my_calendar)
+            .setSmallIcon(R.drawable.ic_calendar)
             .setContentTitle(titulo)
             .setContentText(textoPrincipal)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
+            .setOnlyAlertOnce(true)
             .setAutoCancel(true)
 
         if (itens.size > 1) {
-            builder.setSubText("+ ${itens.size - 1} outras contas")
+            val inbox = NotificationCompat.InboxStyle()
+                .setBigContentTitle("$titulo (${itens.size} pendências)")
+                .setSummaryText("${itens.size} contas a acompanhar")
+
+            itensOrdenados.take(5).forEach { item ->
+                val vFmt = String.format(Locale.getDefault(), "%.2f €", item.transacao.valor)
+                val infoDias = when {
+                    item.diffDias == 0 -> "Hoje"
+                    item.diffDias == 1 -> "Amanhã"
+                    item.diffDias < 0 -> "${-item.diffDias}d atraso"
+                    else -> "${item.diffDias}d"
+                }
+                inbox.addLine("• ${item.transacao.item}: $vFmt ($infoDias)")
+            }
+
+            if (itens.size > 5) {
+                inbox.setSummaryText("+ ${itens.size - 5} outras contas")
+            }
+
+            builder.setStyle(inbox)
+        } else {
+            builder.setStyle(NotificationCompat.BigTextStyle().bigText(textoPrincipal))
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
