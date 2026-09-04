@@ -176,12 +176,9 @@ class RegistoActivity : AppCompatActivity() {
     }
 
     private fun esconderTeclado() {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        // Forçar o fecho usando o ‘token’ da janela ou do foco atual
-        val view = currentFocus ?: window.decorView
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
-        
-        // Limpar o foco para garantir que o teclado não tente reaparecer
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
+        val view = currentFocus ?: window.decorView.rootView
+        imm?.hideSoftInputFromWindow(view.windowToken, 0)
         currentFocus?.clearFocus()
     }
 
@@ -699,6 +696,7 @@ class RegistoActivity : AppCompatActivity() {
                 binding.llSubRecorrencia.visibility = View.VISIBLE
             } else {
                 binding.llSubRecorrencia.visibility = View.GONE
+                esconderTeclado()
             }
         }
 
@@ -706,20 +704,29 @@ class RegistoActivity : AppCompatActivity() {
             if (checkedId == R.id.rbRecorrenteParcelada) {
                 binding.parcelasLayout.visibility = View.VISIBLE
                 binding.etParcelas.requestFocus()
-                binding.etParcelas.post {
-                    binding.root.smoothScrollTo(0, binding.parcelasLayout.y.toInt() + 300)
+                binding.parcelasLayout.post {
+                    binding.root.requestChildRectangleOnScreen(
+                        binding.parcelasLayout,
+                        Rect(0, 0, binding.parcelasLayout.width, binding.parcelasLayout.height),
+                        true
+                    )
                     val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.showSoftInput(binding.etParcelas, InputMethodManager.SHOW_IMPLICIT)
                 }
             } else {
                 binding.parcelasLayout.visibility = View.GONE
+                esconderTeclado()
             }
         }
 
         binding.etParcelas.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                binding.etParcelas.post {
-                    binding.root.smoothScrollTo(0, binding.parcelasLayout.y.toInt() + 300)
+                binding.parcelasLayout.post {
+                    binding.root.requestChildRectangleOnScreen(
+                        binding.parcelasLayout,
+                        Rect(0, 0, binding.parcelasLayout.width, binding.parcelasLayout.height),
+                        true
+                    )
                 }
             }
         }
