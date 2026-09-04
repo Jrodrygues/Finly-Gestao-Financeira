@@ -103,7 +103,7 @@
     <string name="tab_todas">TODAS</string>
     <string name="tab_despesas">DESPESAS</string>
     <string name="tab_rendas">RENDAS</string>
-    <string name="col_item">Item</string>
+    <string name="col_item">Nome</string>
     <string name="col_valor">Valor</string>
     <string name="col_vencimento">Data</string>
     <string name="col_pago">Pago</string>
