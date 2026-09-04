@@ -848,7 +848,7 @@ class ResumoActivity : AppCompatActivity() {
             val headerY = y + 15f
             c.drawText("Item / Descrição", 40f, headerY, tableHeaderCellPaint)
             c.drawText("Categoria", 250f, headerY, tableHeaderCellPaint)
-            c.drawText("Data de Vencimento", 370f, headerY, tableHeaderCellPaint)
+            c.drawText("Data", 370f, headerY, tableHeaderCellPaint)
             c.drawText("Valor", 555f, headerY, tableHeaderCellRightPaint)
         }
 
