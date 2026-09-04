@@ -12,7 +12,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.jesse.finly.R
 import com.jesse.finly.ResumoActivity
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
@@ -111,68 +110,47 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        val builder = if (itens.size == 1) {
-            val item = itens[0]
-            val t = item.transacao
-            val diff = item.diffDias
-            val valorFormatado = String.format(Locale.getDefault(), "%.2f €", t.valor)
-
-            val tit = when (diff) {
-                0 -> "Finly: Conta a vencer hoje!"
-                1 -> "Finly: Conta a vencer amanhã!"
-                in 2..3 -> "Finly: Lembrete de Pagamento"
-                else -> "Finly: Conta em Atraso!"
+        // Ordenar por urgência: Hoje (0) > Atrasado (<0) > Amanhã (1) > Outros
+        val itensOrdenados = itens.sortedWith(compareBy {
+            when (it.diffDias) {
+                0 -> 0
+                in -5..-1 -> 1
+                1 -> 2
+                else -> 3
             }
+        })
 
-            val msg = when (diff) {
-                0 -> "\"${t.item}\" ($valorFormatado) está a vencer hoje!"
-                1 -> "\"${t.item}\" ($valorFormatado) vence amanhã!"
-                in 2..3 -> "\"${t.item}\" ($valorFormatado) vence em $diff dias!"
-                else -> "\"${t.item}\" ($valorFormatado) está pendente e em atraso!"
-            }
+        val topItem = itensOrdenados.first()
+        val t = topItem.transacao
+        val diff = topItem.diffDias
+        val valorFormatado = String.format(Locale.getDefault(), "%.2f €", t.valor)
 
-            NotificationCompat.Builder(applicationContext, channelId)
-                .setSmallIcon(R.drawable.ic_logo_finly)
-                .setContentTitle(tit)
-                .setContentText(msg)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(msg))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-        } else {
-            val tit = "Finly: ${itens.size} Contas Próximas do Vencimento"
-            val curto = "Tem ${itens.size} contas pendentes próximas do vencimento."
+        val titulo = when {
+            diff == 0 -> "Finly: Conta a vencer hoje!"
+            diff == 1 -> "Finly: Conta a vencer amanhã!"
+            diff < 0 -> "Finly: Conta em atraso!"
+            else -> "Finly: Lembrete de Pagamento"
+        }
 
-            val inboxStyle = NotificationCompat.InboxStyle()
-                .setBigContentTitle(tit)
+        val estadoStr = when {
+            diff == 0 -> "vence hoje"
+            diff == 1 -> "vence amanhã"
+            diff < 0 -> "em atraso"
+            else -> "vence em $diff dias"
+        }
 
-            itens.take(4).forEach { item ->
-                val t = item.transacao
-                val diff = item.diffDias
-                val valorFormatado = String.format(Locale.getDefault(), "%.2f €", t.valor)
-                val estadoStr = when {
-                    diff == 0 -> "Hoje"
-                    diff == 1 -> "Amanhã"
-                    diff > 1 -> "Em $diff dias"
-                    else -> "Em atraso"
-                }
-                inboxStyle.addLine("• ${t.item}: $valorFormatado ($estadoStr)")
-            }
+        val textoPrincipal = "\"${t.item}\" ($valorFormatado) - $estadoStr"
 
-            if (itens.size > 4) {
-                inboxStyle.setSummaryText("+ ${itens.size - 4} outras contas")
-            } else {
-                inboxStyle.setSummaryText("Toque para ver no Finly")
-            }
+        val builder = NotificationCompat.Builder(applicationContext, channelId)
+            .setSmallIcon(android.R.drawable.ic_menu_my_calendar)
+            .setContentTitle(titulo)
+            .setContentText(textoPrincipal)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
 
-            NotificationCompat.Builder(applicationContext, channelId)
-                .setSmallIcon(R.drawable.ic_logo_finly)
-                .setContentTitle(tit)
-                .setContentText(curto)
-                .setStyle(inboxStyle)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
+        if (itens.size > 1) {
+            builder.setSubText("+ ${itens.size - 1} outras contas")
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
