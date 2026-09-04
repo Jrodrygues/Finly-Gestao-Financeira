@@ -723,13 +723,10 @@ class RegistoActivity : AppCompatActivity() {
         binding.rgRecorrenciaTipo.setOnCheckedChangeListener { _, checkedId ->
             if (checkedId == R.id.rbRecorrenteParcelada) {
                 binding.parcelasLayout.visibility = View.VISIBLE
-                binding.etParcelas.requestFocus()
                 binding.root.postDelayed({
                     val targetY = binding.btnFinalizarRegisto.top
                     binding.root.smoothScrollTo(0, targetY)
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.showSoftInput(binding.etParcelas, InputMethodManager.SHOW_IMPLICIT)
-                }, 300)
+                }, 200)
             } else {
                 binding.parcelasLayout.visibility = View.GONE
                 esconderTeclado()
@@ -741,7 +738,7 @@ class RegistoActivity : AppCompatActivity() {
                 binding.root.postDelayed({
                     val targetY = binding.btnFinalizarRegisto.top
                     binding.root.smoothScrollTo(0, targetY)
-                }, 300)
+                }, 200)
             }
         }
 
