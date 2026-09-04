@@ -1389,7 +1389,7 @@ class ResumoActivity : AppCompatActivity() {
 
     private fun mostrarDialogoSelecaoPeriodo() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_selecionar_periodo, binding.root as? ViewGroup, false)
-        val cgAnos = dialogView.findViewById<ChipGroup>(R.id.cgAnos)
+        val llAnosContainer = dialogView.findViewById<LinearLayout>(R.id.llAnosContainer)
         val btnCancelar = dialogView.findViewById<Button>(R.id.btnCancelarPeriodo)
         val btnAplicar = dialogView.findViewById<Button>(R.id.btnAplicarPeriodo)
 
@@ -1437,30 +1437,48 @@ class ResumoActivity : AppCompatActivity() {
         }
         atualizarEstiloBotoesMes()
 
-        val anosDisponiveis = FinanceiroUtils.obterAnosDisponiveis(transacoesAtuaisGrafico)
-
-        cgAnos.removeAllViews()
-        anosDisponiveis.forEach { ano ->
-            val chip = Chip(this).apply {
-                text = ano.toString()
-                isCheckable = true
-                isChecked = (ano == anoTemp)
-                setChipBackgroundColorResource(if (isChecked) R.color.colorPrimary else R.color.surfaceColor)
-                setTextColor(ContextCompat.getColor(context, if (isChecked) R.color.white else R.color.textColorPrimary))
-                setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) {
-                        anoTemp = ano
-                        for (i in 0 until cgAnos.childCount) {
-                            val child = cgAnos.getChildAt(i) as? Chip
-                            val selected = child?.text.toString() == anoTemp.toString()
-                            child?.setChipBackgroundColorResource(if (selected) R.color.colorPrimary else R.color.surfaceColor)
-                            child?.setTextColor(ContextCompat.getColor(this@ResumoActivity, if (selected) R.color.white else R.color.textColorPrimary))
-                        }
-                    }
+        fun atualizarEstiloBotoesAno() {
+            for (i in 0 until llAnosContainer.childCount) {
+                val btnChild = llAnosContainer.getChildAt(i) as? MaterialButton ?: continue
+                val selected = (btnChild.text.toString() == anoTemp.toString())
+                if (selected) {
+                    btnChild.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                    btnChild.setTextColor(ContextCompat.getColor(this, R.color.white))
+                    btnChild.setStrokeColorResource(R.color.colorPrimary)
+                } else {
+                    btnChild.setBackgroundColor(ContextCompat.getColor(this, R.color.surfaceColor))
+                    btnChild.setTextColor(ContextCompat.getColor(this, R.color.textColorPrimary))
+                    btnChild.setStrokeColorResource(android.R.color.transparent)
                 }
             }
-            cgAnos.addView(chip)
         }
+
+        val anosDisponiveis = FinanceiroUtils.obterAnosDisponiveis(transacoesAtuaisGrafico)
+        llAnosContainer.removeAllViews()
+
+        anosDisponiveis.forEach { ano ->
+            val btnAno = MaterialButton(this, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
+                text = ano.toString()
+                textSize = 13f
+                isCheckable = false
+                strokeWidth = (1 * resources.displayMetrics.density).toInt()
+                cornerRadius = (12 * resources.displayMetrics.density).toInt()
+                val lp = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    (48 * resources.displayMetrics.density).toInt()
+                ).apply {
+                    setMargins(0, 0, (8 * resources.displayMetrics.density).toInt(), 0)
+                }
+                layoutParams = lp
+
+                setOnClickListener {
+                    anoTemp = ano
+                    atualizarEstiloBotoesAno()
+                }
+            }
+            llAnosContainer.addView(btnAno)
+        }
+        atualizarEstiloBotoesAno()
 
         btnCancelar.setOnClickListener { dialog.dismiss() }
 

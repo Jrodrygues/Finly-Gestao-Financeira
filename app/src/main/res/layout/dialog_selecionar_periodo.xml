@@ -28,19 +28,18 @@
         android:textSize="12sp"
         android:textStyle="bold" />
 
-    <!-- Seletor de Anos (HorizontalScrollView) -->
+    <!-- Seletor de Anos (HorizontalScrollView com LinearLayout em linha única) -->
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
         android:scrollbars="none">
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/cgAnos"
+        <LinearLayout
+            android:id="@+id/llAnosContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:chipSpacingHorizontal="8dp"
-            app:singleLine="true"
-            app:singleSelection="true" />
+            android:orientation="horizontal" />
 
     </HorizontalScrollView>
 

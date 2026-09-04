@@ -81,13 +81,14 @@ object FinanceiroUtils {
 
     /**
      * Calcula dinamicamente a lista de anos disponíveis para seleção com base nas transações do utilizador.
-     * Garante sempre o ano atual, o ano seguinte para planeamento e todos os anos com histórico de dados.
+     * Garante sempre um intervalo confortável (ano atual - 2 até +4) mais todos os anos com histórico.
      */
     fun obterAnosDisponiveis(transacoes: List<Transacao>): Array<Int> {
         val cal = Calendar.getInstance()
         val anoAtual = cal.get(Calendar.YEAR)
         val anosComDados = transacoes.map { it.ano }.filter { it in 2000..2100 }.toSet()
-        val todosAnos = (anosComDados + setOf(anoAtual, anoAtual + 1)).sorted()
+        val intervaloPadrao = (anoAtual - 2..anoAtual + 4).toSet()
+        val todosAnos = (anosComDados + intervaloPadrao).sorted()
         return todosAnos.toTypedArray()
     }
 
