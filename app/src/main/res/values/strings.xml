@@ -43,6 +43,8 @@
     <string name="guia_sec14_desc">Proteja a sua aplicação contra acessos não autorizados. Ative o bloqueio por biometria no seu perfil para exigir a confirmação da sua identidade (impressão digital ou PIN) sempre que abrir o Finly. O estado da biometria é sincronizado no seu perfil no Firebase.</string>
     <string name="guia_sec15_titulo">15. Inteligência &amp; Insights Financeiros</string>
     <string name="guia_sec15_desc">Consulte alertas automáticos de teto orçamental quando os gastos ultrapassarem 100% da renda, badges de comparação percentual em relação ao mês anterior e a previsão de saldo ao final do mês com base em pendências.</string>
+    <string name="guia_sec16_titulo">16. Seleção de Período em Grelha &amp; Exportação</string>
+    <string name="guia_sec16_desc">Toque no título do mês para abrir o modal em grelha rígida 4x3 (JAN..DEZ) e seletor horizontal de anos. O período selecionado sincroniza automaticamente entre o Resumo e a Listagem. Exporte relatórios formatados em PDF ou CSV (Excel) guardados na pasta Downloads.</string>
     <string name="snackbar_item_removido">Item removido: %1$s</string>
     <string name="btn_desfazer">DESFAZER</string>
     <string name="btn_voltar">Voltar</string>

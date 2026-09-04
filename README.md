@@ -6,9 +6,11 @@
 
 ## ✨ Funcionalidades Principais
 
-*   **📊 Dashboards Visuais:** Gráficos circulares (Donut) para resumo mensal, cartões dinâmicos por categoria e gráficos de barras para evolução anual de rendas e despesas.
-*   **🎯 Destaque Visual do Período:** Seleção compacta de mês e ano com destaque proeminente no cabeçalho para rápida identificação do filtro ativo.
-*   **🔔 Notificações Inteligentes de Vencimento:** Alertas automáticos via **WorkManager** sobre contas a vencer (hoje, nos próximos dias ou em atraso recente) com atalho direto ao resumo.
+*   **📊 Dashboards Visuais & Inteligência Financeira:** Gráficos circulares (Donut) para resumo mensal, alertas visuais de teto orçamental quando despesas superam 100% da renda, badges dinâmicas de variação vs. mês anterior (`↓ X%` em verde ou `↑ X%` em vermelho), e card dedicado de **Previsão de Fim de Mês** (`🟢 No Verde` / `🔴 No Vermelho`).
+*   **📅 Seleção em Grelha Rígida 4x3 & Sincronização Bidirecional:** Modal flutuante de seleção rápida em grelha 4x3 (`JAN`..`DEZ`) e seletor horizontal de anos com cálculo dinâmico baseado no histórico. Sincronização bidirecional instantânea do período ativo entre o **Resumo Mensal** e a **Listagem Detalhada**.
+*   **🔔 Notificações Inteligentes de Vencimento:** Alertas automáticos diários às 09:00 AM via **WorkManager** sobre contas a vencer (hoje, amanhã, nos próximos 2 dias ou em atraso recente).
+*   **📤 Exportação Multiformato (PDF & CSV / Excel):** Modal no menu lateral com geração de relatórios em PDF (vetorial com gráficos) e CSV (estruturado com codificação UTF-8 BOM e separador europeu `;` pronto para Microsoft Excel e Google Sheets), guardados diretamente na pasta **Downloads**.
+*   **🐷 Ícone Oficial de Poupança & Formatação Neutra:** Categoria Poupança identificada com o novo vetor de moeda/cofre ([ic_poupanca.xml](file:///C:/Users/jesse/AndroidStudioProjects/Aplicacao%20Orcamento%20Mesal%20Simples/app/src/main/res/drawable/ic_poupanca.xml)) e valores zerados ($0,00\ €$) formatados de forma neutra sem sinais.
 *   **🔄 Sincronização em Tempo Real:** Integração total com **Firebase Firestore**, garantindo que transações, metas de poupança e categorias personalizadas sejam atualizadas instantaneamente em tempo real entre todos os telemóveis ligados à mesma conta.
 *   **🏷️ Gestão de Categorias & Ícones Dinâmicos:** Crie e gira as suas próprias categorias. O seletor de categoria herda automaticamente o ícone correspondente à categoria selecionada. Ao eliminar uma categoria em utilização, as transações associadas são reatribuídas em segurança para a categoria **"Geral"**.
 *   **🔐 Autenticação & Modo Convidado 100% Privado:** Sistema de login/registo via Firebase Auth. O modo "Convidado" guarda dados exclusivamente locais (Room DB), sem qualquer envio para a nuvem.
