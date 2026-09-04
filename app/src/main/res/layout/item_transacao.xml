@@ -12,27 +12,27 @@
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground">
 
-    <!-- Descrição (Item) -->
+    <!-- Descrição (Item) - Permite até 2 linhas para evitar cortar com reticências (...) -->
     <TextView
         android:id="@+id/tvItem"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.8"
+        android:layout_weight="2.2"
         android:text="Item"
         android:textColor="@color/textColorPrimary"
         android:textSize="14sp"
         android:textStyle="bold"
-        android:singleLine="true"
+        android:maxLines="2"
         android:ellipsize="end" />
 
-    <!-- Valor - Alinhado à Direita com Fonte Tabular -->
+    <!-- Valor - Alinhado à Direita com Fonte Tabular e maior espaço -->
     <TextView
         android:id="@+id/tvValor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.2"
+        android:layout_weight="1.4"
         android:gravity="end"
-        android:paddingEnd="8dp"
+        android:paddingEnd="4dp"
         android:fontFeatureSettings="tnum"
         android:text="0,00 €"
         android:textColor="@color/colorNegative"
@@ -44,18 +44,18 @@
         android:id="@+id/tvVencimento"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.2"
+        android:layout_weight="1.0"
         android:gravity="center"
         android:text="01/01"
         android:textColor="@color/textColorSecondary"
-        android:textSize="14sp" />
+        android:textSize="13sp" />
 
     <!-- Status (CheckBox) -->
     <ImageView
         android:id="@+id/ivStatus"
         android:layout_width="0dp"
         android:layout_height="24dp"
-        android:layout_weight="0.8"
+        android:layout_weight="0.6"
         android:scaleType="centerInside"
         android:src="@android:drawable/checkbox_off_background"
         android:contentDescription="@string/col_pago"
