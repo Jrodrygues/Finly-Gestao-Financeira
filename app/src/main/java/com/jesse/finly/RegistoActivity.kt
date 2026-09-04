@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
@@ -41,6 +42,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ScrollView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -703,8 +705,24 @@ class RegistoActivity : AppCompatActivity() {
         binding.rgRecorrenciaTipo.setOnCheckedChangeListener { _, checkedId ->
             if (checkedId == R.id.rbRecorrenteParcelada) {
                 binding.parcelasLayout.visibility = View.VISIBLE
+                binding.root.postDelayed({
+                    val scrollView = binding.root.parent as? ScrollView
+                    scrollView?.fullScroll(View.FOCUS_DOWN)
+                    binding.etParcelas.requestFocus()
+                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.showSoftInput(binding.etParcelas, InputMethodManager.SHOW_IMPLICIT)
+                }, 150)
             } else {
                 binding.parcelasLayout.visibility = View.GONE
+            }
+        }
+
+        binding.etParcelas.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                esconderTeclado()
+                true
+            } else {
+                false
             }
         }
     }
