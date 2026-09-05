@@ -1,7 +1,9 @@
 package com.jesse.finly
 
 import com.jesse.finly.models.Transacao
+import com.jesse.finly.utils.CurrencyFormatter
 import com.jesse.finly.utils.FinanceiroUtils
+import com.jesse.finly.utils.Moeda
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -92,5 +94,29 @@ class FinanceiroUtilsTest {
         assertTrue(anos.contains(2023))
         assertTrue(anos.contains(anoAtual))
         assertTrue(anos.contains(anoAtual + 1))
+    }
+
+    @Test
+    fun `CurrencyFormatter deve formatar valor corretamente para BRL e EUR`() {
+        val formatadoBRL = CurrencyFormatter.formatar(10.5, "BRL")
+        val formatadoEUR = CurrencyFormatter.formatar(10.5, "EUR")
+
+        assertTrue(formatadoBRL.contains("R$") || formatadoBRL.contains("10,50"))
+        assertTrue(formatadoEUR.contains("€") || formatadoEUR.contains("10,50"))
+    }
+
+    @Test
+    fun `formatarComSinal deve formatar corretamente valores positivos, negativos e neutros`() {
+        val neutroEUR = CurrencyFormatter.formatarComSinal(0.0, Moeda.EUR)
+        val positivoEUR = CurrencyFormatter.formatarComSinal(100.0, Moeda.EUR, forcarSinalPositivo = true)
+        val positivoSemSinalEUR = CurrencyFormatter.formatarComSinal(100.0, Moeda.EUR, forcarSinalPositivo = false)
+        val negativoEUR = CurrencyFormatter.formatarComSinal(-50.0, Moeda.EUR)
+
+        assertTrue(neutroEUR.contains("0,00"))
+        assertTrue(!neutroEUR.startsWith("+") && !neutroEUR.startsWith("-"))
+
+        assertTrue(positivoEUR.startsWith("+"))
+        assertTrue(!positivoSemSinalEUR.startsWith("+"))
+        assertTrue(negativoEUR.startsWith("-"))
     }
 }

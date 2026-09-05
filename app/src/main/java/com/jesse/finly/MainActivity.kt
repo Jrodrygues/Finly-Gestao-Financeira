@@ -15,7 +15,6 @@ import android.widget.Button
 import android.widget.LinearLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +34,9 @@ import com.jesse.finly.models.Transacao
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.showToast
 import com.google.android.material.tabs.TabLayout
+import com.jesse.finly.utils.UserPreferencesManager
+import com.jesse.finly.utils.CurrencyFormatter
+import com.jesse.finly.utils.Moeda
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -46,6 +48,8 @@ import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: HomeBinding
+    private lateinit var prefsManager: UserPreferencesManager
+    private var moedaAtual: Moeda = Moeda.EUR
     private var todasTransacoes = listOf<Transacao>()
     private var mesFiltro: String? = null
     private var anoFiltro: Int = 2026
@@ -66,6 +70,9 @@ class MainActivity : AppCompatActivity() {
 
         binding = HomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        prefsManager = UserPreferencesManager(this)
+        moedaAtual = prefsManager.obterMoedaAtual()
 
 
         // Configurar LayoutManager no onCreate apenas uma vez
@@ -154,6 +161,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        val novaMoeda = prefsManager.obterMoedaAtual()
+        if (novaMoeda != moedaAtual) {
+            moedaAtual = novaMoeda
+            adapter?.atualizarMoeda(moedaAtual)
+        }
         val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val ultimoMes = sharedPref.getString("ULTIMO_MES_SELECIONADO", null)
         val ultimoAno = sharedPref.getInt("ULTIMO_ANO_SELECIONADO", 0)
@@ -175,6 +187,21 @@ class MainActivity : AppCompatActivity() {
     private fun ativarSincronizacaoTempoReal() {
         val currentEmail = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "") ?: ""
         if (currentEmail.isEmpty() || currentEmail == "CONVIDADO") return
+
+        FirebaseManager.monitorarPerfil(currentEmail) { perfilNuvem ->
+            lifecycleScope.launch(Dispatchers.Main) {
+                val novaMoeda = Moeda.porCodigo(perfilNuvem.moeda)
+                val moedaMudou = (novaMoeda != moedaAtual)
+                moedaAtual = novaMoeda
+                getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
+                    putString("MOEDA", novaMoeda.codigo)
+                }
+                adapter?.atualizarMoeda(moedaAtual)
+                if (moedaMudou) {
+                    carregarLista()
+                }
+            }
+        }
 
         FirebaseManager.monitorarTransacoes(currentEmail) { listaNuvem ->
             lifecycleScope.launch(Dispatchers.IO) {
@@ -402,9 +429,12 @@ class MainActivity : AppCompatActivity() {
             binding.llColumnHeaders.visibility = View.VISIBLE
         }
 
+        val codigoMoeda = UserPreferencesManager(this).obterMoedaAtual().codigo
+
         if (adapter == null) {
             adapter = TransacaoAdapter(
                 lista,
+                codigoMoeda,
                 onItemClick = { transacao ->
                     val intent = Intent(this@MainActivity, DetalhesPageActivity::class.java)
                     intent.putExtra("isTransactionDetail", true)
@@ -427,7 +457,7 @@ class MainActivity : AppCompatActivity() {
             }
             binding.rvTransacoes.adapter = adapter
         } else {
-            adapter?.updateData(lista)
+            adapter?.updateData(lista, codigoMoeda)
         }
     }
 
@@ -462,58 +492,78 @@ class MainActivity : AppCompatActivity() {
             .filter { it.tipo == "DESPESA" && !it.status }
             .sumOf { it.valor }
 
-        val despesaTotal = despesasPagas + despesasAPagar
         val saldoDisponivel = rendaTotal - despesasPagas
+
+        atualizarRodape(
+            saldoDisponivel = saldoDisponivel,
+            saldoInicial = rendaTotal,
+            totalPago = despesasPagas,
+            totalAPagar = despesasAPagar,
+            posicaoTab = posicaoTab
+        )
+    }
+
+    private fun atualizarRodape(
+        saldoDisponivel: Double,
+        saldoInicial: Double,
+        totalPago: Double,
+        totalAPagar: Double,
+        posicaoTab: Int
+    ) {
+        val totalGeralDespesas = totalPago + totalAPagar
+        val percentagemPaga = if (totalGeralDespesas > 0.001) {
+            ((totalPago / totalGeralDespesas) * 100).toInt().coerceIn(0, 100)
+        } else {
+            0
+        }
+
+        binding.pbProgressoPagamento.progress = percentagemPaga
 
         val colorPositivo = ContextCompat.getColor(this, R.color.colorPositive)
         val colorNegativo = ContextCompat.getColor(this, R.color.colorNegative)
         val colorPadrao = ContextCompat.getColor(this, R.color.textColorSecondary)
 
-        val progressoPercent = if (despesaTotal > 0) ((despesasPagas / despesaTotal) * 100).toInt().coerceIn(0, 100) else 0
-        binding.pbProgressoPagamento.progress = progressoPercent
-
         when (posicaoTab) {
             1 -> {
                 // Aba Despesas
-                val corDespesa = if (abs(despesaTotal) < 0.005) colorPadrao else colorNegativo
-                setSaldoColorido("Total Despesas: ", despesaTotal, corDespesa)
-                binding.tvDetalheSaldo.text = String.format(
-                    Locale.getDefault(),
-                    "Pagas: %.2f €  |  A Pagar: %.2f €  (%d%% pagas)",
-                    despesasPagas, despesasAPagar, progressoPercent
-                )
+                val corDespesa = if (abs(totalGeralDespesas) < 0.001) colorPadrao else colorNegativo
+                val valorDespesaStr = CurrencyFormatter.formatarComSinal(-totalGeralDespesas, moedaAtual)
+                setSaldoColorido("Total Despesas: ", valorDespesaStr, corDespesa)
+
+                val pagasStr = CurrencyFormatter.formatar(totalPago, moedaAtual)
+                val aPagarStr = CurrencyFormatter.formatar(totalAPagar, moedaAtual)
+                binding.tvDetalheSaldo.text = "Pagas: $pagasStr  |  A Pagar: $aPagarStr  ($percentagemPaga% pagas)"
                 binding.tvDetalheSaldo.visibility = View.VISIBLE
             }
             2 -> {
                 // Aba Rendas
-                val corRenda = if (abs(rendaTotal) < 0.005) colorPadrao else colorPositivo
-                setSaldoColorido("Total Rendas: ", rendaTotal, corRenda)
+                val corRenda = if (abs(saldoInicial) < 0.001) colorPadrao else colorPositivo
+                val valorRendaStr = CurrencyFormatter.formatarComSinal(saldoInicial, moedaAtual, forcarSinalPositivo = true)
+                setSaldoColorido("Total Rendas: ", valorRendaStr, corRenda)
                 binding.tvDetalheSaldo.visibility = View.GONE
             }
             else -> {
-                // Aba Todas: Saldo Disponível (ou Défice / A Descoberto se negativo)
-                when {
-                    abs(saldoDisponivel) < 0.005 -> setSaldoColorido("Saldo Disponível: ", 0.0, colorPadrao)
-                    saldoDisponivel < 0 -> setSaldoColorido("Défice / A Descoberto: -", abs(saldoDisponivel), colorNegativo)
-                    else -> setSaldoColorido("Saldo Disponível: ", saldoDisponivel, colorPositivo)
+                // Aba Todas
+                val (prefixo, corSaldo, valorSaldoStr) = when {
+                    abs(saldoDisponivel) < 0.001 -> Triple("Saldo Disponível: ", colorPadrao, CurrencyFormatter.formatar(0.0, moedaAtual))
+                    saldoDisponivel < -0.001 -> Triple("Défice / A Descoberto: ", colorNegativo, CurrencyFormatter.formatarComSinal(saldoDisponivel, moedaAtual))
+                    else -> Triple("Saldo Disponível: ", colorPositivo, CurrencyFormatter.formatarComSinal(saldoDisponivel, moedaAtual, forcarSinalPositivo = true))
                 }
 
-                binding.tvDetalheSaldo.text = String.format(
-                    Locale.getDefault(),
-                    "Inicial: %.2f €  |  Pago: %.2f € (%d%%)  |  A Pagar: %.2f €",
-                    rendaTotal, despesasPagas, progressoPercent, despesasAPagar
-                )
+                setSaldoColorido(prefixo, valorSaldoStr, corSaldo)
+
+                val inicialStr = CurrencyFormatter.formatar(saldoInicial, moedaAtual)
+                val pagoStr = CurrencyFormatter.formatar(totalPago, moedaAtual)
+                val aPagarStr = CurrencyFormatter.formatar(totalAPagar, moedaAtual)
+
+                binding.tvDetalheSaldo.text = "Inicial: $inicialStr  |  Pago: $pagoStr ($percentagemPaga%)  |  A Pagar: $aPagarStr"
                 binding.tvDetalheSaldo.visibility = View.VISIBLE
             }
         }
     }
 
-    private fun setSaldoColorido(prefixo: String, valor: Double, corValor: Int) {
-        // Garante que o prefixo termine com ": " e remove o sinal de menos do valor
+    private fun setSaldoColorido(prefixo: String, valorTexto: String, corValor: Int) {
         val prefixoFormatado = if (prefixo.endsWith(": ")) prefixo else prefixo.trimEnd().removeSuffix(":") + ": "
-        val valorAbsoluto = kotlin.math.abs(valor)
-        
-        val valorTexto = String.format(Locale.getDefault(), "%.2f €", valorAbsoluto)
         val fullText = prefixoFormatado + valorTexto
         val spannable = SpannableString(fullText)
 

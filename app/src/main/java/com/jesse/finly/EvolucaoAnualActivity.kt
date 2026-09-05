@@ -31,19 +31,26 @@ import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.MPPointF
+import androidx.core.content.edit
+import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.ActivityEvolucaoAnualBinding
+import com.jesse.finly.utils.CurrencyFormatter
+import com.jesse.finly.utils.Moeda
+import com.jesse.finly.utils.UserPreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.NumberFormat
 import java.util.Calendar
 import java.util.Locale
 import kotlin.math.abs
-import kotlin.math.round
 
 @RequiresApi(Build.VERSION_CODES.O)
 class EvolucaoAnualActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEvolucaoAnualBinding
+    private lateinit var prefsManager: UserPreferencesManager
+    private var moedaAtual: Moeda = Moeda.EUR
     private val mesesArray = arrayOf("Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez")
     private val mesesNomes = arrayOf("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro")
 
@@ -64,6 +71,9 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         binding = ActivityEvolucaoAnualBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        prefsManager = UserPreferencesManager(this)
+        moedaAtual = prefsManager.obterMoedaAtual()
+
         atualizarAparenciaCabecalho()
 
         binding.btnBackEvolucao.setOnClickListener { finish() }
@@ -80,6 +90,41 @@ class EvolucaoAnualActivity : AppCompatActivity() {
 
         val anoInicial = Calendar.getInstance().get(Calendar.YEAR)
         carregarDadosAnuais(anoInicial)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ativarSincronizacaoTempoReal()
+        val novaMoeda = prefsManager.obterMoedaAtual()
+        if (novaMoeda != moedaAtual) {
+            moedaAtual = novaMoeda
+            atualizarGraficoFormatters()
+        } else {
+            carregarDadosAnuais(anoAtualSelecionado)
+        }
+    }
+
+    private fun ativarSincronizacaoTempoReal() {
+        val email = getSharedPreferences("FinlyAppPrefs", MODE_PRIVATE).getString("EMAIL", "") ?: ""
+        if (email.isEmpty() || FirebaseManager.isGuestEmail(email)) return
+
+        FirebaseManager.monitorarPerfil(email) { perfilNuvem ->
+            lifecycleScope.launch(Dispatchers.Main) {
+                val novaMoeda = Moeda.porCodigo(perfilNuvem.moeda)
+                if (novaMoeda != moedaAtual) {
+                    moedaAtual = novaMoeda
+                    getSharedPreferences("FinlyAppPrefs", MODE_PRIVATE).edit {
+                        putString("MOEDA", novaMoeda.codigo)
+                    }
+                    atualizarGraficoFormatters()
+                }
+            }
+        }
+    }
+
+    private fun atualizarGraficoFormatters() {
+        configurarGraficoVazio()
+        carregarDadosAnuais(anoAtualSelecionado)
     }
 
     private fun atualizarAparenciaCabecalho() {
@@ -150,12 +195,10 @@ class EvolucaoAnualActivity : AppCompatActivity() {
 
                 valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
-                        if (value == 0f) return "0 €"
-                        val prefix = if (value < 0) "-" else ""
-                        val absVal = abs(value)
-                        return if (absVal >= 1000)
-                            String.format(Locale.getDefault(), "%s%.1fk €", prefix, absVal / 1000)
-                        else String.format(Locale.getDefault(), "%s%.0f €", prefix, absVal)
+                        val formatadorInteiro = NumberFormat.getCurrencyInstance(moedaAtual.locale).apply {
+                            maximumFractionDigits = 0
+                        }
+                        return formatadorInteiro.format(value.toDouble())
                     }
                 }
             }
@@ -202,13 +245,14 @@ class EvolucaoAnualActivity : AppCompatActivity() {
                     val corPositivo = ContextCompat.getColor(context, R.color.colorPositive)
                     val corNegativo = ContextCompat.getColor(context, R.color.colorNegative)
 
+                    val balancoStr = CurrencyFormatter.formatarComSinal(balanco, moedaAtual, forcarSinalPositivo = (balanco > 0))
+                    tvMarkerText?.text = "$mesNome: $balancoStr"
+
                     if (balanco < 0) {
-                        tvMarkerText?.text = String.format(Locale.getDefault(), "%s: -%.2f €", mesNome, abs(balanco))
                         tvMarkerText?.setTextColor(corNegativo)
                         cardContainer?.strokeColor = corNegativo
                         ivArrow?.setColorFilter(corNegativo)
                     } else {
-                        tvMarkerText?.text = String.format(Locale.getDefault(), "%s: +%.2f €", mesNome, balanco)
                         tvMarkerText?.setTextColor(corPositivo)
                         cardContainer?.strokeColor = corPositivo
                         ivArrow?.setColorFilter(corPositivo)
@@ -281,19 +325,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
                 rendaPorMes = tempRenda
                 despesaPorMes = tempDespesa
 
-                binding.tvTotalRendaAnual.text = String.format(Locale.getDefault(), "%.2f €", somaRendaAnual)
-                binding.tvTotalDespesaAnual.text = String.format(Locale.getDefault(), "%.2f €", somaDespesaAnual)
-
-                // Saldo Anual com sinal negativo em vermelho se < 0
-                if (saldoAnual < 0) {
-                    binding.tvSaldoAnual.text = String.format(Locale.getDefault(), "-%.2f €",
-                        abs(saldoAnual)
-                    )
-                    binding.tvSaldoAnual.setTextColor(corNegativo)
-                } else {
-                    binding.tvSaldoAnual.text = String.format(Locale.getDefault(), "%.2f €", saldoAnual)
-                    binding.tvSaldoAnual.setTextColor(corPositivo)
-                }
+                atualizarCardsResumoAnual(somaRendaAnual, somaDespesaAnual, saldoAnual)
 
                 // 1. PRIMEIRO atualizar o gráfico para que barChartAnual.data esteja preenchido
                 atualizarGrafico(entriesSaldo, coresSaldo)
@@ -303,6 +335,27 @@ class EvolucaoAnualActivity : AppCompatActivity() {
                 atualizarCardDetalheMes(mesAtualIndex)
             }
         }
+    }
+
+    private fun atualizarCardsResumoAnual(
+        totalRendasAno: Double,
+        totalDespesasAno: Double,
+        saldoAcumuladoAno: Double
+    ) {
+        val corPositivo = ContextCompat.getColor(this, R.color.colorPositive)
+        val corNegativo = ContextCompat.getColor(this, R.color.colorNegative)
+        val corPadrao = ContextCompat.getColor(this, R.color.textColorSecondary)
+
+        binding.tvTotalRendaAnual.text = CurrencyFormatter.formatarComSinal(totalRendasAno, moedaAtual, forcarSinalPositivo = true)
+        binding.tvTotalDespesaAnual.text = CurrencyFormatter.formatarComSinal(-totalDespesasAno, moedaAtual)
+        binding.tvSaldoAnual.text = CurrencyFormatter.formatarComSinal(saldoAcumuladoAno, moedaAtual, forcarSinalPositivo = true)
+
+        val corSaldo = when {
+            saldoAcumuladoAno > 0.001 -> corPositivo
+            saldoAcumuladoAno < -0.001 -> corNegativo
+            else -> corPadrao
+        }
+        binding.tvSaldoAnual.setTextColor(corSaldo)
     }
 
     private fun atualizarCardDetalheMes(index: Int) {
@@ -316,16 +369,12 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         val corNegativo = ContextCompat.getColor(this, R.color.colorNegative)
 
         binding.tvTituloDetalheMes.text = "Detalhes: $mesNome de $anoAtualSelecionado"
-        binding.tvRendaMesDetalhe.text = String.format(Locale.getDefault(), "%.2f €", renda)
-        binding.tvDespesaMesDetalhe.text = String.format(Locale.getDefault(), "%.2f €", despesa)
+        binding.tvRendaMesDetalhe.text = CurrencyFormatter.formatarComSinal(renda, moedaAtual, forcarSinalPositivo = true)
+        binding.tvDespesaMesDetalhe.text = CurrencyFormatter.formatarComSinal(-despesa, moedaAtual)
 
-        if (balanco < 0) {
-            binding.tvSaldoMesDetalhe.text = String.format(Locale.getDefault(), "-%.2f €", abs(balanco))
-            binding.tvSaldoMesDetalhe.setTextColor(corNegativo)
-        } else {
-            binding.tvSaldoMesDetalhe.text = String.format(Locale.getDefault(), "%.2f €", balanco)
-            binding.tvSaldoMesDetalhe.setTextColor(corPositivo)
-        }
+        val isBalancoZero = abs(balanco) < 0.005
+        binding.tvSaldoMesDetalhe.text = CurrencyFormatter.formatarComSinal(balanco, moedaAtual, forcarSinalPositivo = true)
+        binding.tvSaldoMesDetalhe.setTextColor(if (isBalancoZero) ContextCompat.getColor(this, R.color.textColorSecondary) else if (balanco < 0) corNegativo else corPositivo)
 
         if (binding.barChartAnual.data != null) {
             try {
@@ -350,9 +399,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
                     if (value == 0f) return ""
-                    val rounded = round(value).toInt()
-                    val prefix = if (rounded < 0) "-" else ""
-                    return String.format(Locale.getDefault(), "%s%d€", prefix, abs(rounded))
+                    return CurrencyFormatter.formatarComSinal(value.toDouble(), moedaAtual)
                 }
             }
         }

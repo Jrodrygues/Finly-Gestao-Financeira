@@ -16,12 +16,12 @@
         app:boxCornerRadiusBottomStart="12dp"
         app:boxCornerRadiusTopEnd="12dp"
         app:boxCornerRadiusTopStart="12dp"
-        app:prefixText="€ ">
+        app:prefixTextColor="@color/colorPrimary">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/metaEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal" />
+            android:inputType="number" />
     </com.google.android.material.textfield.TextInputLayout>
 </FrameLayout>

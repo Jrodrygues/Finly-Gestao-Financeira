@@ -10,17 +10,38 @@ import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.jesse.finly.R
 import com.jesse.finly.models.Transacao
+import com.jesse.finly.utils.CurrencyFormatter
 import com.jesse.finly.utils.FinanceiroUtils
+import com.jesse.finly.utils.Moeda
 import java.util.Locale
 
 class TransacaoAdapter(
     private var lista: List<Transacao>,
+    private var codigoMoeda: String = "EUR",
     private val onItemClick: (Transacao) -> Unit,
     private val onToggleStatus: (Transacao) -> Unit
 ): RecyclerView.Adapter<TransacaoAdapter.TransacaoViewHolder>() {
 
-    fun updateData(novaLista: List<Transacao>) {
+    constructor(
+        lista: List<Transacao>,
+        moeda: Moeda,
+        onItemClick: (Transacao) -> Unit,
+        onToggleStatus: (Transacao) -> Unit
+    ) : this(lista, moeda.codigo, onItemClick, onToggleStatus)
+
+    fun updateData(novaLista: List<Transacao>, novaMoeda: String = codigoMoeda) {
         this.lista = novaLista
+        this.codigoMoeda = novaMoeda
+        notifyDataSetChanged()
+    }
+
+    fun submeterLista(novaLista: List<Transacao>) {
+        this.lista = novaLista
+        notifyDataSetChanged()
+    }
+
+    fun atualizarMoeda(novaMoeda: Moeda) {
+        this.codigoMoeda = novaMoeda.codigo
         notifyDataSetChanged()
     }
 
@@ -52,16 +73,23 @@ class TransacaoAdapter(
 
         holder.tvItem.text = textoExibicao
         holder.tvVencimento.text = item.vencimento
-        holder.tvValor.text = String.format(Locale.getDefault(), "%.2f €", item.valor)
 
         val corPositiva = ContextCompat.getColor(holder.itemView.context, R.color.colorPositive)
         val corNegativa = ContextCompat.getColor(holder.itemView.context, R.color.colorNegative)
 
+        val moedaEnum = Moeda.porCodigo(codigoMoeda)
+        val valorComSinal = if (item.tipo == "DESPESA") -item.valor else item.valor
+        val valorFormatado = CurrencyFormatter.formatarComSinal(
+            valor = valorComSinal,
+            moeda = moedaEnum,
+            forcarSinalPositivo = (item.tipo == "RENDA")
+        )
+
+        holder.tvValor.text = valorFormatado
+
         if (item.tipo == "DESPESA") {
-            holder.tvValor.text = FinanceiroUtils.formatarMoeda(item.valor, isPositivo = false)
             holder.tvValor.setTextColor(corNegativa)
         } else {
-            holder.tvValor.text = FinanceiroUtils.formatarMoeda(item.valor, isPositivo = true)
             holder.tvValor.setTextColor(corPositiva)
         }
 

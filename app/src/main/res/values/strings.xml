@@ -147,7 +147,7 @@
     <string name="valor_label">Valor: %1$.2f € (%2$s)</string>
     <string name="data_label">Data: %1$s</string>
     <string name="categoria_mes_label">Categoria: %1$s | Mês: %2$s</string>
-    <string name="poupado_label">Poupado: %1$.2f € (%2$d%%)</string>
+    <string name="poupado_label">Poupado: %1$s (%2$d%%)</string>
     <string name="meta_definir_aviso">Defina uma meta para este mês.</string>
     <string name="userName">UserReplace</string>
     <string name="txtTelemovel">Telemóvel</string>
@@ -166,7 +166,7 @@
     <string name="pdf_renda_total">Renda Total: %1$s</string>
     <string name="pdf_despesa_total">Despesa Total: %1$s</string>
     <string name="pdf_poupanca_total">Total Poupança Real: %1$s</string>
-    <string name="pdf_meta_definida">Meta de Poupança Definida: %1$.2f €</string>
+    <string name="pdf_meta_definida">Meta de Poupança Definida: %1$s</string>
     <string name="pdf_saldo_final">Saldo Final: %1$s</string>
     <string name="empty_list_message">Nenhuma transação encontrada</string>
     <string name="empty_list_subtext">Toque no botão abaixo para adicionar a sua primeira conta deste mês.</string>

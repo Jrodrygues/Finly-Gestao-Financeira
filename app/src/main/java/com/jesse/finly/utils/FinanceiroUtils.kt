@@ -4,8 +4,6 @@ import android.util.Patterns
 import android.view.View
 import android.view.HapticFeedbackConstants
 import com.jesse.finly.models.Transacao
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
 import java.util.Calendar
 import java.util.Locale
 import kotlin.math.abs
@@ -21,25 +19,14 @@ object FinanceiroUtils {
     }
 
     /**
-     * Formata um valor monetário no padrão europeu (ex: 2.157,23 € ou 600,00 €) com espaço antes do símbolo.
+     * Formata um valor monetário de acordo com a moeda do utilizador (EUR / BRL).
      */
-    fun formatarMoeda(valor: Double, isPositivo: Boolean? = null): String {
-        val symbols = DecimalFormatSymbols(Locale("pt", "PT")).apply {
-            decimalSeparator = ','
-            groupingSeparator = '.'
-        }
-        val formatter = DecimalFormat("#,##0.00", symbols)
-        val formatado = formatter.format(abs(valor))
-
-        // Se o valor for zero, nunca carregar sinal positivo nem negativo
-        if (abs(valor) < 0.005) {
-            return "$formatado €"
-        }
-
+    fun formatarMoeda(valor: Double, isPositivo: Boolean? = null, codigoMoeda: String? = "EUR"): String {
+        val moeda = Moeda.porCodigo(codigoMoeda)
         return when (isPositivo) {
-            true -> "+$formatado €"
-            false -> "-$formatado €"
-            null -> "$formatado €"
+            true -> CurrencyFormatter.formatarComSinal(abs(valor), moeda, forcarSinalPositivo = true)
+            false -> CurrencyFormatter.formatarComSinal(-abs(valor), moeda)
+            null -> CurrencyFormatter.formatar(valor, moeda)
         }
     }
 

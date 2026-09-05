@@ -28,6 +28,9 @@ import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.BiometricUtils
 import com.jesse.finly.notifications.NotificationHelper
 import com.jesse.finly.notifications.NotificationWorker
+import com.jesse.finly.utils.CurrencyFormatter
+import com.jesse.finly.utils.Moeda
+import com.jesse.finly.utils.UserPreferencesManager
 import com.jesse.finly.utils.showToast
 import java.util.Locale
 import kotlin.math.abs
@@ -163,15 +166,17 @@ class DetalhesPageActivity : AppCompatActivity() {
         val corPositiva = ContextCompat.getColor(this, R.color.colorPositive)
         val corNegativa = ContextCompat.getColor(this, R.color.colorNegative)
 
+        val moedaAtual = UserPreferencesManager(this).obterMoedaAtual()
+
         // Valor Prominente Grande
         binding.llValorHighlight.visibility = View.VISIBLE
         if (transTipo == "DESPESA") {
-            binding.tvValorHighlight.text = FinanceiroUtils.formatarMoeda(transValor, isPositivo = false)
+            binding.tvValorHighlight.text = CurrencyFormatter.formatarComSinal(-transValor, moedaAtual)
             binding.tvValorHighlight.setTextColor(corNegativa)
             binding.tvBadgeTipo.text = "Despesa"
             binding.tvBadgeTipo.setTextColor(corNegativa)
         } else {
-            binding.tvValorHighlight.text = FinanceiroUtils.formatarMoeda(transValor, isPositivo = true)
+            binding.tvValorHighlight.text = CurrencyFormatter.formatarComSinal(transValor, moedaAtual, forcarSinalPositivo = true)
             binding.tvValorHighlight.setTextColor(corPositiva)
             binding.tvBadgeTipo.text = "Renda"
             binding.tvBadgeTipo.setTextColor(corPositiva)
@@ -448,6 +453,51 @@ class DetalhesPageActivity : AppCompatActivity() {
                 prefs.edit { putBoolean("pref_biometric_ativa", false) }
                 atualizarPreferenciaUtilizador(false, "BIOMETRIA")
                 showToast("Bloqueio com biometria desativado")
+            }
+        }
+
+        val prefsManager = UserPreferencesManager(this)
+        val moedaAtual = prefsManager.obterMoedaAtual()
+
+        fun atualizarVisualBotoesMoeda(moeda: Moeda) {
+            val isBrl = (moeda == Moeda.BRL)
+            val colorPrimary = ContextCompat.getColor(this, R.color.colorPrimary)
+            val colorSurface = ContextCompat.getColor(this, R.color.surfaceColor)
+            val colorWhite = ContextCompat.getColor(this, R.color.white)
+            val colorTextPrimary = ContextCompat.getColor(this, R.color.textColorPrimary)
+
+            if (isBrl) {
+                binding.btnMoedaPerfilBRL.setBackgroundColor(colorPrimary)
+                binding.btnMoedaPerfilBRL.setTextColor(colorWhite)
+                binding.btnMoedaPerfilEUR.setBackgroundColor(colorSurface)
+                binding.btnMoedaPerfilEUR.setTextColor(colorTextPrimary)
+            } else {
+                binding.btnMoedaPerfilEUR.setBackgroundColor(colorPrimary)
+                binding.btnMoedaPerfilEUR.setTextColor(colorWhite)
+                binding.btnMoedaPerfilBRL.setBackgroundColor(colorSurface)
+                binding.btnMoedaPerfilBRL.setTextColor(colorTextPrimary)
+            }
+        }
+
+        val isBrl = (moedaAtual == Moeda.BRL)
+        binding.toggleMoedaPerfil.check(if (isBrl) R.id.btnMoedaPerfilBRL else R.id.btnMoedaPerfilEUR)
+        atualizarVisualBotoesMoeda(moedaAtual)
+
+        binding.btnMoedaPerfilEUR.setOnClickListener { view ->
+            FinanceiroUtils.dispararHapticFeedback(view)
+            binding.toggleMoedaPerfil.check(R.id.btnMoedaPerfilEUR)
+            atualizarVisualBotoesMoeda(Moeda.EUR)
+            prefsManager.salvarMoeda(Moeda.EUR) { _ ->
+                showToast("Moeda alterada para Euro (€)")
+            }
+        }
+
+        binding.btnMoedaPerfilBRL.setOnClickListener { view ->
+            FinanceiroUtils.dispararHapticFeedback(view)
+            binding.toggleMoedaPerfil.check(R.id.btnMoedaPerfilBRL)
+            atualizarVisualBotoesMoeda(Moeda.BRL)
+            prefsManager.salvarMoeda(Moeda.BRL) { _ ->
+                showToast("Moeda alterada para Real (R$)")
             }
         }
     }

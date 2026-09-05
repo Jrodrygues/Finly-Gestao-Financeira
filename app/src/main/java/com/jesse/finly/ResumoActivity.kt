@@ -53,13 +53,13 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import android.widget.Button
 import androidx.annotation.RequiresApi
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.ActivityResumoBinding
@@ -69,6 +69,13 @@ import com.jesse.finly.models.Transacao
 import com.jesse.finly.notifications.NotificationHelper
 import com.jesse.finly.utils.showToast
 import com.jesse.finly.utils.FinanceiroUtils
+import com.jesse.finly.utils.UserPreferencesManager
+import androidx.core.content.FileProvider
+import com.jesse.finly.utils.CsvExporter
+import com.jesse.finly.utils.PdfExporter
+import com.jesse.finly.utils.CurrencyFormatter
+import com.jesse.finly.utils.Moeda
+import com.jesse.finly.utils.MoneyTextWatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -79,6 +86,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
 import java.util.Locale
+import kotlin.math.round
 
 @RequiresApi(Build.VERSION_CODES.O)
 class ResumoActivity : AppCompatActivity() {
@@ -98,6 +106,7 @@ class ResumoActivity : AppCompatActivity() {
     private var metaAtual: Double = 0.0
     private var isCategoriesExpanded = false
     private var transacoesAtuaisGrafico: List<Transacao> = emptyList()
+    private var moedaAtual: Moeda = Moeda.EUR
 
 
     companion object {
@@ -169,8 +178,28 @@ class ResumoActivity : AppCompatActivity() {
     private fun mostrarDialogDefinirMeta() {
         val view = layoutInflater.inflate(R.layout.dialog_definir_meta, binding.root as? android.view.ViewGroup, false)
         val input = view.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.metaEditText)
-        input.setText(metaAtual.toString())
-        
+        val metaInputLayout = view.findViewById<TextInputLayout>(R.id.metaInputLayout)
+
+        val moedaAtual = UserPreferencesManager(this).obterMoedaAtual()
+
+        if (moedaAtual == Moeda.BRL) {
+            metaInputLayout.prefixText = "R$ "
+            metaInputLayout.suffixText = null
+        } else {
+            metaInputLayout.prefixText = null
+            metaInputLayout.suffixText = " €"
+        }
+
+        val centavos = round(metaAtual * 100).toLong()
+        if (centavos > 0) {
+            input.setText(centavos.toString())
+        } else {
+            input.setText("")
+        }
+
+        val watcher = MoneyTextWatcher(input, moedaAtual)
+        input.addTextChangedListener(watcher)
+
         // Criar o ícone com verde manualmente para garantir visibilidade
         val icon = ContextCompat.getDrawable(this, R.drawable.ic_dashboard)?.mutate()
         icon?.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
@@ -181,7 +210,7 @@ class ResumoActivity : AppCompatActivity() {
             .setMessage("Quanto deseja poupar em ${binding.spinnerMes.selectedItem}?")
             .setView(view)
             .setPositiveButton("Guardar") { _, _ ->
-                val novaMeta = input.text.toString().toDoubleOrNull() ?: 0.0
+                val novaMeta = watcher.obterValorDouble()
                 salvarMeta(novaMeta)
             }
             .setNegativeButton("Cancelar", null)
@@ -242,13 +271,24 @@ class ResumoActivity : AppCompatActivity() {
                 db.utilizadorDao().atualizarUtilizador(userAtualizado)
 
                 withContext(Dispatchers.Main) {
+                    val novaMoeda = Moeda.porCodigo(perfilNuvem.moeda)
+                    val moedaMudou = (novaMoeda != moedaAtual)
+                    if (moedaMudou) {
+                        moedaAtual = novaMoeda
+                    }
+
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                         putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
                         putBoolean("DARK_MODE", perfilNuvem.darkMode)
                         putBoolean("pref_biometric_ativa", perfilNuvem.biometricAtiva)
+                        putString("MOEDA", perfilNuvem.moeda)
                         putStringSet("CUSTOM_CATEGORIES_$emailClean", HashSet(setUnido))
                     }
                     atualizarDrawerHeader()
+
+                    if (moedaMudou) {
+                        prosseguirComCarregamento()
+                    }
                 }
             }
         }
@@ -279,6 +319,7 @@ class ResumoActivity : AppCompatActivity() {
                         putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
                         putBoolean("DARK_MODE", perfilNuvem.darkMode)
                         putBoolean("pref_biometric_ativa", perfilNuvem.biometricAtiva)
+                        putString("MOEDA", perfilNuvem.moeda)
                         putStringSet("CUSTOM_CATEGORIES_$emailClean", HashSet(setUnido))
                     }
                     atualizarDrawerHeader()
@@ -745,6 +786,7 @@ class ResumoActivity : AppCompatActivity() {
         val mes = binding.spinnerMes.selectedItem.toString()
         val ano = binding.spinnerAno.selectedItem.toString()
         val transacoes = transacoesAtuaisGrafico
+        val moedaAtual = UserPreferencesManager(this).obterMoedaAtual()
 
         val pdfDocument = PdfDocument()
         val pageWidth = 595
@@ -878,20 +920,22 @@ class ResumoActivity : AppCompatActivity() {
         val totalDespesasVal = despesas.sumOf { it.valor }
         val saldoVal = FinanceiroUtils.calcularSaldoPago(transacoes)
 
+        val codigoMoeda = moedaAtual.codigo
+
         val isRendaZero = abs(totalRendaVal) < 0.005
-        val rendaText = FinanceiroUtils.formatarMoeda(totalRendaVal, isPositivo = if (isRendaZero) null else true)
+        val rendaText = FinanceiroUtils.formatarMoeda(totalRendaVal, isPositivo = if (isRendaZero) null else true, codigoMoeda = codigoMoeda)
 
         val isDespesaZero = abs(totalDespesasVal) < 0.005
-        val despesaText = FinanceiroUtils.formatarMoeda(totalDespesasVal, isPositivo = if (isDespesaZero) null else false)
+        val despesaText = FinanceiroUtils.formatarMoeda(totalDespesasVal, isPositivo = if (isDespesaZero) null else false, codigoMoeda = codigoMoeda)
 
         val isSaldoZero = abs(saldoVal) < 0.005
-        val saldoText = FinanceiroUtils.formatarMoeda(saldoVal, isPositivo = if (isSaldoZero) null else (saldoVal >= 0))
+        val saldoText = FinanceiroUtils.formatarMoeda(saldoVal, isPositivo = if (isSaldoZero) null else (saldoVal >= 0), codigoMoeda = codigoMoeda)
 
         val despesasPendentes = despesas.filter { !it.status }
         val totalDespesasPendentes = despesasPendentes.sumOf { it.valor }
         val statusPrevisao = if (saldoVal >= 0) "No Verde" else "No Vermelho"
         val detalhePrevisao = if (despesasPendentes.isNotEmpty()) {
-            "${despesasPendentes.size} pendentes: " + FinanceiroUtils.formatarMoeda(totalDespesasPendentes)
+            "${despesasPendentes.size} pendentes: " + FinanceiroUtils.formatarMoeda(totalDespesasPendentes, codigoMoeda = codigoMoeda)
         } else {
             "Contas em dia"
         }
@@ -934,7 +978,7 @@ class ResumoActivity : AppCompatActivity() {
                 checkPageBreak(20f)
 
                 val catNome = if (cat.length > 28) cat.take(26) + ".." else cat
-                val valorFormatado = String.format(Locale.getDefault(), "%.2f €", totalCat)
+                val valorFormatado = CurrencyFormatter.formatar(totalCat, moedaAtual)
                 val percent = if (totalDespesasVal > 0) ((totalCat / totalDespesasVal) * 100).toInt() else 0
 
                 canvas.drawText(catNome, 40f, currentY, textPaint)
@@ -981,7 +1025,7 @@ class ResumoActivity : AppCompatActivity() {
                 }
                 val itemNome = if (itemNomeStr.length > 28) itemNomeStr.take(26) + ".." else itemNomeStr
                 val catNome = if (t.categoria.length > 18) t.categoria.take(16) + ".." else t.categoria
-                val valorFormatado = String.format(Locale.getDefault(), "%.2f €", t.valor)
+                val valorFormatado = CurrencyFormatter.formatar(t.valor, moedaAtual)
 
                 canvas.drawText(itemNome, 40f, currentY, textPaint)
                 canvas.drawText(catNome, 250f, currentY, labelPaint)
@@ -1019,7 +1063,7 @@ class ResumoActivity : AppCompatActivity() {
                 }
                 val itemNome = if (itemNomeStr.length > 28) itemNomeStr.take(26) + ".." else itemNomeStr
                 val catNome = if (t.categoria.length > 18) t.categoria.take(16) + ".." else t.categoria
-                val valorFormatado = String.format(Locale.getDefault(), "%.2f €", t.valor)
+                val valorFormatado = CurrencyFormatter.formatar(t.valor, moedaAtual)
 
                 canvas.drawText(itemNome, 40f, currentY, textPaint)
                 canvas.drawText(catNome, 250f, currentY, labelPaint)
@@ -1166,26 +1210,11 @@ class ResumoActivity : AppCompatActivity() {
             return
         }
 
-        val nomeFicheiro = "Relatorio_${mes}_$ano.csv"
-
         try {
-            val sb = StringBuilder()
-            // Adiciona BOM (Byte Order Mark) UTF-8 para garantir abertura correta no Excel sem problemas de acentuação
-            sb.append("\uFEFF")
-            // Cabeçalho CSV com separador; (padrão europeu/português para Excel)
-            sb.append("Vencimento;Tipo;Descrição;Categoria;Valor (€);Estado\n")
-
-            transacoes.sortedBy { extrairOrdemData(it.vencimento) }.forEach { t ->
-                val itemEscaped = t.item.replace("\"", "\"\"")
-                val catEscaped = t.categoria.replace("\"", "\"\"")
-                val valorFmt = String.format(Locale.getDefault(), "%.2f", t.valor)
-                val estado = if (t.status) "Pago" else "Pendente"
-
-                sb.append("\"${t.vencimento}\";\"${t.tipo}\";\"$itemEscaped\";\"$catEscaped\";\"$valorFmt\";\"$estado\"\n")
-            }
-
-            val csvText = sb.toString()
-            val bytes = csvText.toByteArray(Charsets.UTF_8)
+            val exporter = CsvExporter(this)
+            val file = exporter.exportarTransacoesMes("$mes de $ano", transacoes)
+            val bytes = file.readBytes()
+            val nomeFicheiro = file.name
             val ok = guardarFicheiroEmDownloads(nomeFicheiro, "text/csv", bytes)
             if (ok) {
                 showToast("Ficheiro CSV salvo em Downloads!", isLong = true)
@@ -1577,12 +1606,14 @@ class ResumoActivity : AppCompatActivity() {
     }
 
     private fun atualizarBarraMeta(valorPoupado: Double) {
-        binding.tvMetaValor.text = String.format(Locale.getDefault(), "%.2f €", metaAtual)
+        val moedaAtual = UserPreferencesManager(this).obterMoedaAtual()
+        binding.tvMetaValor.text = CurrencyFormatter.formatar(metaAtual, moedaAtual)
         
         if (metaAtual > 0) {
             val progresso = ((valorPoupado / metaAtual) * 100).toInt().coerceAtMost(100)
             binding.pbMetaPoupanca.progress = progresso
-            binding.tvMetaStatus.text = getString(R.string.poupado_label, valorPoupado, progresso)
+            val valorPoupadoFmt = CurrencyFormatter.formatar(valorPoupado, moedaAtual)
+            binding.tvMetaStatus.text = getString(R.string.poupado_label, valorPoupadoFmt, progresso)
             
             if (progresso >= 100) {
                 binding.tvMetaStatus.setTextColor(ContextCompat.getColor(this, R.color.colorPositive))
@@ -1653,7 +1684,8 @@ class ResumoActivity : AppCompatActivity() {
             sliceSpace = 3f // Linha fina de separação (slice space) entre fatias
         }
 
-        val totalStr = String.format(Locale.getDefault(), "%.2f €", totalGastos)
+        val moedaAtual = UserPreferencesManager(this).obterMoedaAtual()
+        val totalStr = CurrencyFormatter.formatar(totalGastos, moedaAtual)
         val centerString = SpannableString("Total\n$totalStr")
         val isDark = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
         val textColor = if (isDark) Color.WHITE else Color.BLACK
@@ -1690,17 +1722,17 @@ class ResumoActivity : AppCompatActivity() {
         itensGraficoELegenda.forEachIndexed { index, pair ->
             val color = expenseColors[index % expenseColors.size]
             val percent = if (totalGastos > 0) (pair.second / totalGastos * 100).toInt() else 0
-            adicionarItemCategoria(pair.first, pair.second.toDouble(), percent, color)
+            adicionarItemCategoria(pair.first, pair.second.toDouble(), percent, color, moedaAtual)
         }
     }
 
 
-    private fun adicionarItemCategoria(nome: String, valor: Double, percent: Int, cor: Int) {
+    private fun adicionarItemCategoria(nome: String, valor: Double, percent: Int, cor: Int, moeda: Moeda) {
         val itemView = layoutInflater.inflate(R.layout.item_categoria_resumo, binding.llCategoryDetails, false)
         
         itemView.findViewById<View>(R.id.vColorIndicator).background.setTint(cor)
         itemView.findViewById<TextView>(R.id.tvCategoryName).text = nome
-        itemView.findViewById<TextView>(R.id.tvCategoryValue).text = FinanceiroUtils.formatarMoeda(valor)
+        itemView.findViewById<TextView>(R.id.tvCategoryValue).text = CurrencyFormatter.formatar(valor, moeda)
         itemView.findViewById<TextView>(R.id.tvCategoryPercent).text = String.format(Locale.getDefault(), "(%d%%)", percent)
         
         binding.llCategoryDetails.addView(itemView)
@@ -1744,22 +1776,24 @@ class ResumoActivity : AppCompatActivity() {
         val colorPadrao = ContextCompat.getColor(this, R.color.textColorSecondary)
         val colorAlertaAviso = Color.parseColor("#FF9800")
 
+        val moedaAtual = UserPreferencesManager(this).obterMoedaAtual()
+
         val isRendaZero = abs(renda) < 0.005
-        binding.tvTotalRenda.text = FinanceiroUtils.formatarMoeda(renda, isPositivo = if (isRendaZero) null else true)
+        binding.tvTotalRenda.text = CurrencyFormatter.formatarComSinal(renda, moedaAtual, forcarSinalPositivo = true)
         binding.tvTotalRenda.setTextColor(if (isRendaZero) colorPadrao else colorPositivo)
 
         val isDespesaZero = abs(despesa) < 0.005
-        binding.tvTotalDespesas.text = FinanceiroUtils.formatarMoeda(despesa, isPositivo = if (isDespesaZero) null else false)
+        binding.tvTotalDespesas.text = CurrencyFormatter.formatarComSinal(-despesa, moedaAtual)
         binding.tvTotalDespesas.setTextColor(if (isDespesaZero) colorPadrao else colorNegativo)
 
-        binding.tvTotalPoupanca.text = FinanceiroUtils.formatarMoeda(poupanca)
+        binding.tvTotalPoupanca.text = CurrencyFormatter.formatar(poupanca, moedaAtual)
         binding.tvTotalPoupanca.setTextColor(colorPadrao)
 
         val isSaldoZero = abs(saldo) < 0.005
-        binding.tvSaldoFinal.text = FinanceiroUtils.formatarMoeda(saldo, isPositivo = if (isSaldoZero) null else (saldo >= 0))
+        binding.tvSaldoFinal.text = CurrencyFormatter.formatarComSinal(saldo, moedaAtual, forcarSinalPositivo = true)
         binding.tvSaldoFinal.setTextColor(if (isSaldoZero) colorPadrao else if (saldo < 0) colorNegativo else colorPositivo)
 
-        binding.tvSpentValue.text = "Gasto total: " + FinanceiroUtils.formatarMoeda(despesa)
+        binding.tvSpentValue.text = "Gasto total: ${CurrencyFormatter.formatar(despesa, moedaAtual)}"
         binding.tvPercentValue.text = String.format(Locale.getDefault(), "%d%%", percent)
 
         val colorPercent = when {
@@ -1811,30 +1845,26 @@ class ResumoActivity : AppCompatActivity() {
         }
 
         // 3. Previsão de final de mês
-        val valorDespesasPendentesFmt = FinanceiroUtils.formatarMoeda(totalDespesasPendentes)
-        val isSaldoProjetadoZero = abs(saldoProjetado) < 0.005
-        val saldoFmt = FinanceiroUtils.formatarMoeda(
-            saldoProjetado,
-            isPositivo = if (isSaldoProjetadoZero) null else (saldoProjetado >= 0)
-        )
+        val valorSaldoStr = CurrencyFormatter.formatarComSinal(saldoProjetado, moedaAtual, forcarSinalPositivo = (saldoProjetado >= 0))
+        val pendenciasStr = CurrencyFormatter.formatar(totalDespesasPendentes, moedaAtual)
 
-        if (saldoProjetado >= 0) {
-            binding.tvTagPrevisao.text = "🟢 No Verde"
-            binding.tvTagPrevisao.setTextColor(colorPositivo)
-            binding.ivIconPrevisao.setColorFilter(colorPositivo)
-            binding.tvPrevisaoDetalhes.text = if (numDespesasPendentes > 0) {
-                "Saldo estimado: $saldoFmt ($numDespesasPendentes pendência(s): $valorDespesasPendentesFmt)"
-            } else {
-                "Saldo estimado: $saldoFmt (Contas em dia)"
-            }
-        } else {
+        if (saldoProjetado < 0) {
             binding.tvTagPrevisao.text = "🔴 No Vermelho"
             binding.tvTagPrevisao.setTextColor(colorNegativo)
             binding.ivIconPrevisao.setColorFilter(colorNegativo)
             binding.tvPrevisaoDetalhes.text = if (numDespesasPendentes > 0) {
-                "Saldo estimado: $saldoFmt ($numDespesasPendentes pendência(s): $valorDespesasPendentesFmt)"
+                "Saldo estimado: $valorSaldoStr • $numDespesasPendentes pendências ($pendenciasStr)"
             } else {
-                "Saldo estimado: $saldoFmt"
+                "Saldo estimado: $valorSaldoStr"
+            }
+        } else {
+            binding.tvTagPrevisao.text = "🟢 No Verde"
+            binding.tvTagPrevisao.setTextColor(colorPositivo)
+            binding.ivIconPrevisao.setColorFilter(colorPositivo)
+            binding.tvPrevisaoDetalhes.text = if (numDespesasPendentes > 0) {
+                "Saldo estimado: $valorSaldoStr • $numDespesasPendentes pendências ($pendenciasStr)"
+            } else {
+                "Saldo estimado: $valorSaldoStr • Contas em dia"
             }
         }
     }

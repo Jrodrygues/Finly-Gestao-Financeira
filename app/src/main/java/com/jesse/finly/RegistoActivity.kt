@@ -8,9 +8,11 @@ import android.widget.EditText
 import android.app.DatePickerDialog
 import android.graphics.Color
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.content.res.ColorStateList
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
@@ -34,7 +36,11 @@ import com.jesse.finly.databinding.ActivityRegistoBinding
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.models.Utilizador
 import com.jesse.finly.notifications.NotificationHelper
+import com.jesse.finly.utils.CurrencyTextWatcher
 import com.jesse.finly.utils.FinanceiroUtils
+import com.jesse.finly.utils.Moeda
+import com.jesse.finly.utils.MoneyTextWatcher
+import com.jesse.finly.utils.UserPreferencesManager
 import com.jesse.finly.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,6 +55,7 @@ import android.widget.ImageView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
+import kotlin.math.round
 
 class RegistoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegistoBinding
@@ -65,6 +72,7 @@ class RegistoActivity : AppCompatActivity() {
     private var userId = 0
     private var isNewUserRegistration = false
     private var senhaStr = ""
+    private var currencyWatcher: CurrencyTextWatcher? = null
 
     private val meses = arrayOf("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro")
 
@@ -211,6 +219,9 @@ class RegistoActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         configurarSpinners()
+        if (!isNewUserRegistration && !isUserEditMode) {
+            configurarCampoValor()
+        }
     }
 
     private fun obterCategoriasDisponiveis(): MutableList<String> {
@@ -532,11 +543,15 @@ class RegistoActivity : AppCompatActivity() {
 
 
     private fun configurarParaNovoUtilizador() {
+        currencyWatcher?.let { binding.regEmailText.removeTextChangedListener(it) }
+        currencyWatcher = null
         binding.btnAlterarSenhaPerfil.visibility = View.GONE
         binding.titleRegisto.text = getString(R.string.criar_nova_conta)
         binding.itemLayout.hint = getString(R.string.hint_nome_completo)
         binding.itemLayout.setStartIconDrawable(R.drawable.ic_person)
         
+        binding.valorLayout.prefixText = null
+        binding.valorLayout.suffixText = null
         binding.valorLayout.hint = getString(R.string.hint_email_input)
         binding.valorLayout.setStartIconDrawable(R.drawable.ic_email)
         binding.valorLayout.alpha = 1.0f
@@ -569,12 +584,16 @@ class RegistoActivity : AppCompatActivity() {
     }
 
     private fun configurarParaEdicaoUtilizador() {
+        currencyWatcher?.let { binding.regEmailText.removeTextChangedListener(it) }
+        currencyWatcher = null
         userId = intent.getIntExtra("id", 0)
         binding.titleRegisto.text = getString(R.string.editar_perfil)
         binding.itemLayout.hint = getString(R.string.hint_nome_completo)
         binding.itemLayout.setStartIconDrawable(R.drawable.ic_person)
         binding.regNameText.setText(intent.getStringExtra("name"))
         
+        binding.valorLayout.prefixText = null
+        binding.valorLayout.suffixText = null
         binding.valorLayout.hint = getString(R.string.hint_email_inalteravel)
         binding.valorLayout.setStartIconDrawable(R.drawable.ic_email)
         binding.regEmailText.setText(intent.getStringExtra("email"))
@@ -754,7 +773,30 @@ class RegistoActivity : AppCompatActivity() {
         }
     }
 
+    private fun configurarCampoValor() {
+        val moedaAtual = UserPreferencesManager(this).obterMoedaAtual()
+
+        binding.valorLayout.startIconDrawable = null
+        binding.valorLayout.isExpandedHintEnabled = false
+
+        if (moedaAtual == Moeda.BRL) {
+            binding.valorLayout.prefixText = "R$ "
+            binding.valorLayout.suffixText = null
+        } else {
+            binding.valorLayout.prefixText = "€ "
+            binding.valorLayout.suffixText = null
+        }
+        binding.valorLayout.hint = "Valor"
+
+        binding.regEmailText.inputType = InputType.TYPE_CLASS_NUMBER
+        currencyWatcher?.let { binding.regEmailText.removeTextChangedListener(it) }
+        currencyWatcher = MoneyTextWatcher(binding.regEmailText, moedaAtual)
+        binding.regEmailText.addTextChangedListener(currencyWatcher)
+    }
+
     private fun configurarParaTransacao() {
+        configurarCampoValor()
+
         binding.btnAlterarSenhaPerfil.visibility = View.GONE
         binding.senhaLayout.visibility = View.GONE
         binding.confirmarSenhaLayout.visibility = View.GONE
@@ -763,7 +805,7 @@ class RegistoActivity : AppCompatActivity() {
         binding.regEmailText.isFocusable = true
         binding.regEmailText.isFocusableInTouchMode = true
         binding.itemLayout.setStartIconDrawable(R.drawable.ic_edit)
-        binding.valorLayout.setStartIconDrawable(R.drawable.ic_euro)
+        binding.valorLayout.startIconDrawable = null
         binding.dataLayout.setStartIconDrawable(R.drawable.ic_calendar)
 
         binding.regPhoneText.setOnClickListener { mostrarCalendario() }
@@ -795,7 +837,12 @@ class RegistoActivity : AppCompatActivity() {
         binding.regNameText.setText(itemOriginal)
 
         val valEdit = intent.getDoubleExtra("valor", 0.0)
-        binding.regEmailText.setText(String.format(Locale.US, "%.2f", valEdit))
+        val centavos = round(valEdit * 100).toLong()
+        if (centavos > 0) {
+            binding.regEmailText.setText(centavos.toString())
+        } else {
+            binding.regEmailText.setText("")
+        }
         binding.regPhoneText.setText(intent.getStringExtra("vencimento"))
 
         val tipo = intent.getStringExtra("tipo")
@@ -897,15 +944,29 @@ class RegistoActivity : AppCompatActivity() {
 
     private fun guardarTransacao() {
         val item = binding.regNameText.text.toString().trim()
-        val valorStr = binding.regEmailText.text.toString().trim()
+        val valor = MoneyTextWatcher.obterValorDouble(binding.regEmailText)
         var venc = binding.regPhoneText.text.toString().trim()
         val tipo = if (binding.toggleTipoTransacao.checkedButtonId == R.id.btnToggleRenda) "RENDA" else "DESPESA"
         val categoria = binding.autoCompleteCategoria.text.toString()
 
         val mes = intent.getStringExtra("mes") ?: intent.getStringExtra("MES_ATUAL") ?: meses[Calendar.getInstance()[Calendar.MONTH]]
 
-        if (item.isEmpty() || valorStr.isEmpty() || venc.isEmpty()) {
-            showToast("Introduza a descrição, o valor e a data")
+        if (item.isEmpty()) {
+            binding.itemLayout.error = "Insira um nome ou descrição"
+            return
+        } else {
+            binding.itemLayout.error = null
+        }
+
+        if (valor <= 0.0) {
+            binding.valorLayout.error = "Insira um valor maior que zero"
+            return
+        } else {
+            binding.valorLayout.error = null
+        }
+
+        if (venc.isEmpty()) {
+            showToast("Introduza a data de vencimento")
             return
         }
 
@@ -930,7 +991,6 @@ class RegistoActivity : AppCompatActivity() {
             else -> -1
         }
 
-        val valor = valorStr.replace(",", ".").toDoubleOrNull() ?: 0.0
         val email = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "CONVIDADO") ?: "CONVIDADO"
 
         val anoIntent = if (isEditMode) {
