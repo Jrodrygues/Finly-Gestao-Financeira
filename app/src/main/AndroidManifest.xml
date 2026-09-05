@@ -94,6 +94,14 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <receiver
+            android:name=".notifications.NotificationActionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.jesse.finly.ACTION_MARK_AS_PAID" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

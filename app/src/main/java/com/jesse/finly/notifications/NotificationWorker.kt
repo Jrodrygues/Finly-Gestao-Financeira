@@ -14,6 +14,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.jesse.finly.R
 import com.jesse.finly.ResumoActivity
+import com.jesse.finly.DetalhesPageActivity
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.models.Transacao
@@ -139,12 +140,13 @@ class NotificationWorker(
         val diff = topItem.diffDias
         val valorFormatado = String.format(Locale.getDefault(), "%.2f €", t.valor)
 
+        // 1. Título sem redundância do nome da app (o Android já exibe Finly no cabeçalho)
         val titulo = when (diff) {
-            0 -> "Finly: Conta a vencer hoje!"
-            1 -> "Finly: Conta a vencer amanhã!"
-            2 -> "Finly: Conta a vencer em 2 dias"
-            in -5..-1 -> "Finly: Conta em atraso!"
-            else -> "Finly: Lembrete de Pagamento"
+            0 -> "Conta a vencer hoje!"
+            1 -> "Conta a vencer amanhã!"
+            2 -> "Conta a vencer em 2 dias"
+            in -5..-1 -> "Conta em atraso!"
+            else -> "Lembrete de Pagamento"
         }
 
         val textoPrincipal = when (diff) {
@@ -155,12 +157,52 @@ class NotificationWorker(
             else -> "O seu ${t.item} ($valorFormatado) vence em $diff dias."
         }
 
+        // 2. Ações Rápidas de Alto Valor UX
+        // Ação A: [ Marcar como Paga ] em segundo plano via BroadcastReceiver
+        val paidIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
+            action = NotificationActionReceiver.ACTION_MARK_AS_PAID
+            putExtra(NotificationActionReceiver.EXTRA_TRANS_ID, t.id)
+        }
+        val paidPendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            t.id,
+            paidIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Ação B: [ Ver Detalhes ] abre direto no item em DetalhesPageActivity
+        val detailIntent = Intent(applicationContext, DetalhesPageActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("isTransactionDetail", true)
+            putExtra("id", t.id)
+            putExtra("item", t.item)
+            putExtra("valor", t.valor)
+            putExtra("vencimento", t.vencimento)
+            putExtra("tipo", t.tipo)
+            putExtra("status", t.status)
+            putExtra("categoria", t.categoria)
+            putExtra("mes", t.mes)
+            putExtra("ano", t.ano)
+            putExtra("isRecorrente", t.recorrente)
+            putExtra("parcelasRestantes", t.parcelasRestantes)
+            putExtra("parcelasTotais", t.parcelasTotais)
+        }
+        val detailPendingIntent = PendingIntent.getActivity(
+            applicationContext,
+            t.id + 10000,
+            detailIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val builder = NotificationCompat.Builder(applicationContext, channelId)
-            .setSmallIcon(R.drawable.ic_calendar)
+            .setSmallIcon(R.drawable.ic_notification_small)
+            .setColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
             .setContentTitle(titulo)
             .setContentText(textoPrincipal)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
+            .addAction(R.drawable.ic_notification_small, "Marcar como Paga", paidPendingIntent)
+            .addAction(R.drawable.ic_notification_small, "Ver Detalhes", detailPendingIntent)
             .setOnlyAlertOnce(true)
             .setAutoCancel(true)
 
