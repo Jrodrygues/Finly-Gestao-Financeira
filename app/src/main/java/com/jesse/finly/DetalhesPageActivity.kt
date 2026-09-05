@@ -564,8 +564,7 @@ class DetalhesPageActivity : AppCompatActivity() {
         }
     }
 
-    private fun mostrarLoadingOverlay(mensagem: String) {
-        binding.tvLoadingOverlayText.text = mensagem
+    private fun mostrarLoadingOverlay() {
         binding.layoutLoadingOverlay.visibility = View.VISIBLE
     }
 
@@ -574,7 +573,7 @@ class DetalhesPageActivity : AppCompatActivity() {
     }
 
     private fun executarEliminacaoSimples() {
-        mostrarLoadingOverlay("A eliminar transação...")
+        mostrarLoadingOverlay()
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@DetalhesPageActivity)
             val trans = Transacao(
@@ -594,7 +593,7 @@ class DetalhesPageActivity : AppCompatActivity() {
     }
 
     private fun executarEliminacaoFutura() {
-        mostrarLoadingOverlay("A eliminar recorrência...")
+        mostrarLoadingOverlay()
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@DetalhesPageActivity)
             val dao = db.utilizadorDao()

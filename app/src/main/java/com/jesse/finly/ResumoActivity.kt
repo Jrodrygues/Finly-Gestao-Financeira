@@ -1523,7 +1523,14 @@ class ResumoActivity : AppCompatActivity() {
                 .sumOf { it.valor }
                 
             val totalDespesas = transacoes.asSequence().filter { it.tipo == "DESPESA" }.sumOf { it.valor }
-            val totalPoupanca = transacoes.asSequence().filter { it.categoria == "Poupança" }.sumOf { it.valor }
+            
+            // Poupança realizada no mês atual (para a barra de Meta do Mês)
+            val poupancaNoMes = transacoes.asSequence().filter { it.categoria == "Poupança" }.sumOf { it.valor }
+            
+            // Total Acumulado Geral de Poupança (para o campo 'Total poupança' no Balanço)
+            val todasTransacoesDono = db.utilizadorDao().obterTransacoesPorDono(email)
+            val totalPoupancaGeral = todasTransacoesDono.asSequence().filter { it.categoria == "Poupança" }.sumOf { it.valor }
+
             val totalExterior = transacoes.asSequence().filter { it.categoria == "Exterior" }.sumOf { it.valor }
             
             // Totais Pagos (Para o Saldo Final)
@@ -1552,7 +1559,7 @@ class ResumoActivity : AppCompatActivity() {
                 atualizarInterface(
                     renda = totalRenda,
                     despesa = totalDespesas,
-                    poupanca = totalPoupanca,
+                    poupanca = totalPoupancaGeral,
                     exterior = totalExterior,
                     saldo = saldoPaga,
                     percent = percentagemGasta,
@@ -1563,8 +1570,8 @@ class ResumoActivity : AppCompatActivity() {
                     saldoProjetado = saldoProjetado,
                 )
                 configurarGrafico(transacoes)
-                // A barra de meta continua baseada no que foi poupado (geralmente absoluto, mas mantendo lógica de categoria)
-                atualizarBarraMeta(totalPoupanca)
+                // A barra de meta do mês utiliza a poupança realizada neste mês específico
+                atualizarBarraMeta(poupancaNoMes)
             }
         }
     }

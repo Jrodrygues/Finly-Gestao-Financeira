@@ -836,8 +836,7 @@ class RegistoActivity : AppCompatActivity() {
         binding.btnFinalizarRegisto.text = getString(R.string.atualizar_item)
     }
 
-    private fun mostrarLoadingOverlay(mensagem: String) {
-        binding.tvLoadingOverlayText.text = mensagem
+    private fun mostrarLoadingOverlay() {
         binding.layoutLoadingOverlay.visibility = View.VISIBLE
         binding.btnFinalizarRegisto.isEnabled = false
     }
@@ -856,7 +855,7 @@ class RegistoActivity : AppCompatActivity() {
 
         view.findViewById<View>(R.id.btnConfirmarEliminar).setOnClickListener {
             dialog.dismiss()
-            mostrarLoadingOverlay("A eliminar transação...")
+            mostrarLoadingOverlay()
             lifecycleScope.launch(Dispatchers.IO) {
                 val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
                 val trans = db.utilizadorDao().obterTransacaoPorId(transacaoId)
@@ -944,7 +943,7 @@ class RegistoActivity : AppCompatActivity() {
     }
 
     private fun executarGravacao(item: String, valor: Double, venc: String, tipo: String, cat: String, mes: String, dono: String, isRec: Boolean, numParcelas: Int, ano: Int) {
-        mostrarLoadingOverlay(if (isEditMode) "A atualizar transação..." else "A guardar transação...")
+        mostrarLoadingOverlay()
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
             
@@ -1028,7 +1027,7 @@ class RegistoActivity : AppCompatActivity() {
 
         val email = emailInput.lowercase()
 
-        mostrarLoadingOverlay("A criar conta...")
+        mostrarLoadingOverlay()
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val auth = FirebaseAuth.getInstance()
@@ -1084,7 +1083,7 @@ class RegistoActivity : AppCompatActivity() {
             senhaStr
         }
 
-        mostrarLoadingOverlay("A atualizar perfil...")
+        mostrarLoadingOverlay()
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
             val dao = db.utilizadorDao()
