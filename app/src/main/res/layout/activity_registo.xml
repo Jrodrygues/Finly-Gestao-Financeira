@@ -419,30 +419,22 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
 
-    <!-- Overlay de Carregamento (Loading Loop) -->
+    <!-- Overlay de Carregamento Transparente (Apenas Spinner Centralizado) -->
     <FrameLayout
         android:id="@+id/layoutLoadingOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#99000000"
+        android:background="#66000000"
         android:clickable="true"
         android:focusable="true"
         android:visibility="gone">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ProgressBar
+            android:id="@+id/pbLoadingOverlay"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:layout_gravity="center"
-            android:background="@drawable/bottom_sheet_background"
-            android:gravity="center"
-            android:padding="24dp">
-
-            <ProgressBar
-                android:id="@+id/pbLoadingOverlay"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:indeterminateTint="@color/colorPrimary" />
-        </LinearLayout>
+            android:indeterminateTint="@color/colorPrimary" />
     </FrameLayout>
 
 </FrameLayout>
