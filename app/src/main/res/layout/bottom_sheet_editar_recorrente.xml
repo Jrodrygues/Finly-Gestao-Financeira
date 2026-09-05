@@ -18,24 +18,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/dialog_eliminar_recorrencia_titulo"
+        android:text="@string/dialog_editar_recorrencia_titulo"
         android:textColor="@color/textColorPrimary"
         android:textSize="20sp"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/tvMensagemRecorrente"
+        android:id="@+id/tvMensagemEditarRecorrente"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="20dp"
         android:gravity="center"
-        android:text="@string/dialog_eliminar_recorrencia_msg"
+        android:text="@string/dialog_editar_recorrencia_msg"
         android:textColor="@color/textColorSecondary"
         android:textSize="14sp" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnEliminarApenasEste"
+        android:id="@+id/btnEditarApenasEste"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -43,16 +43,16 @@
         android:paddingVertical="10dp"
         android:gravity="center"
         android:textAlignment="center"
-        android:text="@string/btn_apagar_apenas_este"
-        android:textColor="@color/colorAccent"
+        android:text="@string/btn_editar_apenas_este"
+        android:textColor="@color/colorPrimary"
         android:textSize="15sp"
-        app:icon="@drawable/ic_delete"
+        app:icon="@drawable/ic_edit"
         app:iconGravity="textStart"
         app:iconPadding="12dp"
-        app:iconTint="@color/colorAccent" />
+        app:iconTint="@color/colorPrimary" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnEliminarTudo"
+        android:id="@+id/btnEditarTodosFuturos"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,16 +60,16 @@
         android:paddingVertical="10dp"
         android:gravity="center"
         android:textAlignment="center"
-        android:text="@string/btn_apagar_todos_futuros"
-        android:textColor="#F44336"
+        android:text="@string/btn_editar_todos_futuros"
+        android:textColor="@color/colorPrimary"
         android:textSize="15sp"
-        app:icon="@drawable/ic_delete"
+        app:icon="@drawable/ic_repeat"
         app:iconGravity="textStart"
         app:iconPadding="12dp"
-        app:iconTint="#F44336" />
+        app:iconTint="@color/colorPrimary" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCancelar"
+        android:id="@+id/btnCancelarEditar"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

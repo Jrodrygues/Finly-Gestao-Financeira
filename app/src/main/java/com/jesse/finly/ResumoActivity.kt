@@ -30,6 +30,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.RadioButton
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import android.widget.LinearLayout
@@ -57,6 +58,7 @@ import com.google.android.material.chip.ChipGroup
 import android.widget.Button
 import androidx.annotation.RequiresApi
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -1307,10 +1309,76 @@ class ResumoActivity : AppCompatActivity() {
     }
 
     private fun prosseguirComCarregamento() {
+        if (!verificarMoedaInicialConfigurada()) return
         val mesAtual = binding.spinnerMes.selectedItem?.toString() ?: meses[0]
         val anoAtual = binding.spinnerAno.selectedItem as? Int ?: anos[0]
         carregarDados(mesAtual, anoAtual)
         atualizarDrawerHeader()
+    }
+
+    private fun verificarMoedaInicialConfigurada(): Boolean {
+        val prefsManager = UserPreferencesManager(this)
+        return if (!prefsManager.isMoedaConfigurada()) {
+            mostrarBottomSheetMoedaInicial()
+            false
+        } else {
+            true
+        }
+    }
+
+    private fun mostrarBottomSheetMoedaInicial() {
+        val bottomSheetDialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
+        val bsView = layoutInflater.inflate(R.layout.bottom_sheet_escolher_moeda_inicial, null)
+        bottomSheetDialog.setContentView(bsView)
+        bottomSheetDialog.setCancelable(false)
+        bottomSheetDialog.window?.setDimAmount(0.85f)
+
+        val cardEUR = bsView.findViewById<MaterialCardView>(R.id.cardMoedaEUR)
+        val cardBRL = bsView.findViewById<MaterialCardView>(R.id.cardMoedaBRL)
+        val rbEUR = bsView.findViewById<RadioButton>(R.id.rbMoedaEUR)
+        val rbBRL = bsView.findViewById<RadioButton>(R.id.rbMoedaBRL)
+        val btnConfirmar = bsView.findViewById<View>(R.id.btnConfirmarMoedaInicial)
+
+        var moedaSelecionada = Moeda.EUR
+
+        fun atualizarSelecaoVisual(moeda: Moeda) {
+            moedaSelecionada = moeda
+            val isBrl = (moeda == Moeda.BRL)
+            rbEUR?.isChecked = !isBrl
+            rbBRL?.isChecked = isBrl
+
+            val strokeWidthActive = (2 * resources.displayMetrics.density).toInt()
+            val strokeWidthInactive = (1 * resources.displayMetrics.density).toInt()
+            val colorPrimary = ContextCompat.getColor(this, R.color.colorPrimary)
+            val colorDivider = ContextCompat.getColor(this, R.color.dividerColor)
+
+            cardEUR?.strokeColor = if (!isBrl) colorPrimary else colorDivider
+            cardEUR?.strokeWidth = if (!isBrl) strokeWidthActive else strokeWidthInactive
+
+            cardBRL?.strokeColor = if (isBrl) colorPrimary else colorDivider
+            cardBRL?.strokeWidth = if (isBrl) strokeWidthActive else strokeWidthInactive
+        }
+
+        cardEUR?.setOnClickListener {
+            FinanceiroUtils.dispararHapticFeedback(it)
+            atualizarSelecaoVisual(Moeda.EUR)
+        }
+
+        cardBRL?.setOnClickListener {
+            FinanceiroUtils.dispararHapticFeedback(it)
+            atualizarSelecaoVisual(Moeda.BRL)
+        }
+
+        btnConfirmar?.setOnClickListener {
+            FinanceiroUtils.dispararHapticFeedback(it)
+            UserPreferencesManager(this).salvarMoeda(moedaSelecionada) {
+                showToast("Moeda ${if (moedaSelecionada == Moeda.BRL) "Real (R$)" else "Euro (€)"} configurada com sucesso!")
+            }
+            bottomSheetDialog.dismiss()
+            prosseguirComCarregamento()
+        }
+
+        bottomSheetDialog.show()
     }
 
 

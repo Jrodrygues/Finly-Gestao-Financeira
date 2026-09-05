@@ -71,6 +71,13 @@ class UserPreferencesManager(private val context: Context) {
     }
 
     /**
+     * Indica se o utilizador já definiu a sua moeda principal no onboarding/perfil.
+     */
+    fun isMoedaConfigurada(): Boolean {
+        return prefs.contains(KEY_MOEDA)
+    }
+
+    /**
      * Sincroniza a moeda do Firestore para a cache local logo após o login.
      */
     fun sincronizarMoedaDoFirebase(email: String, onLoaded: ((Moeda) -> Unit)? = null) {

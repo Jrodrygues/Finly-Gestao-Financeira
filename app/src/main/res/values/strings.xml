@@ -20,9 +20,9 @@
     <string name="guia_sec3_titulo">3. Listagem Detalhada &amp; Filtros</string>
     <string name="guia_sec3_desc">Aceda à lista completa de transações. Pesquise por texto, filtre por tipo através das abas e utilize o botão de voltar dedicado no cabeçalho para regressar rapidamente ao resumo.</string>
     <string name="guia_sec4_titulo">4. Adicionar &amp; Editar Transações</string>
-    <string name="guia_sec4_desc">Prima o botão \'+\' na Listagem para registar um novo item (Renda ou Despesa) utilizando o seletor rápido (toggle group). Insira o valor com o símbolo oficial do Euro (€) e aproveite os ícones dinâmicos de categoria.</string>
+    <string name="guia_sec4_desc">Prima o botão \'+\' na Listagem para registar um novo item (Renda ou Despesa) utilizando o seletor rápido (toggle group). O campo de valor adapta-se à moeda selecionada (€ ou R$) com máscara automática de centavos durante a digitação e ícones dinâmicos por categoria.</string>
     <string name="guia_sec5_titulo">5. Recorrência Inteligente</string>
-    <string name="guia_sec5_desc">Ative o switch de recorrência para revelar opções simplificadas de \'Repetir Sempre\' ou transações \'Parceladas\' com definição intuitiva da quantidade de meses.</string>
+    <string name="guia_sec5_desc">Ative a opção de recorrência para transações fixas ou parceladas. Ao editar ou eliminar uma transação recorrente, escolha flexivelmente se deseja aplicar a alteração apenas ao mês selecionado ou a este e a todos os meses futuros.</string>
     <string name="guia_sec6_titulo">6. Categorias Personalizadas</string>
     <string name="guia_sec6_desc">Crie e gira as suas categorias no menu \'Gerir Categorias\' ou ao registar itens. O campo de categoria herda automaticamente o ícone correspondente à categoria escolhida.</string>
     <string name="guia_sec7_titulo">7. Notificações de Vencimento</string>
@@ -45,6 +45,8 @@
     <string name="guia_sec15_desc">Consulte alertas automáticos de teto orçamental quando os gastos ultrapassarem 100% da renda, badges de comparação percentual em relação ao mês anterior e a previsão de saldo ao final do mês com base em pendências.</string>
     <string name="guia_sec16_titulo">16. Seleção de Período em Grelha &amp; Exportação</string>
     <string name="guia_sec16_desc">Toque no título do mês para abrir o modal em grelha rígida 4x3 (JAN..DEZ) e seletor horizontal de anos. O período selecionado sincroniza automaticamente entre o Resumo e a Listagem. Exporte relatórios formatados em PDF ou CSV (Excel) guardados na pasta Downloads.</string>
+    <string name="guia_sec17_titulo">17. Sistema Multi-Moeda &amp; Onboarding</string>
+    <string name="guia_sec17_desc">Ao entrar na aplicação ou criar conta, escolha a sua moeda principal (€ EUR ou R$ BRL) no modal de boas-vindas. Todos os ecrãs, gráficos, formulários e relatórios (PDF/CSV) adaptam-se dinamicamente com máscara de centavos e sincronizam-se em tempo real em todos os seus telemóveis.</string>
     <string name="snackbar_item_removido">Item removido: %1$s</string>
     <string name="btn_desfazer">DESFAZER</string>
     <string name="btn_voltar">Voltar</string>
@@ -173,6 +175,10 @@
     <string name="btn_registar_transacao_cta">+ Registar Transação</string>
     <string name="dialog_eliminar_recorrencia_titulo">Eliminar Recorrência</string>
     <string name="dialog_eliminar_recorrencia_msg">Deseja apagar \'%1$s\' apenas este mês ou todos os meses futuros?</string>
+    <string name="dialog_editar_recorrencia_titulo">Editar Recorrência</string>
+    <string name="dialog_editar_recorrencia_msg">Deseja aplicar as alterações de \'%1$s\' apenas a este mês ou a este mês e todos os meses futuros?</string>
+    <string name="btn_editar_apenas_este">Alterar apenas este mês</string>
+    <string name="btn_editar_todos_futuros">Alterar este mês e meses futuros</string>
     <string name="btn_apagar_apenas_este">Apagar apenas este mês</string>
     <string name="btn_apagar_todos_futuros">Apagar todos os futuros</string>
     <string name="dialog_eliminar_item_titulo">Eliminar Item</string>

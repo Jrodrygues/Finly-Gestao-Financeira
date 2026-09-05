@@ -999,10 +999,78 @@ class RegistoActivity : AppCompatActivity() {
             intent.getIntExtra("ANO_ATUAL", Calendar.getInstance()[Calendar.YEAR])
         }
 
-        executarGravacao(item, valor, venc, tipo, categoria, mes, email, isRecorrente, numParcelas, anoIntent)
+        val isOriginalRecorrente = intent.getBooleanExtra("isRecorrente", false)
+        val eRecorrente = isRecorrente || isOriginalRecorrente
+
+        if (isEditMode && eRecorrente) {
+            mostrarBottomSheetEditarRecorrente(
+                item, valor, venc, tipo, categoria, mes, email, isRecorrente, numParcelas, anoIntent
+            )
+        } else {
+            executarGravacao(item, valor, venc, tipo, categoria, mes, email, isRecorrente, numParcelas, anoIntent)
+        }
     }
 
-    private fun executarGravacao(item: String, valor: Double, venc: String, tipo: String, cat: String, mes: String, dono: String, isRec: Boolean, numParcelas: Int, ano: Int) {
+    private fun mostrarBottomSheetEditarRecorrente(
+        item: String,
+        valor: Double,
+        venc: String,
+        tipo: String,
+        categoria: String,
+        mes: String,
+        email: String,
+        isRecorrente: Boolean,
+        numParcelas: Int,
+        anoIntent: Int
+    ) {
+        val bottomSheetDialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
+        val bsView = layoutInflater.inflate(R.layout.bottom_sheet_editar_recorrente, null)
+        bottomSheetDialog.setContentView(bsView)
+        bottomSheetDialog.window?.setDimAmount(0.85f)
+
+        val tvMensagem = bsView.findViewById<TextView>(R.id.tvMensagemEditarRecorrente)
+        val btnApenasEste = bsView.findViewById<View>(R.id.btnEditarApenasEste)
+        val btnTodosFuturos = bsView.findViewById<View>(R.id.btnEditarTodosFuturos)
+        val btnCancelar = bsView.findViewById<View>(R.id.btnCancelarEditar)
+
+        tvMensagem?.text = getString(R.string.dialog_editar_recorrencia_msg, itemOriginal ?: item)
+
+        btnApenasEste?.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            executarGravacao(
+                item, valor, venc, tipo, categoria, mes, email,
+                isRecorrente, numParcelas, anoIntent, reescreverFuturas = false
+            )
+        }
+
+        btnTodosFuturos?.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            executarGravacao(
+                item, valor, venc, tipo, categoria, mes, email,
+                isRecorrente, numParcelas, anoIntent, reescreverFuturas = true
+            )
+        }
+
+        btnCancelar?.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.show()
+    }
+
+    private fun executarGravacao(
+        item: String,
+        valor: Double,
+        venc: String,
+        tipo: String,
+        cat: String,
+        mes: String,
+        dono: String,
+        isRec: Boolean,
+        numParcelas: Int,
+        ano: Int,
+        reescreverFuturas: Boolean = true
+    ) {
         mostrarLoadingOverlay()
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
@@ -1038,15 +1106,31 @@ class RegistoActivity : AppCompatActivity() {
                 db.utilizadorDao().atualizarTransacao(transacao)
                 FirebaseManager.salvarTransacaoNoFirestore(transacao)
                 
-                if (finalIsRec) {
+                if (finalIsRec && reescreverFuturas) {
                     val todasDoDono = db.utilizadorDao().obterTransacoesPorDono(dono)
                     val mesIndexAtual = meses.indexOfFirst { it.equals(mes, ignoreCase = true) }
                     
+                    val novoDia = venc.split("/").firstOrNull() ?: ""
+
                     todasDoDono.filter { 
                         (it.item.trim().equals(itemOriginal?.trim() ?: item.trim(), ignoreCase = true)) && 
                         ((it.ano > ano) || ((it.ano == ano) && (meses.indexOfFirst { m -> m.equals(it.mes, ignoreCase = true) } > mesIndexAtual)))
                     }.forEach { futura ->
-                        val atualizada = futura.copy(item = item, valor = valor)
+                        val novoVencimentoFuturo = if (novoDia.isNotEmpty() && futura.vencimento.contains("/")) {
+                            val partesFutura = futura.vencimento.split("/")
+                            val mesFutura = partesFutura.getOrNull(1) ?: ""
+                            "$novoDia/$mesFutura"
+                        } else {
+                            venc
+                        }
+
+                        val atualizada = futura.copy(
+                            item = item,
+                            valor = valor,
+                            vencimento = novoVencimentoFuturo,
+                            categoria = cat,
+                            tipo = tipo
+                        )
                         db.utilizadorDao().atualizarTransacao(atualizada)
                         FirebaseManager.salvarTransacaoNoFirestore(atualizada)
                     }
