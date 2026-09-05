@@ -564,7 +564,17 @@ class DetalhesPageActivity : AppCompatActivity() {
         }
     }
 
+    private fun mostrarLoadingOverlay(mensagem: String) {
+        binding.tvLoadingOverlayText.text = mensagem
+        binding.layoutLoadingOverlay.visibility = View.VISIBLE
+    }
+
+    private fun ocultarLoadingOverlay() {
+        binding.layoutLoadingOverlay.visibility = View.GONE
+    }
+
     private fun executarEliminacaoSimples() {
+        mostrarLoadingOverlay("A eliminar transação...")
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@DetalhesPageActivity)
             val trans = Transacao(
@@ -576,6 +586,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             db.utilizadorDao().apagarTransacao(trans)
             FirebaseManager.eliminarTransacaoDoFirestore(trans)
             withContext(Dispatchers.Main) {
+                ocultarLoadingOverlay()
                 showToast("Item removido com sucesso!")
                 finish()
             }
@@ -583,6 +594,7 @@ class DetalhesPageActivity : AppCompatActivity() {
     }
 
     private fun executarEliminacaoFutura() {
+        mostrarLoadingOverlay("A eliminar recorrência...")
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@DetalhesPageActivity)
             val dao = db.utilizadorDao()
@@ -616,6 +628,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             }
 
             withContext(Dispatchers.Main) {
+                ocultarLoadingOverlay()
                 showToast(getString(R.string.toast_recorrencia_removida))
                 finish()
             }

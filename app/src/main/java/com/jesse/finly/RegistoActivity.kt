@@ -727,7 +727,7 @@ class RegistoActivity : AppCompatActivity() {
                 binding.parcelasLayout.visibility = View.VISIBLE
                 binding.root.postDelayed({
                     val targetY = binding.btnFinalizarRegisto.top
-                    binding.root.smoothScrollTo(0, targetY)
+                    binding.mainScrollView.smoothScrollTo(0, targetY)
                 }, 200)
             } else {
                 binding.parcelasLayout.visibility = View.GONE
@@ -739,7 +739,7 @@ class RegistoActivity : AppCompatActivity() {
             if (hasFocus) {
                 binding.root.postDelayed({
                     val targetY = binding.btnFinalizarRegisto.top
-                    binding.root.smoothScrollTo(0, targetY)
+                    binding.mainScrollView.smoothScrollTo(0, targetY)
                 }, 200)
             }
         }
@@ -836,6 +836,17 @@ class RegistoActivity : AppCompatActivity() {
         binding.btnFinalizarRegisto.text = getString(R.string.atualizar_item)
     }
 
+    private fun mostrarLoadingOverlay(mensagem: String) {
+        binding.tvLoadingOverlayText.text = mensagem
+        binding.layoutLoadingOverlay.visibility = View.VISIBLE
+        binding.btnFinalizarRegisto.isEnabled = false
+    }
+
+    private fun ocultarLoadingOverlay() {
+        binding.layoutLoadingOverlay.visibility = View.GONE
+        binding.btnFinalizarRegisto.isEnabled = true
+    }
+
     private fun confirmarEliminacaoTransacaoFromEdit() {
         val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
         val view = layoutInflater.inflate(R.layout.bottom_sheet_eliminar_simples, binding.root as? ViewGroup, false)
@@ -844,6 +855,8 @@ class RegistoActivity : AppCompatActivity() {
             getString(R.string.dialog_eliminar_item_msg, itemOriginal ?: "")
 
         view.findViewById<View>(R.id.btnConfirmarEliminar).setOnClickListener {
+            dialog.dismiss()
+            mostrarLoadingOverlay("A eliminar transação...")
             lifecycleScope.launch(Dispatchers.IO) {
                 val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
                 val trans = db.utilizadorDao().obterTransacaoPorId(transacaoId)
@@ -852,11 +865,11 @@ class RegistoActivity : AppCompatActivity() {
                     FirebaseManager.eliminarTransacaoDoFirestore(it)
                 }
                 withContext(Dispatchers.Main) {
+                    ocultarLoadingOverlay()
                     showToast("Item removido com sucesso!")
                     finish()
                 }
             }
-            dialog.dismiss()
         }
 
         view.findViewById<View>(R.id.btnCancelarSimples).setOnClickListener {
@@ -931,6 +944,7 @@ class RegistoActivity : AppCompatActivity() {
     }
 
     private fun executarGravacao(item: String, valor: Double, venc: String, tipo: String, cat: String, mes: String, dono: String, isRec: Boolean, numParcelas: Int, ano: Int) {
+        mostrarLoadingOverlay(if (isEditMode) "A atualizar transação..." else "A guardar transação...")
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
             
@@ -984,6 +998,7 @@ class RegistoActivity : AppCompatActivity() {
             }
 
             withContext(Dispatchers.Main) {
+                ocultarLoadingOverlay()
                 val notifEnabled = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getBoolean("NOTIFICATIONS", false)
                 if (notifEnabled) {
                     NotificationHelper.agendarWorkerNotificacoes(this@RegistoActivity)
@@ -1013,6 +1028,7 @@ class RegistoActivity : AppCompatActivity() {
 
         val email = emailInput.lowercase()
 
+        mostrarLoadingOverlay("A criar conta...")
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val auth = FirebaseAuth.getInstance()
@@ -1031,12 +1047,14 @@ class RegistoActivity : AppCompatActivity() {
                 FirebaseManager.salvarUtilizadorNoFirestore(novoUtilizador)
 
                 withContext(Dispatchers.Main) {
+                    ocultarLoadingOverlay()
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { putString("TEMP_EMAIL", email) }
                     showToast("Conta criada!", isLong = true)
                     finish()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
+                    ocultarLoadingOverlay()
                     showToast("Erro ao criar conta: ${e.message}", isLong = true)
                 }
             }
@@ -1066,6 +1084,7 @@ class RegistoActivity : AppCompatActivity() {
             senhaStr
         }
 
+        mostrarLoadingOverlay("A atualizar perfil...")
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
             val dao = db.utilizadorDao()
@@ -1094,6 +1113,7 @@ class RegistoActivity : AppCompatActivity() {
             }
 
             withContext(Dispatchers.Main) {
+                ocultarLoadingOverlay()
                 showToast("Perfil atualizado!")
                 finish()
             }
