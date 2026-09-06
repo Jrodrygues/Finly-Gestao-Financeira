@@ -276,23 +276,27 @@ class ResumoActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     val novaMoeda = Moeda.porCodigo(perfilNuvem.moeda)
                     val moedaMudou = (novaMoeda != moedaAtual)
-                    if (moedaMudou) {
-                        moedaAtual = novaMoeda
-                    }
+                    moedaAtual = novaMoeda
+
+                    // Se no documento Firestore 'moedaConfigurada' for true OU se já existir moeda gravada
+                    val isConfigurado = perfilNuvem.moedaConfigurada || perfilNuvem.moeda.isNotBlank()
 
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                         putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
                         putBoolean("DARK_MODE", perfilNuvem.darkMode)
                         putBoolean("pref_biometric_ativa", perfilNuvem.biometricAtiva)
                         putString("MOEDA", perfilNuvem.moeda)
-                        putBoolean("MOEDA_CONFIGURADA", perfilNuvem.moedaConfigurada)
+                        putBoolean("MOEDA_CONFIGURADA", isConfigurado)
                         putStringSet("CUSTOM_CATEGORIES_$emailClean", HashSet(setUnido))
                     }
                     atualizarDrawerHeader()
 
-                    if (moedaMudou) {
-                        prosseguirComCarregamento()
+                    // Se o modal estiver aberto indevidamente por atraso da rede, fecha-o
+                    if (isConfigurado && isShowingOnboardingMoeda) {
+                        isShowingOnboardingMoeda = false
                     }
+
+                    prosseguirComCarregamento()
                 }
             }
         }
@@ -768,12 +772,12 @@ class ResumoActivity : AppCompatActivity() {
                 // ENCERRAR NO FIREBASE
                 com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
 
-                getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { 
+                getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                     remove("EMAIL")
                     remove("NAME")
                     remove("LAST_LOGIN_TIMESTAMP")
                     remove("MOEDA")
-                    remove("MOEDA_CONFIGURADA")
+                    remove("MOEDA_CONFIGURADA") // Reset normal ao sair
                 }
                 val intent = Intent(this, LoginActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -1309,24 +1313,45 @@ class ResumoActivity : AppCompatActivity() {
     }
 
     private fun prosseguirComCarregamento() {
-        if (!verificarMoedaInicialConfigurada()) return
+        val prefsManager = UserPreferencesManager(this)
+
+        // Se a moeda ainda não foi confirmada localmente
+        if (!prefsManager.isMoedaConfigurada()) {
+            val email = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString("EMAIL", "") ?: ""
+            val emailClean = email.trim().lowercase()
+
+            // Utilizador autenticado: aguarda sincronização do Firebase
+            if (emailClean.isNotEmpty() && !FirebaseManager.isGuestEmail(emailClean)) {
+                prefsManager.sincronizarMoedaDoFirebase(emailClean) { moedaNuvem ->
+                    moedaAtual = moedaNuvem
+                    if (!prefsManager.isMoedaConfigurada()) {
+                        verificarSeExibeOnboarding()
+                    } else {
+                        executarCarregamentoInterface()
+                    }
+                }
+                return
+            } else {
+                verificarSeExibeOnboarding()
+                return
+            }
+        }
+
+        executarCarregamentoInterface()
+    }
+
+    private fun verificarSeExibeOnboarding() {
+        if (!isShowingOnboardingMoeda) {
+            isShowingOnboardingMoeda = true
+            mostrarBottomSheetMoedaInicial()
+        }
+    }
+
+    private fun executarCarregamentoInterface() {
         val mesAtual = binding.spinnerMes.selectedItem?.toString() ?: meses[0]
         val anoAtual = binding.spinnerAno.selectedItem as? Int ?: anos[0]
         carregarDados(mesAtual, anoAtual)
         atualizarDrawerHeader()
-    }
-
-    private fun verificarMoedaInicialConfigurada(): Boolean {
-        val prefsManager = UserPreferencesManager(this)
-        return if (!prefsManager.isMoedaConfigurada()) {
-            if (!isShowingOnboardingMoeda) {
-                isShowingOnboardingMoeda = true
-                mostrarBottomSheetMoedaInicial()
-            }
-            false
-        } else {
-            true
-        }
     }
 
     private fun mostrarBottomSheetMoedaInicial() {

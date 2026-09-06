@@ -84,6 +84,9 @@ class UserPreferencesManager(private val context: Context) {
     /**
      * Sincroniza a moeda do Firestore para a cache local logo após o login.
      */
+    /**
+     * Sincroniza a moeda e a flag de configuração do Firestore para a cache local logo após o login.
+     */
     fun sincronizarMoedaDoFirebase(email: String, onLoaded: ((Moeda) -> Unit)? = null) {
         val emailClean = email.trim().lowercase()
         if (FirebaseManager.isGuestEmail(emailClean)) return
@@ -93,9 +96,23 @@ class UserPreferencesManager(private val context: Context) {
                 if (document != null && document.exists()) {
                     val codigo = document.getString("moeda")
                     val moeda = Moeda.porCodigo(codigo)
-                    prefs.edit { putString(KEY_MOEDA, moeda.codigo) }
+
+                    // Lê o boolean do Firestore.
+                    // Se o campo não existir, mas 'moeda' já estiver preenchida no documento, considera configurada (true)
+                    val jaConfiguradoRemoto = document.getBoolean("moedaConfigurada")
+                        ?: (!codigo.isNullOrEmpty())
+
+                    // Grava AMBOS na cache local
+                    prefs.edit {
+                        putString(KEY_MOEDA, moeda.codigo)
+                        putBoolean(KEY_MOEDA_CONFIGURADA, jaConfiguradoRemoto)
+                    }
+
                     onLoaded?.invoke(moeda)
                 }
+            }
+            .addOnFailureListener { e ->
+                Log.e("UserPreferencesManager", "Falha ao sincronizar moeda: ${e.message}")
             }
     }
 }
