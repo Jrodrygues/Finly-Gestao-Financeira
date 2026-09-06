@@ -47,7 +47,7 @@ class UserPreferencesManager(private val context: Context) {
                     val db = MinhaBaseDados.getDatabase(context)
                     val user = db.utilizadorDao().buscarPorEmail(emailClean)
                     if (user != null) {
-                        val updated = user.copy(moeda = moeda.codigo)
+                        val updated = user.copy(moeda = moeda.codigo, moedaConfigurada = true)
                         db.utilizadorDao().atualizarUtilizador(updated)
                         FirebaseManager.salvarUtilizadorNoFirestore(updated)
                     }
@@ -58,7 +58,7 @@ class UserPreferencesManager(private val context: Context) {
 
             // 3. Sincronizar no documento do utilizador no Firestore
             firestore.collection("utilizadores").document(emailClean)
-                .set(mapOf("moeda" to moeda.codigo), SetOptions.merge())
+                .set(mapOf("moeda" to moeda.codigo, "moedaConfigurada" to true), SetOptions.merge())
                 .addOnSuccessListener { onComplete?.invoke(true) }
                 .addOnFailureListener { onComplete?.invoke(false) }
         } else {

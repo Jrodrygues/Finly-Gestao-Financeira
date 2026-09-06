@@ -202,6 +202,7 @@ class LoginActivity : AppCompatActivity() {
                                 putBoolean("NOTIFICATIONS", u.notifications)
                                 putBoolean("pref_biometric_ativa", u.biometricAtiva)
                                 putString("MOEDA", u.moeda)
+                                putBoolean("MOEDA_CONFIGURADA", u.moedaConfigurada)
                             }
                             val currentMode = AppCompatDelegate.getDefaultNightMode()
                             val isSystemDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
@@ -231,6 +232,7 @@ class LoginActivity : AppCompatActivity() {
                             putBoolean("NOTIFICATIONS", utilizadorLocal.notifications)
                             putBoolean("pref_biometric_ativa", utilizadorLocal.biometricAtiva)
                             putString("MOEDA", utilizadorLocal.moeda)
+                            putBoolean("MOEDA_CONFIGURADA", utilizadorLocal.moedaConfigurada)
                         }
                         finalizarSessaoLogin(email, utilizadorLocal.nome)
                     } else {

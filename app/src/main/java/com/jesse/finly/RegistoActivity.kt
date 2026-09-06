@@ -1179,7 +1179,8 @@ class RegistoActivity : AppCompatActivity() {
                     email = email, 
                     telemovel = phone, 
                     donoEmail = "SISTEMA", 
-                    senha = senha
+                    senha = senha,
+                    moedaConfigurada = false
                 )
 
                 val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
@@ -1188,7 +1189,11 @@ class RegistoActivity : AppCompatActivity() {
 
                 withContext(Dispatchers.Main) {
                     ocultarLoadingOverlay()
-                    getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { putString("TEMP_EMAIL", email) }
+                    getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
+                        putString("TEMP_EMAIL", email)
+                        remove("MOEDA")
+                        remove("MOEDA_CONFIGURADA")
+                    }
                     showToast(getString(R.string.toast_conta_criada), isLong = true)
                     finish()
                 }

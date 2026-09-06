@@ -285,6 +285,7 @@ class ResumoActivity : AppCompatActivity() {
                         putBoolean("DARK_MODE", perfilNuvem.darkMode)
                         putBoolean("pref_biometric_ativa", perfilNuvem.biometricAtiva)
                         putString("MOEDA", perfilNuvem.moeda)
+                        putBoolean("MOEDA_CONFIGURADA", perfilNuvem.moedaConfigurada)
                         putStringSet("CUSTOM_CATEGORIES_$emailClean", HashSet(setUnido))
                     }
                     atualizarDrawerHeader()
@@ -323,6 +324,7 @@ class ResumoActivity : AppCompatActivity() {
                         putBoolean("DARK_MODE", perfilNuvem.darkMode)
                         putBoolean("pref_biometric_ativa", perfilNuvem.biometricAtiva)
                         putString("MOEDA", perfilNuvem.moeda)
+                        putBoolean("MOEDA_CONFIGURADA", perfilNuvem.moedaConfigurada)
                         putStringSet("CUSTOM_CATEGORIES_$emailClean", HashSet(setUnido))
                     }
                     atualizarDrawerHeader()
@@ -770,6 +772,8 @@ class ResumoActivity : AppCompatActivity() {
                     remove("EMAIL")
                     remove("NAME")
                     remove("LAST_LOGIN_TIMESTAMP")
+                    remove("MOEDA")
+                    remove("MOEDA_CONFIGURADA")
                 }
                 val intent = Intent(this, LoginActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
