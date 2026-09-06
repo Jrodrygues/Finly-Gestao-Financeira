@@ -18,6 +18,8 @@ import com.jesse.finly.DetalhesPageActivity
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.models.Transacao
+import com.jesse.finly.utils.CurrencyFormatter
+import com.jesse.finly.utils.UserPreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Calendar
@@ -84,7 +86,8 @@ class NotificationWorker(
             val diffMillis = calVenc.timeInMillis - calHoje.timeInMillis
             val diffDias = (diffMillis / (1000 * 60 * 60 * 24)).toInt()
 
-            if ((diffDias >= -5) && (diffDias <= 3)) {
+            // Focar estritamente em contas que VENCEM HOJE (0) ou estão EM ATRASO (-5 a -1)
+            if (diffDias >= -5 && diffDias <= 0) {
                 despesasVencendo.add(ItemVencimento(trans, diffDias))
             }
         }
@@ -106,7 +109,7 @@ class NotificationWorker(
                 "Lembrete de Vencimento",
                 NotificationManager.IMPORTANCE_HIGH,
             ).apply {
-                description = "Notificações para contas a vencer ou em atraso"
+                description = "Notificações para contas a vencer hoje ou em atraso"
             }
             manager.createNotificationChannel(channel)
         }
@@ -122,15 +125,13 @@ class NotificationWorker(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        // Ordenar por urgência: Hoje (0) > Atrasado (<0) > Amanhã (1) > 2 Dias (2) > Outros
+        // Ordenar por urgência: Hoje (0) > Atrasado (<0)
         val itensOrdenados = itens.sortedWith(
             compareBy { item ->
                 when (item.diffDias) {
                     0 -> 0
                     in -5..-1 -> 1
-                    1 -> 2
-                    2 -> 3
-                    else -> 4
+                    else -> 2
                 }
             },
         )
@@ -138,27 +139,23 @@ class NotificationWorker(
         val topItem = itensOrdenados.first()
         val t = topItem.transacao
         val diff = topItem.diffDias
-        val valorFormatado = String.format(Locale.getDefault(), "%.2f €", t.valor)
+        val moedaAtual = UserPreferencesManager(applicationContext).obterMoedaAtual()
+        val valorFormatado = CurrencyFormatter.formatar(t.valor, moedaAtual)
 
-        // 1. Título sem redundância do nome da app (o Android já exibe Finly no cabeçalho)
-        val titulo = when (diff) {
-            0 -> "Conta a vencer hoje!"
-            1 -> "Conta a vencer amanhã!"
-            2 -> "Conta a vencer em 2 dias"
-            in -5..-1 -> "Conta em atraso!"
-            else -> "Lembrete de Pagamento"
+        // Título explícito incluindo Finly para identificação clara quando recolhida
+        val titulo = when {
+            diff == 0 -> "Finly: Conta a vencer hoje! ⏰"
+            diff < 0 -> "Finly: Conta em atraso! ⚠️"
+            else -> "Finly: Lembrete de Pagamento 💰"
         }
 
-        val textoPrincipal = when (diff) {
-            0 -> "O seu ${t.item} ($valorFormatado) vence hoje."
-            1 -> "O seu ${t.item} ($valorFormatado) vence amanhã."
-            2 -> "O seu ${t.item} ($valorFormatado) vence em 2 dias."
-            in -5..-1 -> "O seu ${t.item} ($valorFormatado) está em atraso há ${-diff} dia(s)."
+        val textoPrincipal = when {
+            diff == 0 -> "O seu ${t.item} ($valorFormatado) vence hoje."
+            diff < 0 -> "O seu ${t.item} ($valorFormatado) está em atraso há ${-diff} dia(s)."
             else -> "O seu ${t.item} ($valorFormatado) vence em $diff dias."
         }
 
-        // 2. Ações Rápidas de Alto Valor UX
-        // Ação A: [ Marcar como Paga ] em segundo plano via BroadcastReceiver
+        // Ações Rápidas de Alto Valor UX
         val paidIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
             action = NotificationActionReceiver.ACTION_MARK_AS_PAID
             putExtra(NotificationActionReceiver.EXTRA_TRANS_ID, t.id)
@@ -170,7 +167,6 @@ class NotificationWorker(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Ação B: [ Ver Detalhes ] abre direto no item em DetalhesPageActivity
         val detailIntent = Intent(applicationContext, DetalhesPageActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra("isTransactionDetail", true)
@@ -195,32 +191,30 @@ class NotificationWorker(
         )
 
         val builder = NotificationCompat.Builder(applicationContext, channelId)
-            .setSmallIcon(R.drawable.ic_notification_small)
+            .setSmallIcon(R.drawable.ic_finly_notification)
             .setColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
             .setContentTitle(titulo)
             .setContentText(textoPrincipal)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
-            .addAction(R.drawable.ic_notification_small, "Marcar como Paga", paidPendingIntent)
-            .addAction(R.drawable.ic_notification_small, "Ver Detalhes", detailPendingIntent)
+            .addAction(R.drawable.ic_finly_notification, "Marcar como Paga", paidPendingIntent)
+            .addAction(R.drawable.ic_finly_notification, "Ver Detalhes", detailPendingIntent)
             .setOnlyAlertOnce(true)
             .setAutoCancel(true)
 
         if (itens.size > 1) {
             val inbox = NotificationCompat.InboxStyle()
                 .setBigContentTitle("$titulo (${itens.size} pendências)")
-                .setSummaryText("${itens.size} contas a acompanhar")
+                .setSummaryText("Finly · ${itens.size} contas a acompanhar")
 
             itensOrdenados.take(5).forEach { item ->
-                val vFmt = String.format(Locale.getDefault(), "%.2f €", item.transacao.valor)
-                val infoDias = when (item.diffDias) {
-                    0 -> "vence hoje"
-                    1 -> "vence amanhã"
-                    2 -> "vence em 2d"
-                    in -5..-1 -> "${-item.diffDias}d atraso"
+                val vFmt = CurrencyFormatter.formatar(item.transacao.valor, moedaAtual)
+                val infoDias = when {
+                    item.diffDias == 0 -> "vence hoje"
+                    item.diffDias < 0 -> "${-item.diffDias}d atraso"
                     else -> "vence em ${item.diffDias}d"
                 }
-                inbox.addLine("• O seu ${item.transacao.item} ($vFmt): $infoDias")
+                inbox.addLine("• ${item.transacao.item} ($vFmt): $infoDias")
             }
 
             if (itens.size > 5) {
