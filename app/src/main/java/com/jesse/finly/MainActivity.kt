@@ -584,7 +584,7 @@ class MainActivity : AppCompatActivity() {
             filtrarLista(binding.tabFilter.selectedTabPosition)
 
             if (novaTransacao.status) {
-                showToast("Conta marcada como paga!")
+                showToast(getString(R.string.toast_conta_marcada_paga))
             }
 
             lifecycleScope.launch(Dispatchers.IO) {

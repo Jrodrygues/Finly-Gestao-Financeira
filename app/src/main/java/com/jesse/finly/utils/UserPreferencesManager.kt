@@ -19,6 +19,7 @@ class UserPreferencesManager(private val context: Context) {
     companion object {
         private const val PREFS_NAME = "FinlyAppPrefs"
         private const val KEY_MOEDA = "MOEDA"
+        private const val KEY_MOEDA_CONFIGURADA = "MOEDA_CONFIGURADA"
         private const val KEY_EMAIL = "EMAIL"
     }
 
@@ -28,7 +29,10 @@ class UserPreferencesManager(private val context: Context) {
      */
     fun salvarMoeda(moeda: Moeda, onComplete: ((Boolean) -> Unit)? = null) {
         // 1. Cache local instantânea em SharedPreferences
-        prefs.edit { putString(KEY_MOEDA, moeda.codigo) }
+        prefs.edit {
+            putString(KEY_MOEDA, moeda.codigo)
+            putBoolean(KEY_MOEDA_CONFIGURADA, true)
+        }
 
         var email = prefs.getString(KEY_EMAIL, "") ?: ""
         if (email.isEmpty() || email == "CONVIDADO") {
@@ -74,7 +78,7 @@ class UserPreferencesManager(private val context: Context) {
      * Indica se o utilizador já definiu a sua moeda principal no onboarding/perfil.
      */
     fun isMoedaConfigurada(): Boolean {
-        return prefs.contains(KEY_MOEDA)
+        return prefs.getBoolean(KEY_MOEDA_CONFIGURADA, false)
     }
 
     /**

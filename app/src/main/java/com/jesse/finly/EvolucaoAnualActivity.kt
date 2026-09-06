@@ -368,7 +368,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         val corPositivo = ContextCompat.getColor(this, R.color.colorPositive)
         val corNegativo = ContextCompat.getColor(this, R.color.colorNegative)
 
-        binding.tvTituloDetalheMes.text = "Detalhes: $mesNome de $anoAtualSelecionado"
+        binding.tvTituloDetalheMes.text = getString(R.string.detalhes_mes_ano_format, mesNome, anoAtualSelecionado)
         binding.tvRendaMesDetalhe.text = CurrencyFormatter.formatarComSinal(renda, moedaAtual, forcarSinalPositivo = true)
         binding.tvDespesaMesDetalhe.text = CurrencyFormatter.formatarComSinal(-despesa, moedaAtual)
 

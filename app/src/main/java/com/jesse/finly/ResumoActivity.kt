@@ -109,6 +109,7 @@ class ResumoActivity : AppCompatActivity() {
     private var isCategoriesExpanded = false
     private var transacoesAtuaisGrafico: List<Transacao> = emptyList()
     private var moedaAtual: Moeda = Moeda.EUR
+    private var isShowingOnboardingMoeda = false
 
 
     companion object {
@@ -207,9 +208,9 @@ class ResumoActivity : AppCompatActivity() {
         icon?.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
 
         MaterialAlertDialogBuilder(this)
-            .setTitle("Meta de Poupança")
+            .setTitle(getString(R.string.dialog_meta_poupanca_titulo))
             .setIcon(icon)
-            .setMessage("Quanto deseja poupar em ${binding.spinnerMes.selectedItem}?")
+            .setMessage(getString(R.string.dialog_meta_poupanca_msg, binding.spinnerMes.selectedItem.toString()))
             .setView(view)
             .setPositiveButton("Guardar") { _, _ ->
                 val novaMeta = watcher.obterValorDouble()
@@ -515,8 +516,8 @@ class ResumoActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 if (transacoesAfetadas.isEmpty()) {
                     MaterialAlertDialogBuilder(this@ResumoActivity)
-                        .setTitle("Eliminar Categoria")
-                        .setMessage("Tem a certeza que deseja eliminar a categoria '$categoria'?")
+                        .setTitle(getString(R.string.dialog_eliminar_categoria_titulo))
+                        .setMessage(getString(R.string.dialog_eliminar_categoria_msg, categoria))
                         .setPositiveButton(getString(R.string.btn_sim_eliminar)) { _, _ ->
                             onConfirm()
                         }
@@ -526,14 +527,9 @@ class ResumoActivity : AppCompatActivity() {
                         .show()
                 } else {
                     val quantidade = transacoesAfetadas.size
-                    val mensagem = if (quantidade == 1) {
-                        "1 transação será movida para a categoria Geral."
-                    } else {
-                        "$quantidade transações serão movidas para a categoria Geral."
-                    }
                     MaterialAlertDialogBuilder(this@ResumoActivity)
-                        .setTitle("Categoria em uso")
-                        .setMessage(mensagem)
+                        .setTitle(getString(R.string.dialog_categoria_em_uso_titulo))
+                        .setMessage(getString(R.string.dialog_categoria_em_uso_msg, categoria, quantidade))
                         .setPositiveButton("Eliminar") { _, _ ->
                             lifecycleScope.launch(Dispatchers.IO) {
                                 transacoesAfetadas.forEach { trans ->
@@ -602,7 +598,7 @@ class ResumoActivity : AppCompatActivity() {
         bottomSheetDialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         bottomSheetDialog.setOnShowListener {
-            val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            val bottomSheet = bsView.parent as? View
             bottomSheet?.let { sheet ->
                 sheet.setBackgroundColor(Color.TRANSPARENT)
                 val behavior = BottomSheetBehavior.from(sheet)
@@ -763,9 +759,9 @@ class ResumoActivity : AppCompatActivity() {
         icon?.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
 
         MaterialAlertDialogBuilder(this)
-            .setTitle("Sair")
+            .setTitle(getString(R.string.dialog_sair_titulo))
             .setIcon(icon)
-            .setMessage("Deseja terminar a sessão?")
+            .setMessage(getString(R.string.dialog_sair_msg))
             .setPositiveButton("Sim") { _, _ ->
                 // ENCERRAR NO FIREBASE
                 com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
@@ -1319,7 +1315,10 @@ class ResumoActivity : AppCompatActivity() {
     private fun verificarMoedaInicialConfigurada(): Boolean {
         val prefsManager = UserPreferencesManager(this)
         return if (!prefsManager.isMoedaConfigurada()) {
-            mostrarBottomSheetMoedaInicial()
+            if (!isShowingOnboardingMoeda) {
+                isShowingOnboardingMoeda = true
+                mostrarBottomSheetMoedaInicial()
+            }
             false
         } else {
             true
@@ -1332,6 +1331,16 @@ class ResumoActivity : AppCompatActivity() {
         bottomSheetDialog.setContentView(bsView)
         bottomSheetDialog.setCancelable(false)
         bottomSheetDialog.window?.setDimAmount(0.85f)
+
+        val tvTitulo = bsView.findViewById<TextView>(R.id.tvTituloBoasVindas)
+        val nomeSalvo = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString("NAME", "") ?: ""
+        val primeiroNome = nomeSalvo.trim().split(" ").firstOrNull() ?: ""
+
+        if (primeiroNome.isNotEmpty()) {
+            tvTitulo?.text = getString(R.string.onboarding_moeda_titulo_nome, primeiroNome)
+        } else {
+            tvTitulo?.text = getString(R.string.onboarding_moeda_titulo)
+        }
 
         val cardEUR = bsView.findViewById<MaterialCardView>(R.id.cardMoedaEUR)
         val cardBRL = bsView.findViewById<MaterialCardView>(R.id.cardMoedaBRL)
@@ -1371,6 +1380,7 @@ class ResumoActivity : AppCompatActivity() {
 
         btnConfirmar?.setOnClickListener {
             FinanceiroUtils.dispararHapticFeedback(it)
+            isShowingOnboardingMoeda = false
             UserPreferencesManager(this).salvarMoeda(moedaSelecionada) {
                 showToast("Moeda ${if (moedaSelecionada == Moeda.BRL) "Real (R$)" else "Euro (€)"} configurada com sucesso!")
             }
@@ -1554,7 +1564,7 @@ class ResumoActivity : AppCompatActivity() {
         llAnosContainer.removeAllViews()
 
         anosDisponiveis.forEach { ano ->
-            val btnAno = MaterialButton(this, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
+            val btnAno = MaterialButton(this).apply {
                 text = ano.toString()
                 textSize = 13f
                 isCheckable = false
@@ -1861,7 +1871,7 @@ class ResumoActivity : AppCompatActivity() {
         binding.tvSaldoFinal.text = CurrencyFormatter.formatarComSinal(saldo, moedaAtual, forcarSinalPositivo = true)
         binding.tvSaldoFinal.setTextColor(if (isSaldoZero) colorPadrao else if (saldo < 0) colorNegativo else colorPositivo)
 
-        binding.tvSpentValue.text = "Gasto total: ${CurrencyFormatter.formatar(despesa, moedaAtual)}"
+        binding.tvSpentValue.text = getString(R.string.gasto_total_format, CurrencyFormatter.formatar(despesa, moedaAtual))
         binding.tvPercentValue.text = String.format(Locale.getDefault(), "%d%%", percent)
 
         val colorPercent = when {
@@ -1917,22 +1927,22 @@ class ResumoActivity : AppCompatActivity() {
         val pendenciasStr = CurrencyFormatter.formatar(totalDespesasPendentes, moedaAtual)
 
         if (saldoProjetado < 0) {
-            binding.tvTagPrevisao.text = "🔴 No Vermelho"
+            binding.tvTagPrevisao.text = getString(R.string.tag_no_vermelho)
             binding.tvTagPrevisao.setTextColor(colorNegativo)
             binding.ivIconPrevisao.setColorFilter(colorNegativo)
             binding.tvPrevisaoDetalhes.text = if (numDespesasPendentes > 0) {
-                "Saldo estimado: $valorSaldoStr • $numDespesasPendentes pendências ($pendenciasStr)"
+                getString(R.string.saldo_estimado_fmt, "$valorSaldoStr ${getString(R.string.previsao_pendencias_fmt, numDespesasPendentes, pendenciasStr)}")
             } else {
-                "Saldo estimado: $valorSaldoStr"
+                getString(R.string.saldo_estimado_fmt, valorSaldoStr)
             }
         } else {
-            binding.tvTagPrevisao.text = "🟢 No Verde"
+            binding.tvTagPrevisao.text = getString(R.string.tag_no_verde)
             binding.tvTagPrevisao.setTextColor(colorPositivo)
             binding.ivIconPrevisao.setColorFilter(colorPositivo)
             binding.tvPrevisaoDetalhes.text = if (numDespesasPendentes > 0) {
-                "Saldo estimado: $valorSaldoStr • $numDespesasPendentes pendências ($pendenciasStr)"
+                getString(R.string.saldo_estimado_fmt, "$valorSaldoStr ${getString(R.string.previsao_pendencias_fmt, numDespesasPendentes, pendenciasStr)}")
             } else {
-                "Saldo estimado: $valorSaldoStr • Contas em dia"
+                getString(R.string.saldo_estimado_fmt, "$valorSaldoStr • ${getString(R.string.previsao_contas_em_dia)}")
             }
         }
     }

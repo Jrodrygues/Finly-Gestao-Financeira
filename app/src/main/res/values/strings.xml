@@ -20,7 +20,7 @@
     <string name="guia_sec3_titulo">3. Listagem Detalhada &amp; Filtros</string>
     <string name="guia_sec3_desc">Aceda à lista completa de transações. Pesquise por texto, filtre por tipo através das abas e utilize o botão de voltar dedicado no cabeçalho para regressar rapidamente ao resumo.</string>
     <string name="guia_sec4_titulo">4. Adicionar &amp; Editar Transações</string>
-    <string name="guia_sec4_desc">Prima o botão \'+\' na Listagem para registar um novo item (Renda ou Despesa) utilizando o seletor rápido (toggle group). O campo de valor adapta-se à moeda selecionada (€ ou R$) com máscara automática de centavos durante a digitação e ícones dinâmicos por categoria.</string>
+    <string name="guia_sec4_desc">Prima o botão \'+\' na Listagem para registar um novo ‘item’ (Renda ou Despesa) utilizando o seletor rápido (toggle group). O campo de valor adapta-se à moeda selecionada (€ ou R$) com máscara automática de centavos durante a digitação e ícones dinâmicos por categoria.</string>
     <string name="guia_sec5_titulo">5. Recorrência Inteligente</string>
     <string name="guia_sec5_desc">Ative a opção de recorrência para transações fixas ou parceladas. Ao editar ou eliminar uma transação recorrente, escolha flexivelmente se deseja aplicar a alteração apenas ao mês selecionado ou a este e a todos os meses futuros.</string>
     <string name="guia_sec6_titulo">6. Categorias Personalizadas</string>
@@ -36,12 +36,12 @@
     <string name="guia_sec11_titulo">11. Modo Convidado (100% Local)</string>
     <string name="guia_sec11_desc">Experimente todas as funcionalidades da aplicação sem criar conta. No Modo Convidado, os seus dados são guardados exclusivamente na memória do seu dispositivo com total privacidade.</string>
     <string name="guia_sec12_titulo">12. Modo Escuro / Claro</string>
-    <string name="guia_sec12_desc">Adapte a interface às suas preferências visuais. Ative ou desative o Modo Escuro no seu perfil para uma experiência de utilização confortável a qualquer hora.</string>
+    <string name="guia_sec12_desc">Adapte a ‘interface’ às suas preferências visuais. Ative ou desative o Modo Escuro no seu perfil para uma experiência de utilização confortável a qualquer hora.</string>
     <string name="guia_sec13_titulo">13. Segurança &amp; Privacidade</string>
     <string name="guia_sec13_desc">A sua privacidade é a nossa prioridade. O Finly utiliza encriptação de ponta para garantir que apenas você tem acesso aos seus dados financeiros.</string>
     <string name="guia_sec14_titulo">14. Bloqueio por Biometria / Impressão Digital</string>
     <string name="guia_sec14_desc">Proteja a sua aplicação contra acessos não autorizados. Ative o bloqueio por biometria no seu perfil para exigir a confirmação da sua identidade (impressão digital ou PIN) sempre que abrir o Finly. O estado da biometria é sincronizado no seu perfil no Firebase.</string>
-    <string name="guia_sec15_titulo">15. Inteligência &amp; Insights Financeiros</string>
+    <string name="guia_sec15_titulo">15. Inteligência &amp; Intuições Financeiros</string>
     <string name="guia_sec15_desc">Consulte alertas automáticos de teto orçamental quando os gastos ultrapassarem 100% da renda, badges de comparação percentual em relação ao mês anterior e a previsão de saldo ao final do mês com base em pendências.</string>
     <string name="guia_sec16_titulo">16. Seleção de Período em Grelha &amp; Exportação</string>
     <string name="guia_sec16_desc">Toque no título do mês para abrir o modal em grelha rígida 4x3 (JAN..DEZ) e seletor horizontal de anos. O período selecionado sincroniza automaticamente entre o Resumo e a Listagem. Exporte relatórios formatados em PDF ou CSV (Excel) guardados na pasta Downloads.</string>
@@ -71,7 +71,7 @@
     <string name="hint_palavra_passe">Palavra-passe</string>
     <string name="hint_palavra_passe_atual">Palavra-passe Atual</string>
 
-    <!-- Registo / Novo Item -->
+    <!-- Registo / Novo ‘Item’ -->
     <string name="nova_transacao">Nova Transação</string>
     <string name="editar_item">Editar Item</string>
     <string name="criar_nova_conta">Criar Nova Conta</string>
@@ -80,7 +80,7 @@
     <string name="atualizar_item">ATUALIZAR ITEM</string>
     <string name="btn_criar_conta">CRIAR CONTA</string>
     <string name="btn_atualizar_perfil">ATUALIZAR PERFIL</string>
-    <string name="hint_descricao">Descrição (ex: EDP, Gás)</string>
+    <string name="hint_descricao">Descrição</string>
     <string name="hint_valor">Valor (€)</string>
     <string name="hint_vencimento">Vencimento (Calendário)</string>
     <string name="label_categoria">Categoria:</string>
@@ -119,7 +119,7 @@
     <string name="tab_todas">TODAS</string>
     <string name="tab_despesas">DESPESAS</string>
     <string name="tab_rendas">RENDAS</string>
-    <string name="col_item">Nome</string>
+    <string name="col_item">Descrição</string>
     <string name="col_valor">Valor</string>
     <string name="col_vencimento">Data</string>
     <string name="col_pago">Pago</string>
@@ -139,7 +139,7 @@
     <string name="btn_eliminar_este_item">ELIMINAR ESTE ITEM</string>
     <string name="btn_voltar_listagem">VOLTAR À LISTAGEM</string>
     <string name="utilizador_convidado">Utilizador Convidado</string>
-    <string name="dados_apenas_locais">Dados apenas locais (Offline)</string>
+    <string name="dados_apenas_locais">Dados apenas locais (‘Offline’)</string>
     <string name="sem_email_sincronizado">Sem e-mail sincronizado</string>
 
 
@@ -213,5 +213,117 @@
     <string name="sem_categorias_custom">Ainda não adicionou categorias personalizadas.</string>
     <string name="toast_categoria_adicionada">Categoria \'%1$s\' adicionada!</string>
     <string name="toast_categoria_removida">Categoria \'%1$s\' removida!</string>
+
+    <!-- Onboarding Moeda & Perfil -->
+    <string name="onboarding_moeda_titulo">Bem-vindo ao Finly! 🚀</string>
+    <string name="onboarding_moeda_titulo_nome">Bem-vindo ao Finly, %1$s! 🚀</string>
+    <string name="onboarding_moeda_subtitulo">Escolha a moeda principal para a sua conta:</string>
+    <string name="moeda_eur_titulo">Euro (€ EUR)</string>
+    <string name="moeda_eur_subtitulo">Padrão Portugal e União Europeia</string>
+    <string name="moeda_brl_titulo">Real Brasileiro (R$ BRL)</string>
+    <string name="moeda_brl_subtitulo">Padrão Brasil</string>
+    <string name="btn_continuar">CONTINUAR</string>
+    <string name="moeda_principal_label">Moeda Principal</string>
+    <string name="moeda_eur_curto">€ EUR</string>
+    <string name="moeda_brl_curto">R$ BRL</string>
+    <string name="toast_moeda_alterada_eur">Moeda alterada para Euro (€)</string>
+    <string name="toast_moeda_alterada_brl">Moeda alterada para Real (R$)</string>
+
+    <!-- Modal Editar Categoria & Teto -->
+    <string name="titulo_editar_categoria_teto">Gerir Categoria &amp; Teto Orçamental</string>
+    <string name="hint_nome_categoria">Nome da Categoria</string>
+    <string name="hint_teto_orcamental">Teto Orçamental Mensal</string>
+    <string name="btn_guardar">Guardar</string>
+    <string name="btn_cancelar_caps">CANCELAR</string>
+
+    <!-- Erros de Autenticação / Registos -->
+    <string name="erro_auth_email_em_uso">Este e-mail já está a ser utilizado.</string>
+    <string name="erro_auth_senha_fraca">A palavra-passe deve ter pelo menos 6 caracteres.</string>
+    <string name="erro_auth_email_invalido">O formato do e-mail é inválido.</string>
+    <string name="erro_auth_credenciais_invalidas">E-mail ou palavra-passe incorretos.</string>
+    <string name="erro_auth_utilizador_nao_encontrado">Conta não encontrada.</string>
+    <string name="erro_auth_sem_conexao">Sem ligação à internet. Tente novamente.</string>
+    <string name="erro_auth_generico">Erro ao efetuar a operação. Tente novamente.</string>
+
+    <!-- Mensagens Toast -->
+    <string name="toast_permissao_notificacao_negada">Permissão de notificações negada</string>
+    <string name="toast_biometria_ativada">Bloqueio com biometria ativado!</string>
+    <string name="toast_biometria_cancelada">Autenticação cancelada ou indisponível</string>
+    <string name="toast_biometria_indisponivel">Biometria não disponível ou configurada neste dispositivo</string>
+    <string name="toast_biometria_desativada">Bloqueio com biometria desativado</string>
+    <string name="toast_modo_escuro_ativado">Modo escuro ativado</string>
+    <string name="toast_modo_claro_ativado">Modo claro ativado</string>
+    <string name="toast_notificacoes_ativadas">Notificações ativadas!</string>
+    <string name="toast_notificacoes_desativadas">Notificações desativadas</string>
+    <string name="toast_erro_eliminar_conta_nuvem">Erro ao eliminar conta da nuvem</string>
+    <string name="toast_introduza_email_senha">Introduza o e-mail e a palavra-passe</string>
+    <string name="toast_credenciais_incorretas">E-mail ou palavra-passe incorretos!</string>
+    <string name="toast_introduza_email_valido">Introduza um e-mail válido</string>
+    <string name="toast_conta_marcada_paga">Conta marcada como paga!</string>
+    <string name="toast_digite_nome_categoria">Digite o nome da categoria</string>
+
+    <string name="toast_email_inalteravel">E-mail inalterável</string>
+    <string name="toast_senha_confirmada">Palavra-passe confirmada!</string>
+    <string name="toast_senha_atual_incorreta">Palavra-passe atual incorreta!</string>
+    <string name="toast_introduza_vencimento">Introduza a data de vencimento</string>
+    <string name="toast_data_invalida">Data inválida. Use o formato DD/MM</string>
+    <string name="toast_dados_guardados">Dados guardados!</string>
+    <string name="toast_campos_obrigatorios">Introduza todos os campos obrigatórios</string>
+    <string name="toast_senhas_nao_coincidem">As palavras-passe não coincidem</string>
+    <string name="toast_conta_criada">Conta criada!</string>
+    <string name="toast_nome_email_obrigatorios">Nome e E-mail são obrigatórios</string>
+    <string name="toast_perfil_atualizado">Perfil atualizado!</string>
+
+    <string name="toast_meta_guardada">Meta guardada para %1$s!</string>
+    <string name="toast_modo_convidado_nuvem">Modo Convidado: Dados guardados apenas no dispositivo.</string>
+    <string name="toast_sincronizado_nuvem">Sincronizado: Os seus dados estão seguros na nuvem.</string>
+    <string name="toast_relatorio_pdf_salvo">Relatório salvo em Downloads!</string>
+    <string name="toast_erro_guardar_pdf">Erro ao guardar o relatório PDF.</string>
+    <string name="toast_erro_gerar_pdf">Erro ao gerar PDF: %1$s</string>
+    <string name="toast_sem_transacoes_exportar">Sem transações para exportar em %1$s/%2$d</string>
+    <string name="toast_ficheiro_csv_salvo">Ficheiro CSV salvo em Downloads!</string>
+    <string name="toast_erro_guardar_csv">Erro ao guardar o ficheiro CSV.</string>
+    <string name="toast_erro_exportar_csv">Erro ao exportar CSV: %1$s</string>
+    <string name="toast_moeda_configurada">Moeda %1$s configurada com sucesso!</string>
+    <string name="toast_carregando_perfil">A carregar perfil&#8230; Tente novamente.</string>
+    <string name="toast_transacao_paga">%1$s marcada como paga!</string>
+    <string name="toast_erro_atualizar_transacao">Erro ao atualizar transação.</string>
+
+    <!-- Diálogos, Títulos e Mensagens -->
+    <string name="dialog_sair_titulo">Sair</string>
+    <string name="dialog_sair_msg">Deseja terminar a sessão?</string>
+    <string name="dialog_eliminar_conta_titulo">Eliminar Conta</string>
+    <string name="dialog_eliminar_conta_msg">Esta ação é irreversível. A sua conta e todos os seus dados serão eliminados permanentemente.</string>
+    <string name="dialog_recuperar_senha_titulo">Recuperar Palavra-passe</string>
+    <string name="dialog_modo_convidado_titulo">Modo Convidado</string>
+    <string name="dialog_eliminar_categoria_titulo">Eliminar Categoria</string>
+    <string name="dialog_eliminar_categoria_msg">Tem a certeza que deseja eliminar a categoria \'%1$s\'?</string>
+    <string name="dialog_categoria_em_uso_titulo">Categoria em uso</string>
+    <string name="dialog_categoria_em_uso_msg">A categoria \'%1$s\' está em uso por %2$d transação(ões). Deseja mudar estas transações para \'Geral\' e eliminar a categoria?</string>
+    <string name="dialog_meta_poupanca_titulo">Meta de Poupança</string>
+    <string name="dialog_meta_poupanca_msg">Quanto deseja poupar em %1$s?</string>
+    <string name="dialog_senha_atual_titulo">Palavra-passe Atual</string>
+    <string name="dialog_senha_atual_msg">Por motivos de segurança, introduza a sua palavra-passe atual para definir uma nova.</string>
+    <string name="dialog_autenticacao_requerida_titulo">Autenticação Requerida</string>
+    <string name="dialog_autenticacao_requerida_msg">É necessário autenticar para aceder à sua conta.</string>
+    <string name="dialog_btn_enviar">Enviar</string>
+
+    <!-- Labels e Badges Globais -->
+    <string name="label_despesa">Despesa</string>
+    <string name="label_renda">Renda</string>
+    <string name="label_pago">Pago</string>
+    <string name="label_pendente">Pendente</string>
+    <string name="label_categoria_simples">Categoria</string>
+    <string name="label_data_vencimento">Data de Vencimento</string>
+    <string name="label_recorrencia">Recorrência</string>
+    <string name="label_estado_pagamento">Estado do Pagamento</string>
+    <string name="gasto_total_format">Gasto total: %1$s</string>
+    <string name="gasto_sem_teto_format">Gasto: %1$s (Sem teto definido)</string>
+    <string name="detalhes_mes_ano_format">Detalhes: %1$s de %2$d</string>
+    <string name="tag_no_verde">🟢 No Verde</string>
+    <string name="tag_no_vermelho">🔴 No Vermelho</string>
+    <string name="previsao_contas_em_dia">Contas em dia</string>
+    <string name="previsao_pendencias_fmt">• %1$d pendências (%2$s)</string>
+    <string name="saldo_estimado_fmt">Saldo estimado: %1$s</string>
 </resources>
 

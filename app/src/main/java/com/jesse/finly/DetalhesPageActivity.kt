@@ -173,29 +173,29 @@ class DetalhesPageActivity : AppCompatActivity() {
         if (transTipo == "DESPESA") {
             binding.tvValorHighlight.text = CurrencyFormatter.formatarComSinal(-transValor, moedaAtual)
             binding.tvValorHighlight.setTextColor(corNegativa)
-            binding.tvBadgeTipo.text = "Despesa"
+            binding.tvBadgeTipo.text = getString(R.string.label_despesa)
             binding.tvBadgeTipo.setTextColor(corNegativa)
         } else {
             binding.tvValorHighlight.text = CurrencyFormatter.formatarComSinal(transValor, moedaAtual, forcarSinalPositivo = true)
             binding.tvValorHighlight.setTextColor(corPositiva)
-            binding.tvBadgeTipo.text = "Renda"
+            binding.tvBadgeTipo.text = getString(R.string.label_renda)
             binding.tvBadgeTipo.setTextColor(corPositiva)
         }
 
         // Campo 1: Categoria
-        binding.tvLabelField1.text = "Categoria"
+        binding.tvLabelField1.text = getString(R.string.label_categoria_simples)
         binding.tvValueField1.text = transCat
         binding.ivIconField1.setImageResource(obterIconeParaCategoria(transCat))
 
         // Campo 2: Data de Vencimento
-        binding.tvLabelField2.text = "Data de Vencimento"
+        binding.tvLabelField2.text = getString(R.string.label_data_vencimento)
         binding.tvValueField2.text = "$transData/$transAno"
         binding.ivIconField2.setImageResource(R.drawable.ic_calendar)
 
         // Campo 3: Recorrência
         binding.llField3.visibility = View.VISIBLE
         binding.divField2.visibility = View.VISIBLE
-        binding.tvLabelField3.text = "Recorrência"
+        binding.tvLabelField3.text = getString(R.string.label_recorrencia)
         binding.ivIconField3.setImageResource(R.drawable.ic_repeat)
         binding.tvValueField3.text = if (transIsRecorrente) {
             if (transParcelasTotais == -1) "Repetir Sempre" else "Repetir por $transParcelasTotais meses"
@@ -206,7 +206,7 @@ class DetalhesPageActivity : AppCompatActivity() {
         // Campo 4: Estado do Pagamento com Switch
         binding.llField4.visibility = View.VISIBLE
         binding.divField3.visibility = View.VISIBLE
-        binding.tvLabelField4.text = "Estado do Pagamento"
+        binding.tvLabelField4.text = getString(R.string.label_estado_pagamento)
         binding.switchStatusTransacao.visibility = View.VISIBLE
         binding.switchStatusTransacao.setOnCheckedChangeListener(null)
         binding.switchStatusTransacao.isChecked = transStatus
@@ -232,12 +232,12 @@ class DetalhesPageActivity : AppCompatActivity() {
 
     private fun atualizarVisualStatusTransacao(isPago: Boolean, corPositiva: Int, corNegativa: Int) {
         if (isPago) {
-            binding.tvValueField4.text = "Pago"
+            binding.tvValueField4.text = getString(R.string.label_pago)
             binding.tvValueField4.setTextColor(corPositiva)
             binding.ivIconField4.setImageResource(android.R.drawable.checkbox_on_background)
             binding.ivIconField4.setColorFilter(corPositiva)
         } else {
-            binding.tvValueField4.text = "Pendente"
+            binding.tvValueField4.text = getString(R.string.label_pendente)
             binding.tvValueField4.setTextColor(corNegativa)
             binding.ivIconField4.setImageResource(android.R.drawable.checkbox_off_background)
             binding.ivIconField4.setColorFilter(corNegativa)
@@ -434,25 +434,25 @@ class DetalhesPageActivity : AppCompatActivity() {
                         onSuccess = {
                             prefs.edit { putBoolean("pref_biometric_ativa", true) }
                             atualizarPreferenciaUtilizador(true, "BIOMETRIA")
-                            showToast("Bloqueio com biometria ativado!")
+                            showToast(getString(R.string.toast_biometria_ativada))
                         },
                         onError = {
                             buttonView.isChecked = false
                             prefs.edit { putBoolean("pref_biometric_ativa", false) }
                             atualizarPreferenciaUtilizador(false, "BIOMETRIA")
-                            showToast("Autenticação cancelada ou indisponível")
+                            showToast(getString(R.string.toast_biometria_cancelada))
                         }
                     )
                 } else {
                     buttonView.isChecked = false
                     prefs.edit { putBoolean("pref_biometric_ativa", false) }
                     atualizarPreferenciaUtilizador(false, "BIOMETRIA")
-                    showToast("Biometria não disponível ou configurada neste dispositivo")
+                    showToast(getString(R.string.toast_biometria_indisponivel))
                 }
             } else {
                 prefs.edit { putBoolean("pref_biometric_ativa", false) }
                 atualizarPreferenciaUtilizador(false, "BIOMETRIA")
-                showToast("Bloqueio com biometria desativado")
+                showToast(getString(R.string.toast_biometria_desativada))
             }
         }
 
@@ -488,7 +488,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             binding.toggleMoedaPerfil.check(R.id.btnMoedaPerfilEUR)
             atualizarVisualBotoesMoeda(Moeda.EUR)
             prefsManager.salvarMoeda(Moeda.EUR) { _ ->
-                showToast("Moeda alterada para Euro (€)")
+                showToast(getString(R.string.toast_moeda_alterada_eur))
             }
         }
 
@@ -497,7 +497,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             binding.toggleMoedaPerfil.check(R.id.btnMoedaPerfilBRL)
             atualizarVisualBotoesMoeda(Moeda.BRL)
             prefsManager.salvarMoeda(Moeda.BRL) { _ ->
-                showToast("Moeda alterada para Real (R$)")
+                showToast(getString(R.string.toast_moeda_alterada_brl))
             }
         }
     }
@@ -532,14 +532,14 @@ class DetalhesPageActivity : AppCompatActivity() {
         getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { putBoolean("NOTIFICATIONS", true) }
         atualizarPreferenciaUtilizador(valor = true, "NOTIFICATIONS")
         agendarWorkerNotificacoes()
-        showToast("Notificações ativadas!")
+        showToast(getString(R.string.toast_notificacoes_ativadas))
     }
 
     private fun cancelarNotificacoes() {
         getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { putBoolean("NOTIFICATIONS", false) }
         atualizarPreferenciaUtilizador(false, "NOTIFICATIONS")
         cancelarWorkerNotificacoes()
-        showToast("Notificações desativadas")
+        showToast(getString(R.string.toast_notificacoes_desativadas))
     }
 
     private fun agendarWorkerNotificacoes() {
@@ -636,7 +636,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             FirebaseManager.eliminarTransacaoDoFirestore(trans)
             withContext(Dispatchers.Main) {
                 ocultarLoadingOverlay()
-                showToast("Item removido com sucesso!")
+                showToast(getString(R.string.toast_item_removido))
                 finish()
             }
         }
@@ -744,9 +744,9 @@ class DetalhesPageActivity : AppCompatActivity() {
         icon?.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
 
         MaterialAlertDialogBuilder(this)
-            .setTitle("Sair")
+            .setTitle(getString(R.string.dialog_sair_titulo))
             .setIcon(icon)
-            .setMessage("Deseja terminar a sessão?")
+            .setMessage(getString(R.string.dialog_sair_msg))
             .setPositiveButton("Sim") { _, _ ->
                 // ENCERRAR NO FIREBASE
                 com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
@@ -768,9 +768,9 @@ class DetalhesPageActivity : AppCompatActivity() {
         icon?.setTint(ContextCompat.getColor(this, R.color.colorNegative))
 
         MaterialAlertDialogBuilder(this)
-            .setTitle("Eliminar Conta")
+            .setTitle(getString(R.string.dialog_eliminar_conta_titulo))
             .setIcon(icon)
-            .setMessage("Esta ação é irreversível. A sua conta e todos os seus dados serão eliminados permanentemente da nuvem e do dispositivo. Deseja continuar?")
+            .setMessage(getString(R.string.dialog_eliminar_conta_msg))
             .setPositiveButton("Sim, Eliminar") { _, _ ->
                 lifecycleScope.launch(Dispatchers.IO) {
                     val sucessoNuvem = FirebaseManager.excluirContaTotal(emailStr)

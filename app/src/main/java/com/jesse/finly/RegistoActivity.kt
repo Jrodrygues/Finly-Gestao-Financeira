@@ -55,6 +55,8 @@ import android.widget.ImageView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import kotlin.math.round
 
 class RegistoActivity : AppCompatActivity() {
@@ -317,8 +319,8 @@ class RegistoActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 if (transacoesAfetadas.isEmpty()) {
                     MaterialAlertDialogBuilder(this@RegistoActivity)
-                        .setTitle("Eliminar Categoria")
-                        .setMessage("Tem a certeza que deseja eliminar a categoria '$categoria'?")
+                        .setTitle(getString(R.string.dialog_eliminar_categoria_titulo))
+                        .setMessage(getString(R.string.dialog_eliminar_categoria_msg, categoria))
                         .setPositiveButton(getString(R.string.btn_sim_eliminar)) { _, _ ->
                             onConfirm()
                         }
@@ -328,14 +330,9 @@ class RegistoActivity : AppCompatActivity() {
                         .show()
                 } else {
                     val quantidade = transacoesAfetadas.size
-                    val mensagem = if (quantidade == 1) {
-                        "1 transação será movida para a categoria Geral."
-                    } else {
-                        "$quantidade transações serão movidas para a categoria Geral."
-                    }
                     MaterialAlertDialogBuilder(this@RegistoActivity)
-                        .setTitle("Categoria em uso")
-                        .setMessage(mensagem)
+                        .setTitle(getString(R.string.dialog_categoria_em_uso_titulo))
+                        .setMessage(getString(R.string.dialog_categoria_em_uso_msg, categoria, quantidade))
                         .setPositiveButton("Eliminar") { _, _ ->
                             lifecycleScope.launch(Dispatchers.IO) {
                                 transacoesAfetadas.forEach { trans ->
@@ -409,7 +406,7 @@ class RegistoActivity : AppCompatActivity() {
         bottomSheetDialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         bottomSheetDialog.setOnShowListener {
-            val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            val bottomSheet = bsView.parent as? View
             bottomSheet?.let { sheet ->
                 sheet.setBackgroundColor(Color.TRANSPARENT)
                 val behavior = BottomSheetBehavior.from(sheet)
@@ -665,14 +662,14 @@ class RegistoActivity : AppCompatActivity() {
         icon?.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
 
         val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle("Palavra-passe Atual")
+            .setTitle(getString(R.string.dialog_senha_atual_titulo))
             .setIcon(icon)
-            .setMessage("Por motivos de segurança, introduza a sua palavra-passe atual para definir uma nova.")
+            .setMessage(getString(R.string.dialog_senha_atual_msg))
             .setView(view)
             .setPositiveButton("Confirmar") { d, _ ->
                 val digitada = etSenhaAtual?.text.toString().trim()
                 if (digitada == senhaStr) {
-                    showToast("Palavra-passe confirmada!")
+                    showToast(getString(R.string.toast_senha_confirmada))
                     binding.btnAlterarSenhaPerfil.visibility = View.GONE
                     binding.senhaLayout.visibility = View.VISIBLE
                     binding.confirmarSenhaLayout.visibility = View.VISIBLE
@@ -680,7 +677,7 @@ class RegistoActivity : AppCompatActivity() {
                     binding.regSenhaText.requestFocus()
                     d.dismiss()
                 } else {
-                    showToast("Palavra-passe atual incorreta!")
+                    showToast(getString(R.string.toast_senha_atual_incorreta))
                     binding.btnAlterarSenhaPerfil.visibility = View.VISIBLE
                     binding.senhaLayout.visibility = View.GONE
                     binding.confirmarSenhaLayout.visibility = View.GONE
@@ -966,7 +963,7 @@ class RegistoActivity : AppCompatActivity() {
         }
 
         if (venc.isEmpty()) {
-            showToast("Introduza a data de vencimento")
+            showToast(getString(R.string.toast_introduza_vencimento))
             return
         }
 
@@ -976,7 +973,7 @@ class RegistoActivity : AppCompatActivity() {
                 val mesIndex = meses.indexOf(mes) + 1
                 venc = String.format(Locale.getDefault(), "%02d/%02d", diaInt, mesIndex)
             } else {
-                showToast("Data inválida. Use o formato DD/MM")
+                showToast(getString(R.string.toast_data_invalida))
                 return
             }
         }
@@ -1146,7 +1143,7 @@ class RegistoActivity : AppCompatActivity() {
                 if (notifEnabled) {
                     NotificationHelper.agendarWorkerNotificacoes(this@RegistoActivity)
                 }
-                showToast("Dados guardados!")
+                showToast(getString(R.string.toast_dados_guardados))
                 finish()
             }
         }
@@ -1160,12 +1157,12 @@ class RegistoActivity : AppCompatActivity() {
         val confirmarSenha = binding.regConfirmarSenhaText.text.toString().trim()
 
         if (nome.isEmpty() || emailInput.isEmpty() || senha.isEmpty() || confirmarSenha.isEmpty()) {
-            showToast("Introduza todos os campos obrigatórios")
+            showToast(getString(R.string.toast_campos_obrigatorios))
             return
         }
 
         if (senha != confirmarSenha) {
-            showToast("As palavras-passe não coincidem")
+            showToast(getString(R.string.toast_senhas_nao_coincidem))
             return
         }
 
@@ -1192,15 +1189,31 @@ class RegistoActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     ocultarLoadingOverlay()
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { putString("TEMP_EMAIL", email) }
-                    showToast("Conta criada!", isLong = true)
+                    showToast(getString(R.string.toast_conta_criada), isLong = true)
                     finish()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     ocultarLoadingOverlay()
-                    showToast("Erro ao criar conta: ${e.message}", isLong = true)
+                    showToast(formatarErroAuth(e), isLong = true)
                 }
             }
+        }
+    }
+
+    private fun formatarErroAuth(e: Exception): String {
+        val msg = e.message?.lowercase() ?: ""
+        return when {
+            e is FirebaseAuthUserCollisionException || msg.contains("already in use") || msg.contains("already exists") ->
+                getString(R.string.erro_auth_email_em_uso)
+            e is FirebaseAuthWeakPasswordException || msg.contains("weak password") || msg.contains("6 characters") ->
+                getString(R.string.erro_auth_senha_fraca)
+            msg.contains("invalid email") || msg.contains("badly formatted") ->
+                getString(R.string.erro_auth_email_invalido)
+            msg.contains("network") ->
+                getString(R.string.erro_auth_sem_conexao)
+            else ->
+                getString(R.string.erro_auth_generico)
         }
     }
 

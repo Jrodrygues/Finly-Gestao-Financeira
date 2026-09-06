@@ -73,8 +73,8 @@ class SplashActivity : AppCompatActivity() {
                     },
                     onError = {
                         MaterialAlertDialogBuilder(this)
-                            .setTitle("Autenticação Requerida")
-                            .setMessage("É necessário autenticar para aceder à sua conta.")
+                            .setTitle(getString(R.string.dialog_autenticacao_requerida_titulo))
+                            .setMessage(getString(R.string.dialog_autenticacao_requerida_msg))
                             .setPositiveButton("Tentar Novamente") { _, _ ->
                                 checkSessionAndNavigate()
                             }

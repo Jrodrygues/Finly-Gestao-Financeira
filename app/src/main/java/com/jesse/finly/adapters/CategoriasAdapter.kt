@@ -54,7 +54,7 @@ class CategoriasAdapter(
             } else {
                 // Caso não tenha teto estipulado
                 val gastoStr = CurrencyFormatter.formatar(item.totalGastoNoMes, moeda)
-                binding.tvValoresOrcamento.text = "Gasto: $gastoStr (Sem teto definido)"
+                binding.tvValoresOrcamento.text = itemView.context.getString(R.string.gasto_sem_teto_format, gastoStr)
                 binding.progressBarCategoria.progress = 0
             }
 

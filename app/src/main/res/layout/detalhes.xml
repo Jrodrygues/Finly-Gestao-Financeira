@@ -448,7 +448,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Moeda Principal"
+                        android:text="@string/moeda_principal_label"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="15sp" />
 
@@ -466,7 +466,7 @@
                             android:layout_height="match_parent"
                             android:minWidth="0dp"
                             android:paddingHorizontal="10dp"
-                            android:text="€ EUR"
+                            android:text="@string/moeda_eur_curto"
                             android:textColor="@color/textColorPrimary"
                             android:textSize="11sp"
                             android:textStyle="bold"
@@ -479,7 +479,7 @@
                             android:layout_height="match_parent"
                             android:minWidth="0dp"
                             android:paddingHorizontal="10dp"
-                            android:text="R$ BRL"
+                            android:text="@string/moeda_brl_curto"
                             android:textColor="@color/textColorPrimary"
                             android:textSize="11sp"
                             android:textStyle="bold"

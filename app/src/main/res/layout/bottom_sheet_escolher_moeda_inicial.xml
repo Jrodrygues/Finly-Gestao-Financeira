@@ -23,13 +23,15 @@
         android:layout_height="48dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="12dp"
+        android:contentDescription="@null"
         android:src="@drawable/ic_logo_finly_transp" />
 
     <TextView
+        android:id="@+id/tvTituloBoasVindas"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Bem-vindo ao Finly! 🚀"
+        android:text="@string/onboarding_moeda_titulo"
         android:textColor="@color/textColorPrimary"
         android:textSize="22sp"
         android:textStyle="bold" />
@@ -40,7 +42,7 @@
         android:layout_marginTop="6dp"
         android:layout_marginBottom="24dp"
         android:gravity="center"
-        android:text="Escolha a moeda principal para a sua conta:"
+        android:text="@string/onboarding_moeda_subtitulo"
         android:textColor="@color/textColorSecondary"
         android:textSize="14sp" />
 
@@ -82,7 +84,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Euro (€ EUR)"
+                    android:text="@string/moeda_eur_titulo"
                     android:textColor="@color/textColorPrimary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -91,7 +93,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Padrão Portugal e União Europeia"
+                    android:text="@string/moeda_eur_subtitulo"
                     android:textColor="@color/textColorSecondary"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -145,7 +147,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Real Brasileiro (R$ BRL)"
+                    android:text="@string/moeda_brl_titulo"
                     android:textColor="@color/textColorPrimary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -154,7 +156,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Padrão Brasil"
+                    android:text="@string/moeda_brl_subtitulo"
                     android:textColor="@color/textColorSecondary"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -175,7 +177,7 @@
         style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:text="CONTINUAR"
+        android:text="@string/btn_continuar"
         android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"

@@ -169,7 +169,7 @@ class LoginActivity : AppCompatActivity() {
         val senha = binding.senhaText.text.toString().trim()
 
         if (emailInput.isEmpty() || senha.isEmpty()) {
-            showToast("Introduza o e-mail e a palavra-passe")
+            showToast(getString(R.string.toast_introduza_email_senha))
             return
         }
 
@@ -235,7 +235,7 @@ class LoginActivity : AppCompatActivity() {
                         finalizarSessaoLogin(email, utilizadorLocal.nome)
                     } else {
                         // Se não encontrou nem localmente, nem na nuvem, dar erro original
-                        showToast("E-mail ou palavra-passe incorretos!")
+                        showToast(getString(R.string.toast_credenciais_incorretas))
                     }
                 }
             }
@@ -260,7 +260,7 @@ class LoginActivity : AppCompatActivity() {
         icon?.setTint(androidx.core.content.ContextCompat.getColor(this, R.color.colorPrimary))
 
         MaterialAlertDialogBuilder(this)
-            .setTitle("Recuperar Palavra-passe")
+            .setTitle(getString(R.string.dialog_recuperar_senha_titulo))
             .setIcon(icon)
             .setMessage(getString(R.string.introduza_email_recuperacao))
             .setView(view)
@@ -312,7 +312,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun entrarComoConvidado() {
         val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle("Modo Convidado")
+            .setTitle(getString(R.string.dialog_modo_convidado_titulo))
             .setMessage(getString(R.string.msg_modo_convidado_aviso))
             .setPositiveButton(getString(R.string.btn_continuar_convidado)) { _, _ ->
                 getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
