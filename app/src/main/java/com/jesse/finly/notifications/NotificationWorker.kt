@@ -106,10 +106,10 @@ class NotificationWorker(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
-                "Lembrete de Vencimento",
+                applicationContext.getString(R.string.notif_canal_vencimento_nome),
                 NotificationManager.IMPORTANCE_HIGH,
             ).apply {
-                description = "Notificações para contas a vencer hoje ou em atraso"
+                description = applicationContext.getString(R.string.notif_canal_vencimento_desc)
             }
             manager.createNotificationChannel(channel)
         }
@@ -125,7 +125,6 @@ class NotificationWorker(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        // Ordenar por urgência: Hoje (0) > Atrasado (<0)
         val itensOrdenados = itens.sortedWith(
             compareBy { item ->
                 when (item.diffDias) {
@@ -142,53 +141,17 @@ class NotificationWorker(
         val moedaAtual = UserPreferencesManager(applicationContext).obterMoedaAtual()
         val valorFormatado = CurrencyFormatter.formatar(t.valor, moedaAtual)
 
-        // Título explícito incluindo Finly para identificação clara quando recolhida
         val titulo = when {
-            diff == 0 -> "Finly: Conta a vencer hoje! ⏰"
-            diff < 0 -> "Finly: Conta em atraso! ⚠️"
-            else -> "Finly: Lembrete de Pagamento 💰"
+            diff == 0 -> applicationContext.getString(R.string.notif_titulo_vence_hoje)
+            diff < 0 -> applicationContext.getString(R.string.notif_titulo_em_atraso)
+            else -> applicationContext.getString(R.string.notif_titulo_lembrete)
         }
 
         val textoPrincipal = when {
-            diff == 0 -> "O seu ${t.item} ($valorFormatado) vence hoje."
-            diff < 0 -> "O seu ${t.item} ($valorFormatado) está em atraso há ${-diff} dia(s)."
-            else -> "O seu ${t.item} ($valorFormatado) vence em $diff dias."
+            diff == 0 -> applicationContext.getString(R.string.notif_texto_vence_hoje, t.item, valorFormatado)
+            diff < 0 -> applicationContext.getString(R.string.notif_texto_em_atraso, t.item, valorFormatado, -diff)
+            else -> applicationContext.getString(R.string.notif_texto_vence_dias, t.item, valorFormatado, diff)
         }
-
-        // Ações Rápidas de Alto Valor UX
-        val paidIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
-            action = NotificationActionReceiver.ACTION_MARK_AS_PAID
-            putExtra(NotificationActionReceiver.EXTRA_TRANS_ID, t.id)
-        }
-        val paidPendingIntent = PendingIntent.getBroadcast(
-            applicationContext,
-            t.id,
-            paidIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val detailIntent = Intent(applicationContext, DetalhesPageActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra("isTransactionDetail", true)
-            putExtra("id", t.id)
-            putExtra("item", t.item)
-            putExtra("valor", t.valor)
-            putExtra("vencimento", t.vencimento)
-            putExtra("tipo", t.tipo)
-            putExtra("status", t.status)
-            putExtra("categoria", t.categoria)
-            putExtra("mes", t.mes)
-            putExtra("ano", t.ano)
-            putExtra("isRecorrente", t.recorrente)
-            putExtra("parcelasRestantes", t.parcelasRestantes)
-            putExtra("parcelasTotais", t.parcelasTotais)
-        }
-        val detailPendingIntent = PendingIntent.getActivity(
-            applicationContext,
-            t.id + 10000,
-            detailIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
 
         val builder = NotificationCompat.Builder(applicationContext, channelId)
             .setSmallIcon(R.drawable.ic_finly_notification)
@@ -197,33 +160,100 @@ class NotificationWorker(
             .setContentText(textoPrincipal)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
-            .addAction(R.drawable.ic_finly_notification, "Marcar como Paga", paidPendingIntent)
-            .addAction(R.drawable.ic_finly_notification, "Ver Detalhes", detailPendingIntent)
             .setOnlyAlertOnce(true)
             .setAutoCancel(true)
 
         if (itens.size > 1) {
+            val tituloExpandido = applicationContext.getString(R.string.notif_titulo_multiplas, titulo, itens.size)
             val inbox = NotificationCompat.InboxStyle()
-                .setBigContentTitle("$titulo (${itens.size} pendências)")
-                .setSummaryText("Finly · ${itens.size} contas a acompanhar")
+                .setBigContentTitle(tituloExpandido)
+                .setSummaryText(applicationContext.getString(R.string.notif_resumo_contas, itens.size))
 
             itensOrdenados.take(5).forEach { item ->
                 val vFmt = CurrencyFormatter.formatar(item.transacao.valor, moedaAtual)
                 val infoDias = when {
-                    item.diffDias == 0 -> "vence hoje"
-                    item.diffDias < 0 -> "${-item.diffDias}d atraso"
-                    else -> "vence em ${item.diffDias}d"
+                    item.diffDias == 0 -> applicationContext.getString(R.string.notif_inbox_vence_hoje)
+                    item.diffDias < 0 -> applicationContext.getString(R.string.notif_inbox_atraso, -item.diffDias)
+                    else -> applicationContext.getString(R.string.notif_inbox_dias, item.diffDias)
                 }
-                inbox.addLine("• ${item.transacao.item} ($vFmt): $infoDias")
+                inbox.addLine(applicationContext.getString(R.string.notif_inbox_linha, item.transacao.item, vFmt, infoDias))
             }
 
             if (itens.size > 5) {
-                inbox.setSummaryText("+ ${itens.size - 5} outras contas")
+                inbox.setSummaryText(applicationContext.getString(R.string.notif_resumo_outras_contas, itens.size - 5))
             }
 
             builder.setStyle(inbox)
+
+            val nomeItemCurto = if (t.item.length > 10) t.item.take(8) + ".." else t.item
+            val paidIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
+                action = NotificationActionReceiver.ACTION_MARK_AS_PAID
+                putExtra(NotificationActionReceiver.EXTRA_TRANS_ID, t.id)
+            }
+            val paidPendingIntent = PendingIntent.getBroadcast(
+                applicationContext,
+                t.id,
+                paidIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            builder.addAction(
+                R.drawable.ic_finly_notification,
+                applicationContext.getString(R.string.notif_btn_pagar_item, nomeItemCurto),
+                paidPendingIntent
+            )
+            builder.addAction(
+                R.drawable.ic_finly_notification,
+                applicationContext.getString(R.string.notif_btn_ver_todas),
+                pendingIntent
+            )
         } else {
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(textoPrincipal))
+
+            val paidIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
+                action = NotificationActionReceiver.ACTION_MARK_AS_PAID
+                putExtra(NotificationActionReceiver.EXTRA_TRANS_ID, t.id)
+            }
+            val paidPendingIntent = PendingIntent.getBroadcast(
+                applicationContext,
+                t.id,
+                paidIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val detailIntent = Intent(applicationContext, DetalhesPageActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                putExtra("isTransactionDetail", true)
+                putExtra("id", t.id)
+                putExtra("item", t.item)
+                putExtra("valor", t.valor)
+                putExtra("vencimento", t.vencimento)
+                putExtra("tipo", t.tipo)
+                putExtra("status", t.status)
+                putExtra("categoria", t.categoria)
+                putExtra("mes", t.mes)
+                putExtra("ano", t.ano)
+                putExtra("isRecorrente", t.recorrente)
+                putExtra("parcelasRestantes", t.parcelasRestantes)
+                putExtra("parcelasTotais", t.parcelasTotais)
+            }
+            val detailPendingIntent = PendingIntent.getActivity(
+                applicationContext,
+                t.id + 10000,
+                detailIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            builder.addAction(
+                R.drawable.ic_finly_notification,
+                applicationContext.getString(R.string.notif_btn_marcar_paga),
+                paidPendingIntent
+            )
+            builder.addAction(
+                R.drawable.ic_finly_notification,
+                applicationContext.getString(R.string.notif_btn_ver_detalhes),
+                detailPendingIntent
+            )
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
