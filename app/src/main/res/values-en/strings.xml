@@ -323,12 +323,17 @@
     <string name="notif_canal_vencimento_desc">Notifications for bills due today or currently overdue</string>
 
     <!-- Titles -->
-    <string name="notif_titulo_vence_hoje">Bill due today! ⏰</string>
-    <string name="notif_titulo_em_atraso">Overdue bill! ⚠️</string>
+    <string name="notif_titulo_vence_hoje">Bill due today ⏰</string>
+    <string name="notif_titulo_vence_hoje_plural">%1$d bills due today ⏰</string>
+    <string name="notif_titulo_em_atraso">Overdue bill ⚠️</string>
+    <string name="notif_titulo_em_atraso_plural">%1$d overdue bills ⚠️</string>
     <string name="notif_titulo_lembrete">Payment Reminder 💰</string>
     <string name="notif_titulo_multiplas">%1$s (%2$d pending)</string>
 
     <!-- Body Texts / Lines -->
+    <string name="notif_texto_resumo_single">%1$s (%2$s)</string>
+    <string name="notif_texto_resumo_multi">Total of %1$s</string>
+    <string name="notif_inbox_linha_limpa">• %1$s (%2$s)</string>
     <string name="notif_texto_vence_hoje">Your bill %1$s (%2$s) is due today.</string>
     <string name="notif_texto_em_atraso">Your bill %1$s (%2$s) is overdue by %3$d day(s).</string>
     <string name="notif_texto_vence_dias">Your bill %1$s (%2$s) is due in %3$d days.</string>
@@ -342,7 +347,7 @@
     <string name="notif_resumo_outras_contas">+%1$d more bills</string>
 
     <!-- Action Buttons -->
-    <string name="notif_btn_marcar_paga">Mark as Paid</string>
+    <string name="notif_btn_marcar_paga">Mark Paid</string>
     <string name="notif_btn_pagar_item">Pay %1$s</string>
     <string name="notif_btn_ver_detalhes">View Details</string>
     <string name="notif_btn_ver_todas">View All</string>

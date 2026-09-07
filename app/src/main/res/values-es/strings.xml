@@ -323,12 +323,17 @@
     <string name="notif_canal_vencimento_desc">Notificaciones para cuentas por vencer hoy o vencidas</string>
 
     <!-- Títulos -->
-    <string name="notif_titulo_vence_hoje">¡Cuenta vence hoy! ⏰</string>
-    <string name="notif_titulo_em_atraso">¡Cuenta vencida! ⚠️</string>
+    <string name="notif_titulo_vence_hoje">Cuenta vence hoy ⏰</string>
+    <string name="notif_titulo_vence_hoje_plural">%1$d cuentas vencen hoy ⏰</string>
+    <string name="notif_titulo_em_atraso">Cuenta vencida ⚠️</string>
+    <string name="notif_titulo_em_atraso_plural">%1$d cuentas vencidas ⚠️</string>
     <string name="notif_titulo_lembrete">Recordatorio de Pago 💰</string>
     <string name="notif_titulo_multiplas">%1$s (%2$d pendientes)</string>
 
     <!-- Textos Principales / Líneas -->
+    <string name="notif_texto_resumo_single">%1$s (%2$s)</string>
+    <string name="notif_texto_resumo_multi">Total de %1$s</string>
+    <string name="notif_inbox_linha_limpa">• %1$s (%2$s)</string>
     <string name="notif_texto_vence_hoje">Su cuenta %1$s (%2$s) vence hoy.</string>
     <string name="notif_texto_em_atraso">Su cuenta %1$s (%2$s) tiene un retraso de %3$d día(s).</string>
     <string name="notif_texto_vence_dias">Su cuenta %1$s (%2$s) vence en %3$d días.</string>
@@ -342,7 +347,7 @@
     <string name="notif_resumo_outras_contas">+%1$d cuentas más</string>
 
     <!-- Botones de Acción -->
-    <string name="notif_btn_marcar_paga">Marcar como Pagada</string>
+    <string name="notif_btn_marcar_paga">Marcar Pagada</string>
     <string name="notif_btn_pagar_item">Pagar %1$s</string>
     <string name="notif_btn_ver_detalhes">Ver Detalles</string>
     <string name="notif_btn_ver_todas">Ver Todas</string>

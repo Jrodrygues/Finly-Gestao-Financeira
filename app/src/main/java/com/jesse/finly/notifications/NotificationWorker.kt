@@ -134,57 +134,62 @@ class NotificationWorker(
             },
         )
 
-        val topItem = itensOrdenados.first()
-        val t = topItem.transacao
-        val diff = topItem.diffDias
+        val totalContas = itens.size
+        val valorTotal = itens.sumOf { it.transacao.valor }
         val moedaAtual = UserPreferencesManager(applicationContext).obterMoedaAtual()
-        val valorFormatado = CurrencyFormatter.formatar(t.valor, moedaAtual)
+        val valorTotalFmt = CurrencyFormatter.formatar(valorTotal, moedaAtual)
 
-        val titulo = when {
-            diff == 0 -> applicationContext.getString(R.string.notif_titulo_vence_hoje)
-            diff < 0 -> applicationContext.getString(R.string.notif_titulo_em_atraso)
-            else -> applicationContext.getString(R.string.notif_titulo_lembrete)
+        val temAtraso = itens.any { it.diffDias < 0 }
+
+        val titulo = if (totalContas == 1) {
+            val diff = itens.first().diffDias
+            when {
+                diff < 0 -> applicationContext.getString(R.string.notif_titulo_em_atraso)
+                else -> applicationContext.getString(R.string.notif_titulo_vence_hoje)
+            }
+        } else {
+            when {
+                temAtraso -> applicationContext.getString(R.string.notif_titulo_em_atraso_plural, totalContas)
+                else -> applicationContext.getString(R.string.notif_titulo_vence_hoje_plural, totalContas)
+            }
         }
 
-        val textoPrincipal = when {
-            diff == 0 -> applicationContext.getString(R.string.notif_texto_vence_hoje, t.item, valorFormatado)
-            diff < 0 -> applicationContext.getString(R.string.notif_texto_em_atraso, t.item, valorFormatado, -diff)
-            else -> applicationContext.getString(R.string.notif_texto_vence_dias, t.item, valorFormatado, diff)
+        val topItem = itensOrdenados.first()
+        val t = topItem.transacao
+        val topValorFmt = CurrencyFormatter.formatar(t.valor, moedaAtual)
+
+        val textoResumo = if (totalContas == 1) {
+            applicationContext.getString(R.string.notif_texto_resumo_single, t.item, topValorFmt)
+        } else {
+            applicationContext.getString(R.string.notif_texto_resumo_multi, valorTotalFmt)
         }
 
         val builder = NotificationCompat.Builder(applicationContext, channelId)
             .setSmallIcon(R.drawable.ic_finly_notification)
             .setColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
             .setContentTitle(titulo)
-            .setContentText(textoPrincipal)
+            .setContentText(textoResumo)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
             .setOnlyAlertOnce(true)
             .setAutoCancel(true)
 
-        if (itens.size > 1) {
-            val tituloExpandido = applicationContext.getString(R.string.notif_titulo_multiplas, titulo, itens.size)
-            val inbox = NotificationCompat.InboxStyle()
-                .setBigContentTitle(tituloExpandido)
-                .setSummaryText(applicationContext.getString(R.string.notif_resumo_contas, itens.size))
+        if (totalContas > 1) {
+            val inboxStyle = NotificationCompat.InboxStyle()
+                .setBigContentTitle(titulo)
 
-            itensOrdenados.take(5).forEach { item ->
+            // Linhas limpas sem repetição de texto redundante
+            itensOrdenados.take(4).forEach { item ->
                 val vFmt = CurrencyFormatter.formatar(item.transacao.valor, moedaAtual)
-                val infoDias = when {
-                    item.diffDias == 0 -> applicationContext.getString(R.string.notif_inbox_vence_hoje)
-                    item.diffDias < 0 -> applicationContext.getString(R.string.notif_inbox_atraso, -item.diffDias)
-                    else -> applicationContext.getString(R.string.notif_inbox_dias, item.diffDias)
-                }
-                inbox.addLine(applicationContext.getString(R.string.notif_inbox_linha, item.transacao.item, vFmt, infoDias))
+                inboxStyle.addLine(applicationContext.getString(R.string.notif_inbox_linha_limpa, item.transacao.item, vFmt))
             }
 
-            if (itens.size > 5) {
-                inbox.setSummaryText(applicationContext.getString(R.string.notif_resumo_outras_contas, itens.size - 5))
+            if (totalContas > 4) {
+                inboxStyle.setSummaryText(applicationContext.getString(R.string.notif_resumo_outras_contas, totalContas - 4))
             }
 
-            builder.setStyle(inbox)
+            builder.setStyle(inboxStyle)
 
-            val nomeItemCurto = if (t.item.length > 10) t.item.take(8) + ".." else t.item
             val paidIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
                 action = NotificationActionReceiver.ACTION_MARK_AS_PAID
                 putExtra(NotificationActionReceiver.EXTRA_TRANS_ID, t.id)
@@ -198,7 +203,7 @@ class NotificationWorker(
 
             builder.addAction(
                 R.drawable.ic_finly_notification,
-                applicationContext.getString(R.string.notif_btn_pagar_item, nomeItemCurto),
+                applicationContext.getString(R.string.notif_btn_marcar_paga),
                 paidPendingIntent
             )
             builder.addAction(
@@ -207,7 +212,7 @@ class NotificationWorker(
                 pendingIntent
             )
         } else {
-            builder.setStyle(NotificationCompat.BigTextStyle().bigText(textoPrincipal))
+            builder.setStyle(NotificationCompat.BigTextStyle().bigText(textoResumo))
 
             val paidIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
                 action = NotificationActionReceiver.ACTION_MARK_AS_PAID
