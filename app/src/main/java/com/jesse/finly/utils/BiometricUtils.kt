@@ -4,6 +4,7 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.jesse.finly.R
 
 object BiometricUtils {
 
@@ -49,7 +50,7 @@ object BiometricUtils {
         try {
             biometricPrompt.authenticate(promptInfo)
         } catch (e: Exception) {
-            onError(e.localizedMessage ?: "Erro ao iniciar autenticação biométrica")
+            onError(e.localizedMessage ?: activity.getString(R.string.erro_autenticacao_biometrica))
         }
     }
 }

@@ -54,9 +54,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.chip.ChipGroup
 import android.widget.Button
-import androidx.annotation.RequiresApi
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -69,15 +67,15 @@ import com.jesse.finly.models.MetaPoupanca
 import com.jesse.finly.models.Utilizador
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.notifications.NotificationHelper
-import com.jesse.finly.utils.showToast
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.UserPreferencesManager
-import androidx.core.content.FileProvider
 import com.jesse.finly.utils.CsvExporter
 import com.jesse.finly.utils.PdfExporter
 import com.jesse.finly.utils.CurrencyFormatter
+import com.jesse.finly.utils.IdiomaUtils
 import com.jesse.finly.utils.Moeda
 import com.jesse.finly.utils.MoneyTextWatcher
+import com.jesse.finly.utils.ToastHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -90,7 +88,6 @@ import java.util.Calendar
 import java.util.Locale
 import kotlin.math.round
 
-@RequiresApi(Build.VERSION_CODES.O)
 class ResumoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityResumoBinding
     private val meses = arrayOf("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro")
@@ -156,7 +153,7 @@ class ResumoActivity : AppCompatActivity() {
 
         binding.btnVerDetalhes.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("MES_SELECIONADO", binding.spinnerMes.selectedItem.toString())
+            intent.putExtra("MES_SELECIONADO", obterMesSelecionadoCanonical())
             intent.putExtra("ANO_SELECIONADO", binding.spinnerAno.selectedItem as Int)
             intent.putExtra("IS_DETALHES_MODE", true)
             startActivity(intent)
@@ -212,11 +209,11 @@ class ResumoActivity : AppCompatActivity() {
             .setIcon(icon)
             .setMessage(getString(R.string.dialog_meta_poupanca_msg, binding.spinnerMes.selectedItem.toString()))
             .setView(view)
-            .setPositiveButton("Guardar") { _, _ ->
+            .setPositiveButton(getString(R.string.btn_guardar)) { _, _ ->
                 val novaMeta = watcher.obterValorDouble()
                 salvarMeta(novaMeta)
             }
-            .setNegativeButton("Cancelar", null)
+            .setNegativeButton(getString(R.string.btn_cancelar), null)
             .show()
     }
 
@@ -240,10 +237,10 @@ class ResumoActivity : AppCompatActivity() {
             if (!FirebaseManager.isGuestEmail(emailClean)) {
                 FirebaseManager.salvarMetaNoFirestore(metaObj)
             }
-            
+
             withContext(Dispatchers.Main) {
                 carregarDados(mesSel, anoSel)
-                showToast("Meta guardada para $mesSel!")
+                showToast(getString(R.string.toast_meta_guardada, mesSel))
             }
         }
     }
@@ -275,7 +272,6 @@ class ResumoActivity : AppCompatActivity() {
 
                 withContext(Dispatchers.Main) {
                     val novaMoeda = Moeda.porCodigo(perfilNuvem.moeda)
-                    val moedaMudou = (novaMoeda != moedaAtual)
                     moedaAtual = novaMoeda
 
                     // Se no documento Firestore 'moedaConfigurada' for true OU se já existir moeda gravada
@@ -488,7 +484,7 @@ class ResumoActivity : AppCompatActivity() {
 
         sincronizarCategoriasNuvem(customSet)
         showToast(getString(R.string.toast_categoria_adicionada, catClean))
-        val mesSel = binding.spinnerMes.selectedItem?.toString() ?: "Janeiro"
+        val mesSel = obterMesSelecionadoCanonical()
         val anoSel = binding.spinnerAno.selectedItem?.toString()?.toIntOrNull() ?: 2026
         carregarDados(mesSel, anoSel)
     }
@@ -504,7 +500,7 @@ class ResumoActivity : AppCompatActivity() {
 
         sincronizarCategoriasNuvem(customSet)
         showToast(getString(R.string.toast_categoria_removida, categoria))
-        val mesSel = binding.spinnerMes.selectedItem?.toString() ?: "Janeiro"
+        val mesSel = obterMesSelecionadoCanonical()
         val anoSel = binding.spinnerAno.selectedItem?.toString()?.toIntOrNull() ?: 2026
         carregarDados(mesSel, anoSel)
     }
@@ -524,10 +520,10 @@ class ResumoActivity : AppCompatActivity() {
                     MaterialAlertDialogBuilder(this@ResumoActivity)
                         .setTitle(getString(R.string.dialog_eliminar_categoria_titulo))
                         .setMessage(getString(R.string.dialog_eliminar_categoria_msg, categoria))
-                        .setPositiveButton(getString(R.string.btn_sim_eliminar)) { _, _ ->
+                        .setPositiveButton(getString(R.string.btn_eliminar)) { _, _ ->
                             onConfirm()
                         }
-                        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                        .setNegativeButton(getString(R.string.btn_cancelar)) { dialog, _ ->
                             dialog.dismiss()
                         }
                         .show()
@@ -536,7 +532,7 @@ class ResumoActivity : AppCompatActivity() {
                     MaterialAlertDialogBuilder(this@ResumoActivity)
                         .setTitle(getString(R.string.dialog_categoria_em_uso_titulo))
                         .setMessage(getString(R.string.dialog_categoria_em_uso_msg, categoria, quantidade))
-                        .setPositiveButton("Eliminar") { _, _ ->
+                        .setPositiveButton(getString(R.string.btn_sim_eliminar)) { _, _ ->
                             lifecycleScope.launch(Dispatchers.IO) {
                                 transacoesAfetadas.forEach { trans ->
                                     val transAtualizada = trans.copy(categoria = "Geral")
@@ -548,7 +544,7 @@ class ResumoActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                        .setNegativeButton("Cancelar") { dialog, _ ->
+                        .setNegativeButton(getString(R.string.btn_cancelar)) { dialog, _ ->
                             dialog.dismiss()
                         }
                         .show()
@@ -662,7 +658,7 @@ class ResumoActivity : AppCompatActivity() {
             // 2. Categorias do Sistema (Mostrar 4 por omissão ou todas se expandido)
             val padraoParaMostrar = if (isPadraoExpanded) categoriasPadrao else categoriasPadrao.take(4)
             btnVerMaisPadrao?.visibility = View.VISIBLE
-            btnVerMaisPadrao?.text = if (isPadraoExpanded) "Ver menos" else "Ver mais categorias do sistema"
+            btnVerMaisPadrao?.text = if (isPadraoExpanded) getString(R.string.ver_menos_categorias) else getString(R.string.ver_mais_categorias_sistema)
 
             for (catPadrao in padraoParaMostrar) {
                 val itemView = layoutInflater.inflate(R.layout.item_categoria_custom, containerPadrao, false)
@@ -672,7 +668,7 @@ class ResumoActivity : AppCompatActivity() {
                 val btnRemover = itemView.findViewById<View>(R.id.btnRemoverCategoriaCustom)
 
                 ivIcon?.setImageResource(obterIconeParaCategoria(catPadrao))
-                tvNome?.text = catPadrao
+                tvNome?.text = IdiomaUtils.formatarNomeCategoria(this, catPadrao)
                 tvTag?.visibility = View.VISIBLE
                 btnRemover?.visibility = View.GONE
                 containerPadrao?.addView(itemView)
@@ -698,7 +694,7 @@ class ResumoActivity : AppCompatActivity() {
 
                 atualizarListaCustom()
             } else {
-                showToast("Digite o nome da categoria")
+                showToast(getString(R.string.toast_digite_nome_categoria))
             }
         }
 
@@ -722,10 +718,10 @@ class ResumoActivity : AppCompatActivity() {
         if (emailClean.isEmpty() || emailClean == "convidado") {
             tvNome?.text = getString(R.string.utilizador_convidado)
             tvEmail?.text = getString(R.string.dados_apenas_locais)
-            mostrarInicial(tvInitial, "Convidado")
+            mostrarInicial(tvInitial, getString(R.string.utilizador_convidado))
             
             ivCloud?.setImageResource(R.drawable.ic_cloud_off)
-            ivCloud?.setOnClickListener { showToast("Modo Convidado: Dados guardados apenas no dispositivo.") }
+            ivCloud?.setOnClickListener { showToast(getString(R.string.toast_nuvem_convidado)) }
             return
         }
 
@@ -740,7 +736,7 @@ class ResumoActivity : AppCompatActivity() {
                     mostrarInicial(tvInitial, utilizador.nome)
                     
                     ivCloud?.setImageResource(R.drawable.ic_cloud_done)
-                    ivCloud?.setOnClickListener { showToast("Sincronizado: Os seus dados estão seguros na nuvem.") }
+                    ivCloud?.setOnClickListener { showToast(getString(R.string.toast_nuvem_sincronizado)) }
                 }
             }
         }
@@ -768,7 +764,7 @@ class ResumoActivity : AppCompatActivity() {
             .setTitle(getString(R.string.dialog_sair_titulo))
             .setIcon(icon)
             .setMessage(getString(R.string.dialog_sair_msg))
-            .setPositiveButton("Sim") { _, _ ->
+            .setPositiveButton(getString(R.string.dialog_sair_btn_sim)) { _, _ ->
                 // ENCERRAR NO FIREBASE
                 com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
 
@@ -784,7 +780,7 @@ class ResumoActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             }
-            .setNegativeButton("Não", null)
+            .setNegativeButton(getString(R.string.dialog_sair_btn_nao), null)
             .show()
     }
 
@@ -864,7 +860,7 @@ class ResumoActivity : AppCompatActivity() {
         fun drawHeaderAndFooter(c: Canvas, pNum: Int) {
             c.drawRect(0f, 0f, pageWidth.toFloat(), 85f, headerPaint)
             c.drawText("Finly", 30f, 40f, titlePaint)
-            c.drawText("Relatório Financeiro Mensal • $mes / $ano", 30f, 62f, subtitlePaint)
+            c.drawText(getString(R.string.pdf_relatorio_subtitulo, mes, ano), 30f, 62f, subtitlePaint)
 
             // Logo ícone vetorial de altíssima definição (Renderizado a 6x para nitidez cristalina ao fazer ‘zoom’ no PDF)
             val logoVector = ContextCompat.getDrawable(this, R.drawable.ic_logo_finly_transp)
@@ -888,8 +884,8 @@ class ResumoActivity : AppCompatActivity() {
 
             c.drawLine(30f, 810f, 565f, 810f, linePaint)
             val dataHoje = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(java.util.Date())
-            c.drawText("Gerado por Finly em $dataHoje", 30f, 825f, labelPaint)
-            c.drawText("Página $pNum", 525f, 825f, labelPaint)
+            c.drawText(getString(R.string.pdf_rodape_gerado, dataHoje), 30f, 825f, labelPaint)
+            c.drawText(getString(R.string.pdf_rodape_pagina, pNum), 525f, 825f, labelPaint)
         }
 
         var currentY = 0f
@@ -909,10 +905,10 @@ class ResumoActivity : AppCompatActivity() {
         fun drawTableHeader(c: Canvas, y: Float) {
             c.drawRoundRect(30f, y, 565f, y + 22f, 4f, 4f, tableHeaderPaint)
             val headerY = y + 15f
-            c.drawText("Item / Descrição", 40f, headerY, tableHeaderCellPaint)
-            c.drawText("Categoria", 250f, headerY, tableHeaderCellPaint)
-            c.drawText("Data", 370f, headerY, tableHeaderCellPaint)
-            c.drawText("Valor", 555f, headerY, tableHeaderCellRightPaint)
+            c.drawText(getString(R.string.pdf_col_item_desc), 40f, headerY, tableHeaderCellPaint)
+            c.drawText(getString(R.string.pdf_col_categoria), 250f, headerY, tableHeaderCellPaint)
+            c.drawText(getString(R.string.pdf_col_data), 370f, headerY, tableHeaderCellPaint)
+            c.drawText(getString(R.string.pdf_col_valor), 555f, headerY, tableHeaderCellRightPaint)
         }
 
         drawHeaderAndFooter(canvas, pageNumber)
@@ -939,26 +935,26 @@ class ResumoActivity : AppCompatActivity() {
 
         val despesasPendentes = despesas.filter { !it.status }
         val totalDespesasPendentes = despesasPendentes.sumOf { it.valor }
-        val statusPrevisao = if (saldoVal >= 0) "No Verde" else "No Vermelho"
+        val statusPrevisao = if (saldoVal >= 0) getString(R.string.pdf_previsao_status_verde) else getString(R.string.pdf_previsao_status_vermelho)
         val detalhePrevisao = if (despesasPendentes.isNotEmpty()) {
-            "${despesasPendentes.size} pendentes: " + FinanceiroUtils.formatarMoeda(totalDespesasPendentes, codigoMoeda = codigoMoeda)
+            getString(R.string.pdf_previsao_pendentes, despesasPendentes.size, FinanceiroUtils.formatarMoeda(totalDespesasPendentes, codigoMoeda = codigoMoeda))
         } else {
-            "Contas em dia"
+            getString(R.string.pdf_previsao_contas_em_dia)
         }
 
-        canvas.drawText("TOTAL RENDAS", 50f, 122f, labelPaint)
+        canvas.drawText(getString(R.string.pdf_card_total_rendas), 50f, 122f, labelPaint)
         canvas.drawText(rendaText, 50f, 142f, valueRendaPaint)
 
-        canvas.drawText("TOTAL DESPESAS", 210f, 122f, labelPaint)
+        canvas.drawText(getString(R.string.pdf_card_total_despesas), 210f, 122f, labelPaint)
         canvas.drawText(despesaText, 210f, 142f, valueDespesaPaint)
 
-        canvas.drawText("SALDO FINAL", 380f, 122f, labelPaint)
+        canvas.drawText(getString(R.string.pdf_card_saldo_final), 380f, 122f, labelPaint)
         val isSaldoNegativo = binding.tvSaldoFinal.currentTextColor == ContextCompat.getColor(this, R.color.colorNegative)
         val saldoPaint = if (isSaldoZero) labelPaint else if (isSaldoNegativo) valueDespesaPaint else valueRendaPaint
         canvas.drawText(saldoText, 380f, 142f, saldoPaint)
 
         canvas.drawLine(50f, 157f, 545f, 157f, linePaint)
-        canvas.drawText("Previsão Fim de Mês: $statusPrevisao ($detalhePrevisao)", 50f, 175f, textPaint)
+        canvas.drawText(getString(R.string.pdf_card_previsao_fim_mes, statusPrevisao, detalhePrevisao), 50f, 175f, textPaint)
 
         currentY = 210f
 
@@ -970,14 +966,14 @@ class ResumoActivity : AppCompatActivity() {
             .sortedByDescending { it.second }
 
         if (gastosPorCategoria.isNotEmpty()) {
-            canvas.drawText("RESUMO DE DESPESAS POR CATEGORIA", 30f, currentY, textBoldPaint)
+            canvas.drawText(getString(R.string.pdf_secao_despesas_cat), 30f, currentY, textBoldPaint)
             currentY += 12f
 
             canvas.drawRoundRect(30f, currentY, 565f, currentY + 22f, 4f, 4f, tableHeaderPaint)
             val miniHeaderY = currentY + 15f
-            canvas.drawText("Categoria", 40f, miniHeaderY, tableHeaderCellPaint)
-            canvas.drawText("Total Gasto", 320f, miniHeaderY, tableHeaderCellPaint)
-            canvas.drawText("% do Total", 460f, miniHeaderY, tableHeaderCellPaint)
+            canvas.drawText(getString(R.string.pdf_col_categoria), 40f, miniHeaderY, tableHeaderCellPaint)
+            canvas.drawText(getString(R.string.pdf_col_total_gasto), 320f, miniHeaderY, tableHeaderCellPaint)
+            canvas.drawText(getString(R.string.pdf_col_percent_total), 460f, miniHeaderY, tableHeaderCellPaint)
             currentY += 34f
 
             for ((cat, totalCat) in gastosPorCategoria) {
@@ -1011,13 +1007,13 @@ class ResumoActivity : AppCompatActivity() {
         val rendas = transacoes.filter { it.tipo == "RENDA" }.sortedBy { extrairOrdemData(it.vencimento) }
         checkPageBreak(60f)
 
-        canvas.drawText("RENDAS (ENTRADAS)", 30f, currentY, textBoldPaint)
+        canvas.drawText(getString(R.string.pdf_secao_rendas), 30f, currentY, textBoldPaint)
         currentY += 12f
         drawTableHeader(canvas, currentY)
         currentY += 34f
 
         if (rendas.isEmpty()) {
-            canvas.drawText("Nenhuma renda registada para este período.", 40f, currentY, labelPaint)
+            canvas.drawText(getString(R.string.pdf_sem_rendas), 40f, currentY, labelPaint)
             currentY += rowHeight
         } else {
             for (t in rendas) {
@@ -1049,13 +1045,13 @@ class ResumoActivity : AppCompatActivity() {
         val despesasOrdenadas = despesas.sortedBy { extrairOrdemData(it.vencimento) }
         checkPageBreak(60f)
 
-        canvas.drawText("DESPESAS (SAÍDAS)", 30f, currentY, textBoldPaint)
+        canvas.drawText(getString(R.string.pdf_secao_despesas), 30f, currentY, textBoldPaint)
         currentY += 12f
         drawTableHeader(canvas, currentY)
         currentY += 34f
 
         if (despesasOrdenadas.isEmpty()) {
-            canvas.drawText("Nenhuma despesa registada para este período.", 40f, currentY, labelPaint)
+            canvas.drawText(getString(R.string.pdf_sem_despesas), 40f, currentY, labelPaint)
             currentY += rowHeight
         } else {
             for (t in despesasOrdenadas) {
@@ -1090,12 +1086,12 @@ class ResumoActivity : AppCompatActivity() {
             val bytes = baos.toByteArray()
             val ok = guardarFicheiroEmDownloads(nomeFicheiro, "application/pdf", bytes)
             if (ok) {
-                showToast("Relatório salvo em Downloads!", isLong = true)
+                showToast(getString(R.string.toast_relatorio_pdf_salvo), isLong = true)
             } else {
-                showToast("Erro ao guardar o relatório PDF.")
+                showToast(getString(R.string.toast_relatorio_pdf_erro_guardar))
             }
         } catch (e: Exception) {
-            showToast("Erro ao gerar PDF: ${e.message}")
+            showToast(getString(R.string.toast_relatorio_pdf_erro_gerar, e.message ?: ""))
         } finally {
             pdfDocument.close()
         }
@@ -1212,7 +1208,7 @@ class ResumoActivity : AppCompatActivity() {
         val transacoes = transacoesAtuaisGrafico
 
         if (transacoes.isEmpty()) {
-            showToast("Sem transações para exportar em $mes/$ano")
+            showToast(getString(R.string.toast_csv_sem_transacoes, mes, ano))
             return
         }
 
@@ -1223,12 +1219,12 @@ class ResumoActivity : AppCompatActivity() {
             val nomeFicheiro = file.name
             val ok = guardarFicheiroEmDownloads(nomeFicheiro, "text/csv", bytes)
             if (ok) {
-                showToast("Ficheiro CSV salvo em Downloads!", isLong = true)
+                showToast(getString(R.string.toast_csv_salvo), isLong = true)
             } else {
-                showToast("Erro ao guardar o ficheiro CSV.")
+                showToast(getString(R.string.toast_csv_erro_guardar))
             }
         } catch (e: Exception) {
-            showToast("Erro ao exportar CSV: ${e.message}")
+            showToast(getString(R.string.toast_csv_erro_exportar, e.message ?: ""))
         }
     }
 
@@ -1274,6 +1270,10 @@ class ResumoActivity : AppCompatActivity() {
         val email = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString("EMAIL", "") ?: ""
         if (email.isEmpty() || email == "CONVIDADO") return
         val emailClean = email.trim().lowercase()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            FirebaseManager.removerCampoSenhaDoFirestore(emailClean)
+        }
 
         FirebaseManager.monitorarTransacoes(emailClean) { listaNuvem ->
             lifecycleScope.launch(Dispatchers.IO) {
@@ -1348,7 +1348,7 @@ class ResumoActivity : AppCompatActivity() {
     }
 
     private fun executarCarregamentoInterface() {
-        val mesAtual = binding.spinnerMes.selectedItem?.toString() ?: meses[0]
+        val mesAtual = obterMesSelecionadoCanonical()
         val anoAtual = binding.spinnerAno.selectedItem as? Int ?: anos[0]
         carregarDados(mesAtual, anoAtual)
         atualizarDrawerHeader()
@@ -1410,8 +1410,13 @@ class ResumoActivity : AppCompatActivity() {
         btnConfirmar?.setOnClickListener {
             FinanceiroUtils.dispararHapticFeedback(it)
             isShowingOnboardingMoeda = false
+            val moedaDesc = if (moedaSelecionada == Moeda.BRL)
+                getString(R.string.moeda_real_nome_completo)
+            else
+                getString(R.string.moeda_euro_nome_completo)
+
             UserPreferencesManager(this).salvarMoeda(moedaSelecionada) {
-                showToast("Moeda ${if (moedaSelecionada == Moeda.BRL) "Real (R$)" else "Euro (€)"} configurada com sucesso!")
+                showToast(getString(R.string.toast_moeda_configurada_sucesso, moedaDesc))
             }
             bottomSheetDialog.dismiss()
             prosseguirComCarregamento()
@@ -1442,7 +1447,7 @@ class ResumoActivity : AppCompatActivity() {
                 } else if (email == "CONVIDADO") {
                     showToast(getString(R.string.toast_convidado_perfil))
                 } else {
-                    showToast("A carregar perfil... Tente novamente.")
+                    showToast(getString(R.string.toast_carregar_perfil))
                 }
             }
         }
@@ -1474,8 +1479,14 @@ class ResumoActivity : AppCompatActivity() {
         }
     }
 
+    private fun obterMesSelecionadoCanonical(): String {
+        val pos = binding.spinnerMes.selectedItemPosition
+        return if (pos in meses.indices) meses[pos] else "Janeiro"
+    }
+
     private fun configurarSpinners() {
-        val adapterMes = HighlightSpinnerAdapter(this, meses) { binding.spinnerMes.selectedItemPosition }
+        val mesesExibicao = meses.map { IdiomaUtils.formatarNomeMes(this, it) }.toTypedArray()
+        val adapterMes = HighlightSpinnerAdapter(this, mesesExibicao) { binding.spinnerMes.selectedItemPosition }
         binding.spinnerMes.adapter = adapterMes
 
         val adapterAno = HighlightSpinnerAdapter(this, anos) { binding.spinnerAno.selectedItemPosition }
@@ -1503,7 +1514,7 @@ class ResumoActivity : AppCompatActivity() {
 
         val itemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val mesSel = binding.spinnerMes.selectedItem.toString()
+                val mesSel = obterMesSelecionadoCanonical()
                 val anoSel = binding.spinnerAno.selectedItem as Int
                 if (lastLoadedMonth == mesSel && lastLoadedYear == anoSel) return
                 
@@ -1760,28 +1771,31 @@ class ResumoActivity : AppCompatActivity() {
         val itensGraficoELegenda = if (!isCategoriesExpanded && gastosPorCategoria.size > 4) {
             val top3 = gastosPorCategoria.take(3).toMutableList()
             val restoValor = gastosPorCategoria.drop(3).sumOf { it.second.toDouble() }.toFloat()
-            top3.add(Pair("Outros", restoValor))
+            top3.add(Pair(getString(R.string.grafico_categoria_outros), restoValor))
             top3
         } else {
             gastosPorCategoria
         }
 
         binding.btnVerMaisCategorias.visibility = if (gastosPorCategoria.size > 4) View.VISIBLE else View.GONE
-        binding.btnVerMaisCategorias.text = if (isCategoriesExpanded) "Ver menos" else "Ver mais categorias"
+        binding.btnVerMaisCategorias.text = if (isCategoriesExpanded)
+            getString(R.string.btn_ver_menos_categorias)
+        else
+            getString(R.string.btn_ver_mais_categorias)
 
         val totalGastos = gastosPorCategoria.sumOf { it.second.toDouble() }
         val entries = itensGraficoELegenda.map { PieEntry(it.second, it.first) }
         
         // Cores diversificadas para despesas (sem verde, reservado para rendas/poupança)
         val expenseColors = listOf(
-            Color.parseColor("#7E57C2"), // Roxo / Violeta
-            Color.parseColor("#00897B"), // Azul-petróleo (Teal)
-            Color.parseColor("#FB8C00"), // Laranja
-            Color.parseColor("#00ACC1"), // Ciano
-            Color.parseColor("#3F51B5"), // Índigo
-            Color.parseColor("#E91E63"), // Rosa
-            Color.parseColor("#FF5722"), // Laranja escuro / Coral
-            Color.parseColor("#2196F3")  // Azul
+            "#7E57C2".toColorInt(), // Roxo / Violeta
+            "#00897B".toColorInt(), // Azul-petróleo (Teal)
+            "#FB8C00".toColorInt(), // Laranja
+            "#00ACC1".toColorInt(), // Ciano
+            "#3F51B5".toColorInt(), // Índigo
+            "#E91E63".toColorInt(), // Rosa
+            "#FF5722".toColorInt(), // Laranja escuro / Coral
+            "#2196F3".toColorInt()  // Azul
         )
 
         val dataSet = PieDataSet(entries, "").apply {
@@ -1793,16 +1807,20 @@ class ResumoActivity : AppCompatActivity() {
 
         val moedaAtual = UserPreferencesManager(this).obterMoedaAtual()
         val totalStr = CurrencyFormatter.formatar(totalGastos, moedaAtual)
-        val centerString = SpannableString("Total\n$totalStr")
+        val centerTextRaw = getString(R.string.grafico_centro_total, totalStr)
+        val centerString = SpannableString(centerTextRaw)
+        val breakIndex = centerTextRaw.indexOf('\n')
         val isDark = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
         val textColor = if (isDark) Color.WHITE else Color.BLACK
-        val mutedColor = if (isDark) Color.parseColor("#B0B0B0") else Color.parseColor("#666666")
+        val mutedColor = if (isDark) "#B0B0B0".toColorInt() else "#666666".toColorInt()
 
-        centerString.setSpan(ForegroundColorSpan(mutedColor), 0, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        centerString.setSpan(RelativeSizeSpan(0.75f), 0, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        centerString.setSpan(ForegroundColorSpan(textColor), 5, centerString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        centerString.setSpan(RelativeSizeSpan(1.15f), 5, centerString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        centerString.setSpan(StyleSpan(Typeface.BOLD), 5, centerString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        if (breakIndex != -1) {
+            centerString.setSpan(ForegroundColorSpan(mutedColor), 0, breakIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            centerString.setSpan(RelativeSizeSpan(0.75f), 0, breakIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            centerString.setSpan(ForegroundColorSpan(textColor), breakIndex, centerString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            centerString.setSpan(RelativeSizeSpan(1.15f), breakIndex, centerString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            centerString.setSpan(StyleSpan(Typeface.BOLD), breakIndex, centerString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
 
         val pieData = PieData(dataSet)
         binding.pieChart.apply {
@@ -1838,7 +1856,7 @@ class ResumoActivity : AppCompatActivity() {
         val itemView = layoutInflater.inflate(R.layout.item_categoria_resumo, binding.llCategoryDetails, false)
         
         itemView.findViewById<View>(R.id.vColorIndicator).background.setTint(cor)
-        itemView.findViewById<TextView>(R.id.tvCategoryName).text = nome
+        itemView.findViewById<TextView>(R.id.tvCategoryName).text = IdiomaUtils.formatarNomeCategoria(this, nome)
         itemView.findViewById<TextView>(R.id.tvCategoryValue).text = CurrencyFormatter.formatar(valor, moeda)
         itemView.findViewById<TextView>(R.id.tvCategoryPercent).text = String.format(Locale.getDefault(), "(%d%%)", percent)
         
@@ -1881,7 +1899,7 @@ class ResumoActivity : AppCompatActivity() {
         val colorPositivo = ContextCompat.getColor(this, R.color.colorPositive)
         val colorNegativo = ContextCompat.getColor(this, R.color.colorNegative)
         val colorPadrao = ContextCompat.getColor(this, R.color.textColorSecondary)
-        val colorAlertaAviso = Color.parseColor("#FF9800")
+        val colorAlertaAviso = "#FF9800".toColorInt()
 
         val moedaAtual = UserPreferencesManager(this).obterMoedaAtual()
 
@@ -1926,21 +1944,21 @@ class ResumoActivity : AppCompatActivity() {
 
             when {
                 diff < -0.5 -> {
-                    binding.tvTagComparativoMes.text = "↓ $diffAbs% vs. $abrevMes"
+                    binding.tvTagComparativoMes.text = getString(R.string.comparativo_mes_queda_fmt, diffAbs, abrevMes)
                     binding.tvTagComparativoMes.setTextColor(colorPositivo)
                     binding.tvTagComparativoMes.background = ContextCompat.getDrawable(this, R.drawable.badge_padrao_background)
-                    binding.tvTagComparativoMes.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E8F5E9"))
+                    binding.tvTagComparativoMes.backgroundTintList = ColorStateList.valueOf("#E8F5E9".toColorInt())
                     binding.tvTagComparativoMes.visibility = View.VISIBLE
                 }
                 diff > 0.5 -> {
-                    binding.tvTagComparativoMes.text = "↑ $diffAbs% vs. $abrevMes"
+                    binding.tvTagComparativoMes.text = getString(R.string.comparativo_mes_alta_fmt, diffAbs, abrevMes)
                     binding.tvTagComparativoMes.setTextColor(colorNegativo)
                     binding.tvTagComparativoMes.background = ContextCompat.getDrawable(this, R.drawable.badge_padrao_background)
-                    binding.tvTagComparativoMes.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FFEBEE"))
+                    binding.tvTagComparativoMes.backgroundTintList = ColorStateList.valueOf("#FFEBEE".toColorInt())
                     binding.tvTagComparativoMes.visibility = View.VISIBLE
                 }
                 else -> {
-                    binding.tvTagComparativoMes.text = "0% vs. $abrevMes"
+                    binding.tvTagComparativoMes.text = getString(R.string.comparativo_mes_neutro_fmt, abrevMes)
                     binding.tvTagComparativoMes.setTextColor(colorPadrao)
                     binding.tvTagComparativoMes.background = ContextCompat.getDrawable(this, R.drawable.badge_padrao_background)
                     binding.tvTagComparativoMes.backgroundTintList = null
@@ -1974,6 +1992,10 @@ class ResumoActivity : AppCompatActivity() {
                 getString(R.string.saldo_estimado_fmt, "$valorSaldoStr • ${getString(R.string.previsao_contas_em_dia)}")
             }
         }
+    }
+
+    private fun showToast(msg: String, isLong: Boolean = false) {
+        ToastHelper.showCustomToast(this, msg, isLong)
     }
 
     private suspend fun processarRecorrencia(db: MinhaBaseDados, email: String, mesAlvo: String, anoAlvo: Int) {

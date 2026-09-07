@@ -81,7 +81,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Nome"
+                android:text="@string/txtNome"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -170,7 +170,7 @@
                             android:id="@+id/tvLabelField1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Categoria"
+                            android:text="@string/col_categoria"
                             android:textColor="@color/textColorSecondary"
                             android:textSize="12sp" />
                         <TextView
@@ -216,7 +216,7 @@
                             android:id="@+id/tvLabelField2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Data de Vencimento"
+                            android:text="@string/col_vencimento"
                             android:textColor="@color/textColorSecondary"
                             android:textSize="12sp" />
                         <TextView
@@ -262,7 +262,7 @@
                             android:id="@+id/tvLabelField3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Recorrência"
+                            android:text="@string/col_recorrencia"
                             android:textColor="@color/textColorSecondary"
                             android:textSize="12sp" />
                         <TextView
@@ -309,7 +309,7 @@
                             android:id="@+id/tvLabelField4"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Estado do Pagamento"
+                            android:text="@string/col_estado_pagamento"
                             android:textColor="@color/textColorSecondary"
                             android:textSize="12sp" />
                         <TextView
@@ -353,7 +353,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="CONFIGURAÇÕES"
+                    android:text="@string/label_configuracoes"
                     android:textColor="@color/textColorSecondary"
                     android:textSize="12sp"
                     android:textStyle="bold"
@@ -369,7 +369,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Lembrete de Vencimento"
+                        android:text="@string/label_lembrete_vencimento"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="15sp" />
 
@@ -396,7 +396,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Ativar Modo Escuro"
+                        android:text="@string/label_ativar_modo_escuro"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="15sp" />
 
@@ -422,7 +422,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Bloqueio com Biometria"
+                        android:text="@string/label_bloqueio_biometria"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="15sp" />
 
@@ -488,6 +488,50 @@
                     </com.google.android.material.button.MaterialButtonToggleGroup>
                 </LinearLayout>
 
+                <!-- Divisor elegante -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="12dp"
+                    android:background="#1AFFFFFF" />
+
+                <!-- Linha Clicável de Idioma -->
+                <LinearLayout
+                    android:id="@+id/llConfigIdioma"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="4dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_idioma"
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/tvIdiomaAtual"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:textColor="@color/textColorSecondary"
+                        android:textSize="13sp" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/textColorSecondary" />
+                </LinearLayout>
+
+
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -539,7 +583,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="24dp"
-                android:text="Eliminar Conta (Ação Irreversível)"
+                android:text="@string/label_eliminar_conta_irreversivel"
                 android:textColor="@color/colorNegative"
                 android:textSize="13sp" />
         </LinearLayout>

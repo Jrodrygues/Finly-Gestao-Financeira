@@ -23,7 +23,6 @@ import com.jesse.finly.utils.UserPreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Calendar
-import java.util.Locale
 
 class NotificationWorker(
     context: Context,

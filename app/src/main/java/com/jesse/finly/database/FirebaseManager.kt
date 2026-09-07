@@ -2,6 +2,7 @@ package com.jesse.finly.database
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.jesse.finly.models.MetaPoupanca
@@ -114,19 +115,43 @@ object FirebaseManager {
 
     /**
      * Sincroniza um utilizador local para o Firestore após o registo ou alteração de perfil.
+     * Importante: O campo 'senha' possui a anotação @Exclude para nunca ser gravado no Firestore.
      */
     suspend fun salvarUtilizadorNoFirestore(utilizador: Utilizador) {
         val email = utilizador.email.trim().lowercase()
         if (isGuestEmail(email)) return
 
         try {
-            db.collection("utilizadores")
-                .document(email)
-                .set(utilizador)
-                .await()
-            Log.d("FirebaseManager", "Utilizador salvo no Firestore: $email | customCategories: ${utilizador.customCategories}")
+            val userRef = db.collection("utilizadores").document(email)
+            userRef.set(utilizador).await()
+
+            // Elimina qualquer campo legado de 'senha' que possa existir em documentos antigos no Firestore
+            try {
+                userRef.update("senha", FieldValue.delete()).await()
+            } catch (_: Exception) {
+                // Campo 'senha' já não existe, ignorar
+            }
+
+            Log.d("FirebaseManager", "Utilizador salvo no Firestore sem senha: $email | customCategories: ${utilizador.customCategories}")
         } catch (e: Exception) {
             Log.e("FirebaseManager", "Erro ao salvar utilizador: ${e.message}")
+        }
+    }
+
+    /**
+     * Garante a eliminação proativa do campo 'senha' no documento do Firestore.
+     */
+    suspend fun removerCampoSenhaDoFirestore(email: String) {
+        val clean = email.trim().lowercase()
+        if (isGuestEmail(clean)) return
+        try {
+            db.collection("utilizadores")
+                .document(clean)
+                .update("senha", FieldValue.delete())
+                .await()
+            Log.d("FirebaseManager", "Campo 'senha' removido do Firestore para: $clean")
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Erro ao remover campo 'senha': ${e.message}")
         }
     }
 

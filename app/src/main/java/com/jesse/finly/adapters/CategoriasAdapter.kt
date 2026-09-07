@@ -8,6 +8,7 @@ import com.jesse.finly.R
 import com.jesse.finly.databinding.ItemCategoriaBinding
 import com.jesse.finly.models.Categoria
 import com.jesse.finly.utils.CurrencyFormatter
+import com.jesse.finly.utils.IdiomaUtils
 import com.jesse.finly.utils.Moeda
 
 class CategoriasAdapter(
@@ -28,7 +29,7 @@ class CategoriasAdapter(
 
     inner class ViewHolder(val binding: ItemCategoriaBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Categoria) {
-            binding.tvNomeCategoria.text = item.nome
+            binding.tvNomeCategoria.text = IdiomaUtils.formatarNomeCategoria(itemView.context, item.nome)
             
             // Verifica se a categoria possui limite definido
             if (item.limiteMensal > 0.0) {

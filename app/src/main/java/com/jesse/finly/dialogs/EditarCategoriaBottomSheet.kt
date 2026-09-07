@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.jesse.finly.R
 import com.jesse.finly.databinding.BottomSheetEditarCategoriaBinding
 import com.jesse.finly.models.Categoria
 import com.jesse.finly.utils.Moeda
@@ -75,7 +76,7 @@ class EditarCategoriaBottomSheet : BottomSheetDialogFragment() {
         val limiteValor = moneyWatcher.obterValorDouble() // Retorna Double limpo
 
         if (nome.isEmpty()) {
-            binding.tilNomeCategoria.error = "Digite o nome da categoria"
+            binding.tilNomeCategoria.error = getString(R.string.msg_digite_nome_categoria)
             return
         } else {
             binding.tilNomeCategoria.error = null

@@ -1,0 +1,560 @@
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="Typos,Spelling">
+
+    <string name="app_name">Finly</string>
+    <string name="menu_resumo">Monthly Overview</string>
+    <string name="menu_planilha">Transaction History</string>
+    <string name="menu_perfil">My Profile</string>
+    <string name="menu_guia">User Guide</string>
+    <string name="menu_evolucao">Yearly Overview</string>
+    <string name="menu_exportar">Export Report</string>
+
+    <string name="menu_sair">Sign Out</string>
+    <string name="accoes">Actions</string>
+
+    <!-- User Guide -->
+    <string name="guia_titulo">USER GUIDE</string>
+    <string name="guia_sec1_titulo">1. Monthly Overview &amp; Charts</string>
+    <string name="guia_sec1_desc">Get a clear financial overview for the selected month using the top selector. The pie chart and list detail your exact spending breakdown by category and percentage.</string>
+    <string name="guia_sec2_titulo">2. Savings Goal &amp; Progress</string>
+    <string name="guia_sec2_desc">Set your monthly savings target. The progress bar updates automatically with transactions from the \'Savings\' category and syncs across all your devices in real time.</string>
+    <string name="guia_sec3_titulo">3. Detailed List &amp; Filters</string>
+    <string name="guia_sec3_desc">Access your full transaction history. Search by keyword, filter by type using tabs, and use the dedicated header back button to quickly return to your overview.</string>
+    <string name="guia_sec4_titulo">4. Add &amp; Edit Transactions</string>
+    <string name="guia_sec4_desc">Tap the \'+\' button on the Transactions screen to register a new entry (Income or Expense) using the quick toggle. The amount field adapts to your currency (€ or $) with automated cents formatting during typing and dynamic category icons.</string>
+    <string name="guia_sec5_titulo">5. Smart Recurrence</string>
+    <string name="guia_sec5_desc">Enable recurrence for fixed or installment transactions. When editing or deleting a recurring item, choose whether to apply changes only to the selected month or to all future months.</string>
+    <string name="guia_sec6_titulo">6. Custom Categories</string>
+    <string name="guia_sec6_desc">Create and manage custom categories via \'Manage Categories\' or while logging entries. The category field automatically inherits the icon assigned to each category.</string>
+    <string name="guia_sec7_titulo">7. Due Date Notifications</string>
+    <string name="guia_sec7_desc">Receive automatic alerts for upcoming bills (due today, within 3 days, or recently overdue). Tapping a notification opens directly into your Overview. Toggle this on or off in your profile.</string>
+    <string name="guia_sec8_titulo">8. Export Reports (PDF / CSV)</string>
+    <string name="guia_sec8_desc">Export monthly financial reports directly from the side drawer. Choose between high-resolution PDF documents (with charts and tables) or structured CSV spreadsheets (ready for Excel or Google Sheets).</string>
+    <string name="guia_sec9_titulo">9. Yearly Overview</string>
+    <string name="guia_sec9_desc">Open the side drawer to view your annual bar chart, comparing actual monthly earnings against total expenditures throughout the entire year.</string>
+    <string name="guia_sec10_titulo">10. Real-Time Cloud Sync</string>
+    <string name="guia_sec10_desc">When you register an account, your transactions, savings goals, and categories sync securely to the cloud with end-to-end encryption across all your mobile devices.</string>
+    <string name="guia_sec11_titulo">11. Guest Mode (100% Local)</string>
+    <string name="guia_sec11_desc">Explore all app features without an account. In Guest Mode, your data remains stored strictly on your device memory with complete privacy.</string>
+    <string name="guia_sec12_titulo">12. Dark &amp; Light Mode</string>
+    <string name="guia_sec12_desc">Tailor the visual interface to your style. Switch between Dark and Light mode from your profile settings for a comfortable experience at any time of day.</string>
+    <string name="guia_sec13_titulo">13. Security &amp; Privacy</string>
+    <string name="guia_sec13_desc">Your privacy is our utmost priority. Finly leverages cutting-edge encryption to ensure that only you can access your personal financial information.</string>
+    <string name="guia_sec14_titulo">14. Biometric Lock / Fingerprint</string>
+    <string name="guia_sec14_desc">Protect your app against unauthorized access. Turn on biometric unlock in your profile to require fingerprint or PIN authentication whenever Finly opens. Biometric settings sync with your cloud profile.</string>
+    <string name="guia_sec15_titulo">15. Financial Insights &amp; Projections</string>
+    <string name="guia_sec15_desc">Receive automated budget warnings when spending exceeds 100% of income, review percentage indicators comparing to the previous month, and check end-of-month projected balances based on pending bills.</string>
+    <string name="guia_sec16_titulo">16. Period Selector &amp; File Exporting</string>
+    <string name="guia_sec16_desc">Tap the month header to trigger a 4x3 month grid (JAN..DEC) with a horizontal year selector. Selection syncs smoothly between Overview and List. Export formatted PDF and CSV reports saved directly to your Downloads folder.</string>
+    <string name="guia_sec17_titulo">17. Multi-Currency System &amp; Onboarding</string>
+    <string name="guia_sec17_desc">Select your primary currency (€ EUR, $ USD, or R$ BRL) during initial onboarding. All views, charts, inputs, and reports adapt dynamically with fractional digit formatting and sync across devices.</string>
+    <string name="snackbar_item_removido">Item removed: %1$s</string>
+    <string name="btn_desfazer">UNDO</string>
+    <string name="btn_voltar">Back</string>
+
+    <!-- Login -->
+    <string name="lembrar_email">Remember email</string>
+    <string name="entrar">SIGN IN</string>
+    <string name="entrar_convidado">Continue as Guest</string>
+    <string name="ou_separador">OR</string>
+    <string name="bem_vindo_finly">Welcome to Finly</string>
+    <string name="criar_conta_link">Don\'t have an account? Sign up here</string>
+    <string name="esqueceu_senha">Forgot password?</string>
+    <string name="msg_modo_convidado_aviso">As a guest, your data will not sync to the cloud and will be permanently lost if you uninstall the app. Do you want to continue?</string>
+    <string name="btn_continuar_convidado">Continue</string>
+    <string name="hint_confirmar_palavra_passe">Confirm Password</string>
+    <string name="email_recuperacao_enviado">Password reset email sent!</string>
+    <string name="erro_recuperacao">Failed to send password reset email.</string>
+    <string name="introduza_email_recuperacao">Enter your email to reset your password.</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_palavra_passe">Password</string>
+    <string name="hint_palavra_passe_atual">Current Password</string>
+
+    <!-- Register / New Item -->
+    <string name="nova_transacao">New Transaction</string>
+    <string name="editar_item">Edit Item</string>
+    <string name="criar_nova_conta">Create New Account</string>
+    <string name="editar_perfil">Edit Profile</string>
+    <string name="guardar_na_listagem">SAVE TRANSACTION</string>
+    <string name="atualizar_item">UPDATE ITEM</string>
+    <string name="btn_criar_conta">CREATE ACCOUNT</string>
+    <string name="btn_atualizar_perfil">UPDATE PROFILE</string>
+    <string name="hint_descricao">Description</string>
+    <string name="hint_valor">Amount ($)</string>
+    <string name="hint_vencimento">Due Date (Calendar)</string>
+    <string name="label_categoria">Category:</string>
+    <string name="label_mes_referencia">Reference Month:</string>
+    <string name="rb_despesa">EXPENSE</string>
+    <string name="rb_renda">INCOME</string>
+    <string name="cb_repetir_sempre">Repeat every month (Fixed)</string>
+    <string name="cb_repetir_vezes">Repeat fixed number of times</string>
+    <string name="hint_parcelas">Number of installments?</string>
+
+    <!-- Overview -->
+    <string name="percentagem_renda_gasta">PERCENTAGE OF INCOME SPENT</string>
+    <string name="ver_listagem_detalhada">VIEW DETAILED HISTORY</string>
+    <string name="label_periodo">Period:</string>
+    <string name="label_resumo_categoria">BREAKDOWN BY CATEGORY</string>
+    <string name="label_meta_poupanca">Savings Goal</string>
+    <string name="btn_definir_meta">SET GOAL</string>
+    <string name="label_total_renda">Total Monthly Income: </string>
+    <string name="label_total_despesas">Total Monthly Expenses: </string>
+    <string name="label_total_poupanca">Total Saved: </string>
+    <string name="label_total_exterior">Total Abroad: </string>
+    <string name="label_saldo">ACCOUNT BALANCE: </string>
+    <string name="btn_exportar_pdf">EXPORT PDF REPORT</string>
+    <string name="dialog_exportar_titulo">Export Report - %1$s, %2$d</string>
+    <string name="exportar_btn_pdf">Export as PDF</string>
+    <string name="exportar_btn_csv">Export as CSV</string>
+    <string name="exportar_sub_pdf">High-resolution document with formatted charts and tables</string>
+    <string name="exportar_sub_csv">Structured spreadsheet ready for Excel or Google Sheets</string>
+    <string name="aviso_teto_orcamental">⚠️ Warning: expenses exceed total income</string>
+    <string name="previsao_fim_mes_titulo">End of Month Forecast</string>
+
+    <!-- Transactions (Home) -->
+    <string name="hint_pesquisar">Search&#8230;</string>
+
+    <string name="tab_todas">ALL</string>
+    <string name="tab_despesas">EXPENSES</string>
+    <string name="tab_rendas">INCOME</string>
+    <string name="col_item">Description</string>
+    <string name="col_valor">Amount</string>
+    <string name="col_vencimento">Due Date</string>
+    <string name="col_pago">Paid</string>
+    <string name="col_ver">View</string>
+
+    <!-- Profile -->
+    <string name="btn_minha_listagem">MY TRANSACTIONS</string>
+    <string name="btn_editar_dados">EDIT ACCOUNT DETAILS</string>
+    <string name="btn_terminar_sessao">SIGN OUT</string>
+    <string name="btn_eliminar_registo">DELETE ACCOUNT</string>
+    <string name="dialog_eliminar_titulo">Delete Account</string>
+    <string name="dialog_eliminar_msg">Are you sure you want to delete your account? All saved transactions and records will be permanently removed.</string>
+    <string name="toast_conta_eliminada">Account deleted successfully</string>
+
+    <!-- Transaction -->
+    <string name="btn_editar_este_item">EDIT THIS ITEM</string>
+    <string name="btn_eliminar_este_item">DELETE THIS ITEM</string>
+    <string name="btn_voltar_listagem">BACK TO TRANSACTIONS</string>
+    <string name="utilizador_convidado">Guest User</string>
+    <string name="dados_apenas_locais">Stored locally on device (Offline)</string>
+    <string name="sem_email_sincronizado">No synchronized email</string>
+
+    <string name="toast_convidado_perfil">Guest mode: No cloud profile to edit</string>
+    <string name="meta_atingida">Goal Reached! Congratulations! 🎉</string>
+    <string name="valor_label">Amount: $%1$.2f (%2$s)</string>
+    <string name="data_label">Date: %1$s</string>
+    <string name="categoria_mes_label">Category: %1$s | Month: %2$s</string>
+    <string name="poupado_label">Saved: %1$s (%2$d%%)</string>
+    <string name="meta_definir_aviso">Set a savings goal for this month.</string>
+    <string name="userName">UserReplace</string>
+    <string name="txtTelemovel">Phone</string>
+    <string name="txtEmail">Email</string>
+    <string name="txtPalavraPasse">Password</string>
+    <string name="txtNome">Name</string>
+
+    <!-- Labels List / Overview -->
+    <string name="total_despesas">Total Expenses: </string>
+    <string name="total_rendas">Total Income: </string>
+    <string name="saldo_final_label">Final Balance: </string>
+
+    <!-- PDF -->
+    <string name="pdf_titulo">Finly Financial Report</string>
+    <string name="pdf_periodo">Period: %1$s / %2$s</string>
+    <string name="pdf_renda_total">Total Income: %1$s</string>
+    <string name="pdf_despesa_total">Total Expenses: %1$s</string>
+    <string name="pdf_poupanca_total">Total Saved: %1$s</string>
+    <string name="pdf_meta_definida">Target Savings Goal: %1$s</string>
+    <string name="pdf_saldo_final">Final Balance: %1$s</string>
+    <string name="empty_list_message">No transactions found</string>
+    <string name="empty_list_subtext">Tap the button below to add your first transaction for this month.</string>
+    <string name="btn_registar_transacao_cta">+ Add Transaction</string>
+    <string name="dialog_eliminar_recorrencia_titulo">Delete Recurrence</string>
+    <string name="dialog_eliminar_recorrencia_msg">Do you want to delete \'%1$s\' for this month only or for all upcoming months?</string>
+    <string name="dialog_editar_recorrencia_titulo">Edit Recurrence</string>
+    <string name="dialog_editar_recorrencia_msg">Do you want to apply modifications for \'%1$s\' to this month only or to all upcoming months?</string>
+    <string name="btn_editar_apenas_este">This month only</string>
+    <string name="btn_editar_todos_futuros">This and future months</string>
+    <string name="btn_apagar_apenas_este">Delete this month only</string>
+    <string name="btn_apagar_todos_futuros">Delete all future occurrences</string>
+    <string name="dialog_eliminar_item_titulo">Delete Item</string>
+    <string name="dialog_eliminar_item_msg">Are you sure you want to permanently delete \'%1$s\'?</string>
+    <string name="btn_sim_eliminar">Yes, delete item</string>
+    <string name="btn_nao_manter">NO, KEEP ITEM</string>
+    <string name="toast_recorrencia_removida">Recurrence removed!</string>
+    <string name="toast_item_removido">Item removed successfully!</string>
+    <string name="recorrencia_label">Recurrence: %1$s</string>
+    <string name="hint_nome_completo">Full Name</string>
+    <string name="hint_email_input">Email</string>
+    <string name="hint_email_inalteravel">Email (Read-only)</string>
+    <string name="hint_telemovel">Phone Number</string>
+    <string name="evolucao_ano_label">Yearly Overview for %1$d</string>
+    <string name="total_rendas_label">Total Income</string>
+    <string name="total_despesas_label">Total Expenses</string>
+    <string name="saldo_anual_label">Annual Net Balance</string>
+    <string name="label_ano">Year</string>
+    <string name="aviso_convidado_titulo">Guest Notice</string>
+    <string name="aviso_convidado_msg">As a guest user, all data is stored locally. Do you wish to continue?</string>
+    <string name="marker_separator">"  |  "</string>
+    <string name="default_year">2026</string>
+    <string name="default_value_currency">$0.00</string>
+
+    <!-- New Category & Management -->
+    <string name="hint_nova_categoria">Ex: Leisure, Gym</string>
+    <string name="dialog_nova_categoria_titulo">New Category</string>
+    <string name="btn_adicionar">ADD</string>
+    <string name="option_nova_categoria">⚙️ Manage Categories&#8230;</string>
+    <string name="titulo_gerir_categorias">Manage Categories</string>
+    <string name="label_categorias_personalizadas">My Custom Categories</string>
+    <string name="sem_categorias_custom">You haven\'t added custom categories yet.</string>
+    <string name="toast_categoria_adicionada">Category \'%1$s\' added!</string>
+    <string name="toast_categoria_removida">Category \'%1$s\' removed!</string>
+
+    <!-- Onboarding Currency & Profile -->
+    <string name="onboarding_moeda_titulo">Welcome to Finly! 🚀</string>
+    <string name="onboarding_moeda_titulo_nome">Welcome to Finly, %1$s! 🚀</string>
+    <string name="onboarding_moeda_subtitulo">Select your primary account currency:</string>
+    <string name="moeda_eur_titulo">Euro (€ EUR)</string>
+    <string name="moeda_eur_subtitulo">European Union standard</string>
+    <string name="moeda_brl_titulo">Brazilian Real (R$ BRL)</string>
+    <string name="moeda_brl_subtitulo">Brazil standard</string>
+    <string name="btn_continuar">CONTINUE</string>
+    <string name="moeda_principal_label">Main Currency</string>
+    <string name="moeda_eur_curto">€ EUR</string>
+    <string name="moeda_brl_curto">R$ BRL</string>
+    <string name="toast_moeda_alterada_eur">Currency changed to Euro (€)</string>
+    <string name="toast_moeda_alterada_brl">Currency changed to Real (R$)</string>
+
+    <!-- Category Cap Modal -->
+    <string name="titulo_editar_categoria_teto">Manage Category &amp; Spending Cap</string>
+    <string name="hint_nome_categoria">Category Name</string>
+    <string name="hint_teto_orcamental">Monthly Spending Cap</string>
+    <string name="btn_cancelar_caps">CANCEL</string>
+
+    <!-- Authentication / Registration Errors -->
+    <string name="erro_auth_email_em_uso">This email address is already in use.</string>
+    <string name="erro_auth_senha_fraca">Password must contain at least 6 characters.</string>
+    <string name="erro_auth_email_invalido">Invalid email format.</string>
+    <string name="erro_auth_credenciais_invalidas">Incorrect email or password.</string>
+    <string name="erro_auth_utilizador_nao_encontrado">Account not found.</string>
+    <string name="erro_auth_sem_conexao">No internet connection. Please try again.</string>
+    <string name="erro_auth_generico">An error occurred. Please try again.</string>
+
+    <!-- Toast Messages -->
+    <string name="toast_permissao_notificacao_negada">Notification permission denied</string>
+    <string name="toast_biometria_ativada">Biometric lock enabled!</string>
+    <string name="toast_biometria_cancelada">Authentication cancelled or unavailable</string>
+    <string name="toast_biometria_indisponivel">Biometrics not available or enrolled on this device</string>
+    <string name="toast_biometria_desativada">Biometric lock disabled</string>
+    <string name="toast_modo_escuro_ativado">Dark mode enabled</string>
+    <string name="toast_modo_claro_ativado">Light mode enabled</string>
+    <string name="toast_notificacoes_ativadas">Notifications enabled!</string>
+    <string name="toast_notificacoes_desativadas">Notifications disabled</string>
+    <string name="toast_erro_eliminar_conta_nuvem">Failed to delete account from cloud</string>
+    <string name="toast_introduza_email_senha">Please enter your email and password</string>
+    <string name="toast_credenciais_incorretas">Invalid email or password!</string>
+    <string name="toast_introduza_email_valido">Please enter a valid email</string>
+    <string name="toast_conta_marcada_paga">Bill marked as paid!</string>
+
+    <string name="toast_email_inalteravel">Email cannot be changed</string>
+    <string name="toast_senha_confirmada">Password confirmed!</string>
+    <string name="toast_senha_atual_incorreta">Incorrect current password!</string>
+    <string name="toast_introduza_vencimento">Please enter a due date</string>
+    <string name="toast_data_invalida">Invalid date. Use MM/DD format</string>
+    <string name="toast_dados_guardados">Data saved successfully!</string>
+    <string name="toast_campos_obrigatorios">Please fill in all required fields</string>
+    <string name="toast_senhas_nao_coincidem">Passwords do not match</string>
+    <string name="toast_conta_criada">Account created successfully!</string>
+    <string name="toast_nome_email_obrigatorios">Name and email are required</string>
+    <string name="toast_perfil_atualizado">Profile updated successfully!</string>
+
+    <string name="toast_meta_guardada">Savings goal saved for %1$s!</string>
+    <string name="toast_modo_convidado_nuvem">Guest Mode: Data stored locally only.</string>
+    <string name="toast_sincronizado_nuvem">Synced: Your data is safely stored in the cloud.</string>
+    <string name="toast_erro_guardar_pdf">Error saving PDF report.</string>
+    <string name="toast_erro_gerar_pdf">Error generating PDF: %1$s</string>
+    <string name="toast_sem_transacoes_exportar">No transactions to export for %1$s/%2$d</string>
+    <string name="toast_ficheiro_csv_salvo">CSV file saved to Downloads!</string>
+    <string name="toast_erro_guardar_csv">Error saving CSV file.</string>
+    <string name="toast_erro_exportar_csv">Error exporting CSV: %1$s</string>
+    <string name="toast_moeda_configurada">Currency %1$s configured successfully!</string>
+    <string name="toast_carregando_perfil">Loading profile&#8230; Please wait.</string>
+    <string name="toast_transacao_paga">%1$s marked as paid!</string>
+    <string name="toast_erro_atualizar_transacao">Failed to update transaction.</string>
+
+    <!-- Dialogs & Titles -->
+    <string name="dialog_sair_titulo">Sign Out</string>
+    <string name="dialog_sair_msg">Are you sure you want to sign out of your account?</string>
+    <string name="dialog_eliminar_conta_titulo">Delete Account</string>
+    <string name="dialog_eliminar_conta_msg">This action cannot be undone. Your profile, transactions, and cloud history will be permanently deleted.</string>
+    <string name="dialog_recuperar_senha_titulo">Reset Password</string>
+    <string name="dialog_modo_convidado_titulo">Guest Mode</string>
+    <string name="dialog_eliminar_categoria_titulo">Delete Category</string>
+    <string name="dialog_eliminar_categoria_msg">Are you sure you want to delete category \'%1$s\'?</string>
+    <string name="dialog_categoria_em_uso_titulo">Category in Use</string>
+    <string name="dialog_categoria_em_uso_msg">The category \'%1$s\' is currently linked to %2$d transaction(s). Reassign them to \'General\' and remove this category?</string>
+    <string name="dialog_meta_poupanca_titulo">Savings Goal</string>
+    <string name="dialog_meta_poupanca_msg">How much do you plan to save in %1$s?</string>
+    <string name="dialog_senha_atual_titulo">Current Password</string>
+    <string name="dialog_senha_atual_msg">For security reasons, enter your current password to choose a new one.</string>
+    <string name="dialog_autenticacao_requerida_titulo">Authentication Required</string>
+    <string name="dialog_autenticacao_requerida_msg">Authentication is required to access your account.</string>
+    <string name="dialog_btn_enviar">Send</string>
+
+    <!-- Labels & Global Badges -->
+    <string name="label_despesa">Expense</string>
+    <string name="label_renda">Income</string>
+    <string name="label_pago">Paid</string>
+    <string name="label_pendente">Pending</string>
+    <string name="label_categoria_simples">Category</string>
+    <string name="label_data_vencimento">Due Date</string>
+    <string name="label_recorrencia">Recurrence</string>
+    <string name="label_estado_pagamento">Payment Status</string>
+    <string name="gasto_total_format">Total spent: %1$s</string>
+    <string name="gasto_sem_teto_format">Spent: %1$s (No budget limit)</string>
+    <string name="detalhes_mes_ano_format">Details: %1$s %2$d</string>
+    <string name="tag_no_verde">🟢 In the Green</string>
+    <string name="tag_no_vermelho">🔴 In the Red</string>
+    <string name="previsao_contas_em_dia">All bills paid</string>
+    <string name="previsao_pendencias_fmt">• %1$d pending (%2$s)</string>
+    <string name="saldo_estimado_fmt">Estimated balance: %1$s</string>
+
+    <!-- Due Date Notifications -->
+    <string name="notif_canal_vencimento_nome">Due Date Reminders</string>
+    <string name="notif_canal_vencimento_desc">Notifications for bills due today or currently overdue</string>
+
+    <!-- Titles -->
+    <string name="notif_titulo_vence_hoje">Bill due today! ⏰</string>
+    <string name="notif_titulo_em_atraso">Overdue bill! ⚠️</string>
+    <string name="notif_titulo_lembrete">Payment Reminder 💰</string>
+    <string name="notif_titulo_multiplas">%1$s (%2$d pending)</string>
+
+    <!-- Body Texts / Lines -->
+    <string name="notif_texto_vence_hoje">Your bill %1$s (%2$s) is due today.</string>
+    <string name="notif_texto_em_atraso">Your bill %1$s (%2$s) is overdue by %3$d day(s).</string>
+    <string name="notif_texto_vence_dias">Your bill %1$s (%2$s) is due in %3$d days.</string>
+
+    <string name="notif_inbox_vence_hoje">due today</string>
+    <string name="notif_inbox_atraso">%1$dd overdue</string>
+    <string name="notif_inbox_dias">due in %1$dd</string>
+    <string name="notif_inbox_linha">• %1$s (%2$s): %3$s</string>
+
+    <string name="notif_resumo_contas">%1$d bills to track</string>
+    <string name="notif_resumo_outras_contas">+%1$d more bills</string>
+
+    <!-- Action Buttons -->
+    <string name="notif_btn_marcar_paga">Mark as Paid</string>
+    <string name="notif_btn_pagar_item">Pay %1$s</string>
+    <string name="notif_btn_ver_detalhes">View Details</string>
+    <string name="notif_btn_ver_todas">View All</string>
+
+    <!-- ResumoActivity Actions -->
+    <string name="btn_guardar">Save</string>
+    <string name="btn_cancelar">Cancel</string>
+    <string name="btn_eliminar">Delete</string>
+    <string name="dialog_sair_btn_sim">Yes</string>
+    <string name="dialog_sair_btn_nao">No</string>
+    <string name="toast_digite_nome_categoria">Please enter a category name</string>
+    <string name="toast_nuvem_convidado">Guest Mode: Data stored locally only.</string>
+    <string name="toast_nuvem_sincronizado">Synced: Your data is safely stored in the cloud.</string>
+    <string name="toast_carregar_perfil">Loading profile... Please wait.</string>
+    <string name="toast_moeda_configurada_sucesso">%1$s currency configured successfully!</string>
+    <string name="moeda_real_nome_completo">Brazilian Real (R$)</string>
+    <string name="moeda_euro_nome_completo">Euro (€)</string>
+    <string name="btn_ver_mais_categorias">Show more categories</string>
+    <string name="btn_ver_menos_categorias">Show less</string>
+    <string name="grafico_categoria_outros">Others</string>
+    <string name="grafico_centro_total">Total\n%1$s</string>
+
+    <!-- PDF & CSV Export -->
+    <string name="pdf_relatorio_subtitulo">Monthly Financial Report • %1$s / %2$s</string>
+    <string name="pdf_rodape_gerado">Generated by Finly on %1$s</string>
+    <string name="pdf_rodape_pagina">Page %1$d</string>
+    <string name="pdf_card_total_rendas">TOTAL INCOME</string>
+    <string name="pdf_card_total_despesas">TOTAL EXPENSES</string>
+    <string name="pdf_card_saldo_final">NET BALANCE</string>
+    <string name="pdf_card_previsao_fim_mes">End of Month Forecast: %1$s (%2$s)</string>
+    <string name="pdf_previsao_status_verde">In the Green</string>
+    <string name="pdf_previsao_status_vermelho">In the Red</string>
+    <string name="pdf_previsao_contas_em_dia">All bills settled</string>
+    <string name="pdf_previsao_pendentes">%1$d pending: %2$s</string>
+    <string name="pdf_secao_despesas_cat">EXPENSES BY CATEGORY</string>
+    <string name="pdf_col_categoria">Category</string>
+    <string name="pdf_col_total_gasto">Total Spent</string>
+    <string name="pdf_col_percent_total">%% of Total</string>
+    <string name="pdf_secao_rendas">INCOME ENTRIES</string>
+    <string name="pdf_secao_despesas">EXPENSES (OUTFLOWS)</string>
+    <string name="pdf_col_item_desc">Item / Description</string>
+    <string name="pdf_col_data">Date</string>
+    <string name="pdf_col_valor">Amount</string>
+    <string name="pdf_sem_rendas">No income logged for this period.</string>
+    <string name="pdf_sem_despesas">No expenses logged for this period.</string>
+    <string name="toast_relatorio_pdf_salvo">Report saved to Downloads!</string>
+    <string name="toast_relatorio_pdf_erro_guardar">Failed to save PDF report.</string>
+    <string name="toast_relatorio_pdf_erro_gerar">Error generating PDF: %1$s</string>
+    <string name="toast_csv_sem_transacoes">No transactions available to export for %1$s/%2$s</string>
+    <string name="toast_csv_salvo">CSV file saved to Downloads!</string>
+    <string name="toast_csv_erro_guardar">Failed to save CSV file.</string>
+    <string name="toast_csv_erro_exportar">Error exporting CSV: %1$s</string>
+
+    <!-- MainActivity Footer & Balances -->
+    <string name="main_saldo_total_despesas_prefix">Total Expenses: </string>
+    <string name="main_saldo_total_rendas_prefix">Total Income: </string>
+    <string name="main_saldo_disponivel_prefix">Available Balance: </string>
+    <string name="main_saldo_defice_prefix">Deficit / Negative: </string>
+
+    <string name="main_saldo_detalhe_despesas">Paid: %1$s  |  Pending: %2$s  (%3$d%% paid)</string>
+    <string name="main_saldo_detalhe_todas">Initial: %1$s  |  Paid: %2$s (%3$d%%)  |  Pending: %4$s</string>
+
+    <!-- MainActivity Period Dialog -->
+    <string name="main_btn_cancelar_periodo">Cancel</string>
+    <string name="main_btn_aplicar_periodo">Apply</string>
+
+    <!-- DetalhesPageActivity Profile & Transaction Labels -->
+    <string name="label_email">Email</string>
+    <string name="label_telemovel">Phone</string>
+    <string name="recorrencia_repetir_sempre">Repeat Indefinitely</string>
+    <string name="recorrencia_repetir_meses">Repeat for %1$d months</string>
+    <string name="recorrencia_unica">Single (One-time)</string>
+
+    <!-- DetalhesPageActivity Theme & Alerts -->
+    <string name="dark_mode_ativado">Dark Mode Enabled</string>
+    <string name="dark_mode_desativado">Enable Dark Mode</string>
+    <string name="toast_permissao_notif_negada">Notification permission denied</string>
+
+    <!-- DetalhesPageActivity Biometrics -->
+    <string name="biometria_prompt_titulo">Enable Biometrics</string>
+    <string name="biometria_prompt_subtitulo">Confirm your identity to enable biometric lock</string>
+
+    <!-- DetalhesPageActivity Confirmations -->
+    <string name="dialog_btn_sim_eliminar">Yes, Delete</string>
+
+    <!-- RegistoActivity Hints & Warnings -->
+    <string name="hint1_valor">Amount</string>
+    <string name="hint_nova_palavra_passe">New Password</string>
+    <string name="hint_confirmar_nova_palavra_passe">Confirm New Password</string>
+
+    <string name="toast_item_removido_sucesso">Item removed successfully!</string>
+    <string name="btn_confirmar">Confirm</string>
+
+    <string name="erro_campo_nome_obrigatorio">Please enter a description or name</string>
+    <string name="erro_campo_valor_maior_zero">Amount must be greater than zero</string>
+
+    <!-- LoginActivity Actions -->
+    <string name="btn_enviar">Send</string>
+    <string name="utilizador_padrao_nome">User</string>
+    <string name="criar_conta_trecho_destaque">Sign up here</string>
+
+    <!-- EvolucaoAnualActivity Chart & Balance -->
+    <string name="chart_marker_mes_balanco">%1$s: %2$s</string>
+    <string name="chart_label_saldo_mensal">Monthly net</string>
+    <string name="comparativo_mes_queda_fmt">↓ %1$d%% vs. %2$s</string>
+    <string name="comparativo_mes_alta_fmt">↑ %1$d%% vs. %2$s</string>
+    <string name="comparativo_mes_neutro_fmt">0%% vs. %1$s</string>
+
+    <string name="label_idioma">Language</string>
+    <string name="titulo_dialog_idioma">Select Language</string>
+    <string name="idioma_padrao_sistema">System Default</string>
+
+    <!-- EvolucaoAnualActivity -->
+    <string name="evolucao_detalhe_mes_dica">Monthly Details (Tap a bar)</string>
+    <string name="label_rendas_mes">Monthly Income</string>
+    <string name="label_despesas_mes">Monthly Expenses</string>
+    <string name="label_balanco_mes">Monthly Net Balance</string>
+
+    <!-- RegistoActivity / Transacoes -->
+    <string name="label_repetir_transacao">Repeat Transaction (Recurring)</string>
+    <string name="label_fixa_mensal">Fixed (Monthly)</string>
+    <string name="label_parcelada">Installments</string>
+    <string name="btn_alterar_palavra_passe">Change password</string>
+    <string name="btn_cancelar_alteracao_palavra_passe">Cancel password change</string>
+    <string name="msg_digite_nome_categoria">Enter category name</string>
+
+    <!-- Categorias / BottomSheet -->
+    <string name="as_minhas_categorias">My Categories</string>
+    <string name="categorias_do_sistema">System Categories</string>
+    <string name="ver_mais_categorias">Show more categories</string>
+    <string name="ver_mais_categorias_sistema">Show more system categories</string>
+    <string name="ver_menos_categorias">Show less</string>
+    <string name="label_categoria_padrao">Default</string>
+
+    <!-- DetalhesPageActivity / Layout -->
+    <string name="col_categoria">Category</string>
+    <string name="col_recorrencia">Recurrence</string>
+    <string name="col_estado_pagamento">Payment Status</string>
+    <string name="label_configuracoes">SETTINGS</string>
+    <string name="label_lembrete_vencimento">Due Reminder</string>
+    <string name="label_ativar_modo_escuro">Enable Dark Mode</string>
+    <string name="label_bloqueio_biometria">Biometric Lock</string>
+    <string name="label_eliminar_conta_irreversivel">Delete Account (Irreversible)</string>
+
+    <!-- Dialog Selecionar Periodo -->
+    <string name="dialog_selecionar_periodo_titulo">Select Period</string>
+    <string name="col_ano">Year</string>
+    <string name="col_mes">Month</string>
+    <string name="btn_aplicar">APPLY</string>
+
+    <!-- Notificacoes / Toast -->
+    <string name="toast_transacao_marcada_paga">%1$s marked as paid!</string>
+    <string name="erro_autenticacao_biometrica">Error initiating biometric authentication</string>
+
+    <!-- Meses Abreviados -->
+    <string name="mes_abrev_jan">JAN</string>
+    <string name="mes_abrev_fev">FEB</string>
+    <string name="mes_abrev_mar">MAR</string>
+    <string name="mes_abrev_abr">APR</string>
+    <string name="mes_abrev_mai">MAY</string>
+    <string name="mes_abrev_jun">JUN</string>
+    <string name="mes_abrev_jul">JUL</string>
+    <string name="mes_abrev_ago">AUG</string>
+    <string name="mes_abrev_set">SEP</string>
+    <string name="mes_abrev_out">OCT</string>
+    <string name="mes_abrev_nov">NOV</string>
+    <string name="mes_abrev_dez">DEC</string>
+
+    <!-- Meses Completos -->
+    <string name="mes_jan">January</string>
+    <string name="mes_fev">February</string>
+    <string name="mes_mar">March</string>
+    <string name="mes_abr">April</string>
+    <string name="mes_mai">May</string>
+    <string name="mes_jun">June</string>
+    <string name="mes_jul">July</string>
+    <string name="mes_ago">August</string>
+    <string name="mes_set">September</string>
+    <string name="mes_out">October</string>
+    <string name="mes_nov">November</string>
+    <string name="mes_dez">December</string>
+
+    <!-- Relatórios PDF / CSV -->
+    <string name="pdf_moeda_selecionada">Selected currency: %1$s</string>
+    <string name="csv_cabecalho_fmt">Date;Description;Category;Type;Amount (%1$s);Paid\n</string>
+    <string name="label_sim">Yes</string>
+    <string name="label_nao">No</string>
+
+    <!-- Splash Biometria & Outros -->
+    <string name="dialog_biometria_titulo">Authentication Required</string>
+    <string name="dialog_biometria_msg">Authentication is required to access your account.</string>
+    <string name="btn_tentar_novamente">Try Again</string>
+    <string name="btn_sair">Exit</string>
+    <string name="desc_status_nuvem">Cloud Status</string>
+    <string name="label_gasto_total">Total spent: %1$s</string>
+
+    <!-- Categorias -->
+    <string name="cat_geral">General</string>
+    <string name="cat_habitacao">Housing</string>
+    <string name="cat_alimentacao">Food &amp; Dining</string>
+    <string name="cat_transporte">Transportation</string>
+    <string name="cat_saude">Healthcare</string>
+    <string name="cat_lazer">Entertainment</string>
+    <string name="cat_educacao">Education</string>
+    <string name="cat_compras">Shopping</string>
+    <string name="cat_assinaturas">Subscriptions</string>
+    <string name="cat_investimentos">Investments</string>
+    <string name="cat_poupanca">Savings</string>
+    <string name="cat_exterior">International</string>
+    <string name="cat_outros">Others</string>
+
+    <!-- Guia Seção 18 -->
+    <string name="guia_sec18_titulo">18. Multi-Language Support (Per-App Language)</string>
+    <string name="guia_sec18_desc">Go to the Profile menu to switch the app language at any time between English (US), Spanish, Portuguese (Portugal), and Portuguese (Brazil). The interface, exported reports, categories, and notifications update instantly without needing to restart your device.</string>
+</resources>

@@ -12,7 +12,6 @@ import android.text.InputType
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.content.res.ColorStateList
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
@@ -26,6 +25,7 @@ import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
@@ -36,12 +36,10 @@ import com.jesse.finly.databinding.ActivityRegistoBinding
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.models.Utilizador
 import com.jesse.finly.notifications.NotificationHelper
-import com.jesse.finly.utils.CurrencyTextWatcher
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.Moeda
 import com.jesse.finly.utils.MoneyTextWatcher
 import com.jesse.finly.utils.UserPreferencesManager
-import com.jesse.finly.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -57,6 +55,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.jesse.finly.utils.IdiomaUtils
+import com.jesse.finly.utils.ToastHelper
 import kotlin.math.round
 
 class RegistoActivity : AppCompatActivity() {
@@ -74,7 +74,7 @@ class RegistoActivity : AppCompatActivity() {
     private var userId = 0
     private var isNewUserRegistration = false
     private var senhaStr = ""
-    private var currencyWatcher: CurrencyTextWatcher? = null
+    private var currencyWatcher: MoneyTextWatcher? = null
 
     private val meses = arrayOf("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro")
 
@@ -148,13 +148,6 @@ class RegistoActivity : AppCompatActivity() {
             }
         }
 
-
-
-
-
-
-
-
         binding.btnFinalizarRegisto.setOnClickListener { view ->
             FinanceiroUtils.dispararHapticFeedback(view)
             when {
@@ -213,10 +206,6 @@ class RegistoActivity : AppCompatActivity() {
         imm?.hideSoftInputFromWindow(view.windowToken, 0)
         currentFocus?.clearFocus()
     }
-
-
-
-
 
     override fun onResume() {
         super.onResume()
@@ -333,7 +322,7 @@ class RegistoActivity : AppCompatActivity() {
                     MaterialAlertDialogBuilder(this@RegistoActivity)
                         .setTitle(getString(R.string.dialog_categoria_em_uso_titulo))
                         .setMessage(getString(R.string.dialog_categoria_em_uso_msg, categoria, quantidade))
-                        .setPositiveButton("Eliminar") { _, _ ->
+                        .setPositiveButton(getString(R.string.btn_sim_eliminar)) { _, _ ->
                             lifecycleScope.launch(Dispatchers.IO) {
                                 transacoesAfetadas.forEach { trans ->
                                     val transAtualizada = trans.copy(categoria = "Geral")
@@ -345,7 +334,7 @@ class RegistoActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                        .setNegativeButton("Cancelar") { dialog, _ ->
+                        .setNegativeButton(getString(R.string.btn_cancelar)) { dialog, _ ->
                             dialog.dismiss()
                         }
                         .show()
@@ -464,7 +453,7 @@ class RegistoActivity : AppCompatActivity() {
             // 2. Categorias do Sistema (Mostrar 4 por omissão ou todas se expandido)
             val padraoParaMostrar = if (isPadraoExpanded) categoriasPadrao else categoriasPadrao.take(4)
             btnVerMaisPadrao?.visibility = View.VISIBLE
-            btnVerMaisPadrao?.text = if (isPadraoExpanded) "Ver menos" else "Ver mais categorias do sistema"
+            btnVerMaisPadrao?.text = if (isPadraoExpanded) getString(R.string.ver_menos_categorias) else getString(R.string.ver_mais_categorias_sistema)
 
             for (catPadrao in padraoParaMostrar) {
                 val itemView = layoutInflater.inflate(R.layout.item_categoria_custom, containerPadrao, false)
@@ -474,7 +463,7 @@ class RegistoActivity : AppCompatActivity() {
                 val btnRemover = itemView.findViewById<View>(R.id.btnRemoverCategoriaCustom)
 
                 ivIcon?.setImageResource(obterIconeParaCategoria(catPadrao))
-                tvNome?.text = catPadrao
+                tvNome?.text = IdiomaUtils.formatarNomeCategoria(this, catPadrao)
                 tvTag?.visibility = View.VISIBLE
                 btnRemover?.visibility = View.GONE
                 containerPadrao?.addView(itemView)
@@ -500,7 +489,7 @@ class RegistoActivity : AppCompatActivity() {
 
                 atualizarListaCustom()
             } else {
-                showToast("Digite o nome da categoria")
+                showToast(getString(R.string.msg_digite_nome_categoria))
             }
         }
 
@@ -512,27 +501,28 @@ class RegistoActivity : AppCompatActivity() {
     }
 
     private fun configurarSpinners() {
-        val listaCategorias = obterCategoriasDisponiveis()
-        val adapterCat = ArrayAdapter(this, R.layout.dropdown_item, listaCategorias)
+        val listaCategoriasInterna = obterCategoriasDisponiveis()
+        val listaCategoriasExibicao = listaCategoriasInterna.map { cat ->
+            if (cat == getString(R.string.option_nova_categoria)) cat else IdiomaUtils.formatarNomeCategoria(this, cat)
+        }
+        val adapterCat = ArrayAdapter(this, R.layout.dropdown_item, listaCategoriasExibicao)
         binding.autoCompleteCategoria.setAdapter(adapterCat)
 
-        if (binding.autoCompleteCategoria.text.isNullOrEmpty()) {
-            val primeiraValida = listaCategorias.firstOrNull { it != getString(R.string.option_nova_categoria) } ?: "Geral"
-            binding.autoCompleteCategoria.setText(primeiraValida, false)
-            atualizarIconeCategoria(primeiraValida)
-        } else {
-            atualizarIconeCategoria(binding.autoCompleteCategoria.text.toString())
-        }
+        val catSalva = intent.getStringExtra("categoria")
+        val catExibir = IdiomaUtils.formatarNomeCategoria(this, catSalva ?: "Geral")
+        binding.autoCompleteCategoria.setText(catExibir, false)
+        atualizarIconeCategoria(catSalva ?: "Geral")
 
         binding.autoCompleteCategoria.setOnItemClickListener { _, _, position, _ ->
-            val selecionada = adapterCat.getItem(position)
-            if (selecionada == getString(R.string.option_nova_categoria)) {
-                val primeiraValida = listaCategorias.firstOrNull { it != getString(R.string.option_nova_categoria) } ?: "Geral"
+            val selecionadaExibicao = adapterCat.getItem(position)
+            val selecionadaInterna = if (position in listaCategoriasInterna.indices) listaCategoriasInterna[position] else selecionadaExibicao
+            if (selecionadaExibicao == getString(R.string.option_nova_categoria) || selecionadaInterna == getString(R.string.option_nova_categoria)) {
+                val primeiraValida = IdiomaUtils.formatarNomeCategoria(this, "Geral")
                 binding.autoCompleteCategoria.setText(primeiraValida, false)
-                atualizarIconeCategoria(primeiraValida)
+                atualizarIconeCategoria("Geral")
                 mostrarBottomSheetGerirCategorias()
-            } else if (selecionada != null) {
-                atualizarIconeCategoria(selecionada)
+            } else if (selecionadaInterna != null) {
+                atualizarIconeCategoria(selecionadaInterna)
             }
         }
     }
@@ -540,7 +530,7 @@ class RegistoActivity : AppCompatActivity() {
 
 
     private fun configurarParaNovoUtilizador() {
-        currencyWatcher?.let { binding.regEmailText.removeTextChangedListener(it) }
+        currencyWatcher?.let { watcher -> binding.regEmailText.removeTextChangedListener(watcher) }
         currencyWatcher = null
         binding.btnAlterarSenhaPerfil.visibility = View.GONE
         binding.titleRegisto.text = getString(R.string.criar_nova_conta)
@@ -555,11 +545,11 @@ class RegistoActivity : AppCompatActivity() {
         binding.regEmailText.isEnabled = true
         binding.regEmailText.isFocusable = true
         binding.regEmailText.isFocusableInTouchMode = true
-        binding.regEmailText.inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        binding.regEmailText.inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
         
         binding.dataLayout.hint = getString(R.string.hint_telemovel)
         binding.dataLayout.setStartIconDrawable(R.drawable.ic_phone)
-        binding.regPhoneText.inputType = android.text.InputType.TYPE_CLASS_PHONE
+        binding.regPhoneText.inputType = InputType.TYPE_CLASS_PHONE
         binding.regPhoneText.isFocusableInTouchMode = true
         binding.regPhoneText.isFocusable = true
         binding.regPhoneText.setOnClickListener(null)
@@ -581,7 +571,7 @@ class RegistoActivity : AppCompatActivity() {
     }
 
     private fun configurarParaEdicaoUtilizador() {
-        currencyWatcher?.let { binding.regEmailText.removeTextChangedListener(it) }
+        currencyWatcher?.let { watcher -> binding.regEmailText.removeTextChangedListener(watcher) }
         currencyWatcher = null
         userId = intent.getIntExtra("id", 0)
         binding.titleRegisto.text = getString(R.string.editar_perfil)
@@ -600,7 +590,7 @@ class RegistoActivity : AppCompatActivity() {
         binding.valorLayout.alpha = 0.5f
 
         val showToastEmailBlock = {
-            showToast("E-mail inalterável")
+            showToast(getString(R.string.toast_email_inalteravel))
         }
 
         binding.regEmailText.setOnTouchListener { v, event ->
@@ -618,7 +608,7 @@ class RegistoActivity : AppCompatActivity() {
         binding.dataLayout.hint = getString(R.string.hint_telemovel)
         binding.dataLayout.setStartIconDrawable(R.drawable.ic_phone)
         binding.regPhoneText.setText(formatarTelemovel(intent.getStringExtra("phone") ?: ""))
-        binding.regPhoneText.inputType = android.text.InputType.TYPE_CLASS_PHONE
+        binding.regPhoneText.inputType = InputType.TYPE_CLASS_PHONE
         binding.regPhoneText.isFocusableInTouchMode = true
         binding.regPhoneText.isFocusable = true
         binding.regPhoneText.setOnClickListener(null)
@@ -626,8 +616,8 @@ class RegistoActivity : AppCompatActivity() {
         senhaStr = intent.getStringExtra("senha") ?: ""
         binding.senhaLayout.visibility = View.GONE
         binding.confirmarSenhaLayout.visibility = View.GONE
-        binding.senhaLayout.hint = "Nova Palavra-passe"
-        binding.confirmarSenhaLayout.hint = "Confirmar Nova Palavra-passe"
+        binding.senhaLayout.hint = getString(R.string.hint_nova_palavra_passe)
+        binding.confirmarSenhaLayout.hint = getString(R.string.hint_confirmar_nova_palavra_passe)
         binding.regSenhaText.setText("")
         binding.regConfirmarSenhaText.setText("")
 
@@ -666,7 +656,7 @@ class RegistoActivity : AppCompatActivity() {
             .setIcon(icon)
             .setMessage(getString(R.string.dialog_senha_atual_msg))
             .setView(view)
-            .setPositiveButton("Confirmar") { d, _ ->
+            .setPositiveButton(getString(R.string.btn_confirmar)) { d, _ ->
                 val digitada = etSenhaAtual?.text.toString().trim()
                 if (digitada == senhaStr) {
                     showToast(getString(R.string.toast_senha_confirmada))
@@ -685,7 +675,7 @@ class RegistoActivity : AppCompatActivity() {
                     d.dismiss()
                 }
             }
-            .setNegativeButton("Cancelar", null)
+            .setNegativeButton(getString(R.string.btn_cancelar), null)
             .create()
 
         dialog.show()
@@ -783,10 +773,10 @@ class RegistoActivity : AppCompatActivity() {
             binding.valorLayout.prefixText = "€ "
             binding.valorLayout.suffixText = null
         }
-        binding.valorLayout.hint = "Valor"
+        binding.valorLayout.hint = getString(R.string.hint1_valor)
 
         binding.regEmailText.inputType = InputType.TYPE_CLASS_NUMBER
-        currencyWatcher?.let { binding.regEmailText.removeTextChangedListener(it) }
+        currencyWatcher?.let { watcher -> binding.regEmailText.removeTextChangedListener(watcher) }
         currencyWatcher = MoneyTextWatcher(binding.regEmailText, moedaAtual)
         binding.regEmailText.addTextChangedListener(currencyWatcher)
     }
@@ -909,7 +899,7 @@ class RegistoActivity : AppCompatActivity() {
                 }
                 withContext(Dispatchers.Main) {
                     ocultarLoadingOverlay()
-                    showToast("Item removido com sucesso!")
+                    showToast(getString(R.string.toast_item_removido_sucesso))
                     finish()
                 }
             }
@@ -944,19 +934,20 @@ class RegistoActivity : AppCompatActivity() {
         val valor = MoneyTextWatcher.obterValorDouble(binding.regEmailText)
         var venc = binding.regPhoneText.text.toString().trim()
         val tipo = if (binding.toggleTipoTransacao.checkedButtonId == R.id.btnToggleRenda) "RENDA" else "DESPESA"
-        val categoria = binding.autoCompleteCategoria.text.toString()
+        val categoriaText = binding.autoCompleteCategoria.text.toString()
+        val categoria = IdiomaUtils.obterChaveInternaCategoria(this, categoriaText)
 
         val mes = intent.getStringExtra("mes") ?: intent.getStringExtra("MES_ATUAL") ?: meses[Calendar.getInstance()[Calendar.MONTH]]
 
         if (item.isEmpty()) {
-            binding.itemLayout.error = "Insira um nome ou descrição"
+            binding.itemLayout.error = getString(R.string.erro_campo_nome_obrigatorio)
             return
         } else {
             binding.itemLayout.error = null
         }
 
         if (valor <= 0.0) {
-            binding.valorLayout.error = "Insira um valor maior que zero"
+            binding.valorLayout.error = getString(R.string.erro_campo_valor_maior_zero)
             return
         } else {
             binding.valorLayout.error = null
@@ -1231,26 +1222,38 @@ class RegistoActivity : AppCompatActivity() {
         val confirmarSenha = binding.regConfirmarSenhaText.text.toString().trim()
 
         if (nome.isEmpty() || email.isEmpty()) {
-            showToast("Nome e E-mail são obrigatórios")
+            showToast(getString(R.string.toast_nome_email_obrigatorios))
             return
         }
 
-        val senhaFinal = if (binding.senhaLayout.visibility == View.VISIBLE && novaSenha.isNotEmpty()) {
+        if (binding.senhaLayout.isVisible && novaSenha.isNotEmpty()) {
             if (novaSenha != confirmarSenha) {
-                showToast("As palavras-passe não coincidem")
+                showToast(getString(R.string.toast_senhas_nao_coincidem))
                 return
             }
-            novaSenha
-        } else {
-            senhaStr
         }
 
         mostrarLoadingOverlay()
         lifecycleScope.launch(Dispatchers.IO) {
+            if (binding.senhaLayout.visibility == View.VISIBLE && novaSenha.isNotEmpty()) {
+                try {
+                    val firebaseUser = FirebaseAuth.getInstance().currentUser
+                    firebaseUser?.updatePassword(novaSenha)?.await()
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        ocultarLoadingOverlay()
+                        this@RegistoActivity.showToast(formatarErroAuth(e), isLong = true)
+                    }
+                    return@launch
+                }
+            }
+
             val db = MinhaBaseDados.getDatabase(this@RegistoActivity)
             val dao = db.utilizadorDao()
 
             val userExistente = dao.buscarPorEmail(email)
+            val senhaFinal = if (novaSenha.isNotEmpty()) novaSenha else senhaStr
+
             val utilizadorEditado = Utilizador(
                 id = if (userId > 0) userId else (userExistente?.id ?: 0),
                 nome = nome,
@@ -1275,9 +1278,13 @@ class RegistoActivity : AppCompatActivity() {
 
             withContext(Dispatchers.Main) {
                 ocultarLoadingOverlay()
-                showToast("Perfil atualizado!")
+                showToast(getString(R.string.toast_perfil_atualizado))
                 finish()
             }
         }
+    }
+
+    private fun showToast(msg: String, isLong: Boolean = false) {
+        ToastHelper.showCustomToast(this, msg, isLong)
     }
 }

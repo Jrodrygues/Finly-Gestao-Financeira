@@ -99,29 +99,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp"
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="12dp"
+            android:gravity="center_vertical"
+            android:weightSum="3"
             android:baselineAligned="false">
 
+            <!-- 1. Rendimentos Anual -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textAlignment="center"
                     android:text="@string/total_rendas_label"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
+                    android:maxLines="1"
                     android:textColor="@color/textColorSecondary" />
+
                 <TextView
                     android:id="@+id/tvTotalRendaAnual"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:textAlignment="center"
                     android:text="@string/default_value_currency"
+                    android:textColor="@color/colorPositive"
+                    android:textSize="13sp"
                     android:textStyle="bold"
-                    android:textSize="15sp"
-                    android:textColor="@color/colorPositive" />
+                    android:maxLines="1" />
             </LinearLayout>
 
             <View
@@ -130,26 +143,36 @@
                 android:layout_gravity="center_vertical"
                 android:background="@color/dividerColor" />
 
+            <!-- 2. Despesas Anual -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textAlignment="center"
                     android:text="@string/total_despesas_label"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
+                    android:maxLines="1"
                     android:textColor="@color/textColorSecondary" />
+
                 <TextView
                     android:id="@+id/tvTotalDespesaAnual"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:textAlignment="center"
                     android:text="@string/default_value_currency"
+                    android:textColor="@color/colorNegative"
+                    android:textSize="13sp"
                     android:textStyle="bold"
-                    android:textSize="15sp"
-                    android:textColor="@color/colorNegative" />
+                    android:maxLines="1" />
             </LinearLayout>
 
             <View
@@ -158,26 +181,36 @@
                 android:layout_gravity="center_vertical"
                 android:background="@color/dividerColor" />
 
+            <!-- 3. Saldo Anual -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textAlignment="center"
                     android:text="@string/saldo_anual_label"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
+                    android:maxLines="1"
                     android:textColor="@color/textColorSecondary" />
+
                 <TextView
                     android:id="@+id/tvSaldoAnual"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:textAlignment="center"
                     android:text="@string/default_value_currency"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="13sp"
                     android:textStyle="bold"
-                    android:textSize="15sp"
-                    android:textColor="@color/textColorPrimary" />
+                    android:maxLines="1" />
             </LinearLayout>
 
         </LinearLayout>
@@ -211,13 +244,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="12dp">
 
             <TextView
                 android:id="@+id/tvTituloDetalheMes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Detalhe do Mês (Toque numa barra)"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:text="@string/evolucao_detalhe_mes_dica"
                 android:textColor="@color/colorPrimary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -226,70 +262,117 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
+                android:weightSum="3"
                 android:baselineAligned="false">
 
+                <!-- 1. Rendimentos do Mês -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:gravity="center"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rendas do Mês"
-                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:textAlignment="center"
+                        android:text="@string/label_rendas_mes"
+                        android:textSize="11sp"
+                        android:maxLines="1"
                         android:textColor="@color/textColorSecondary" />
+
                     <TextView
                         android:id="@+id/tvRendaMesDetalhe"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center"
+                        android:textAlignment="center"
                         android:text="0,00 €"
-                        android:textSize="15sp"
+                        android:textColor="@color/colorPositive"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:textColor="@color/colorPositive" />
+                        android:maxLines="1" />
                 </LinearLayout>
 
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/dividerColor" />
+
+                <!-- 2. Despesas do Mês -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:gravity="center"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Despesas do Mês"
-                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:textAlignment="center"
+                        android:text="@string/label_despesas_mes"
+                        android:textSize="11sp"
+                        android:maxLines="1"
                         android:textColor="@color/textColorSecondary" />
+
                     <TextView
                         android:id="@+id/tvDespesaMesDetalhe"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center"
+                        android:textAlignment="center"
                         android:text="0,00 €"
-                        android:textSize="15sp"
+                        android:textColor="@color/colorNegative"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:textColor="@color/colorNegative" />
+                        android:maxLines="1" />
                 </LinearLayout>
 
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/dividerColor" />
+
+                <!-- 3. Balanço do Mês -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:gravity="center"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Balanço do Mês"
-                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:textAlignment="center"
+                        android:text="@string/label_balanco_mes"
+                        android:textSize="11sp"
+                        android:maxLines="1"
                         android:textColor="@color/textColorSecondary" />
+
                     <TextView
                         android:id="@+id/tvSaldoMesDetalhe"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center"
+                        android:textAlignment="center"
                         android:text="0,00 €"
-                        android:textSize="15sp"
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:textColor="@color/textColorPrimary" />
+                        android:maxLines="1" />
                 </LinearLayout>
 
             </LinearLayout>

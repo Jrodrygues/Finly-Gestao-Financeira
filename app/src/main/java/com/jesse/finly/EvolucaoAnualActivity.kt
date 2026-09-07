@@ -3,13 +3,11 @@ package com.jesse.finly
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -36,6 +34,7 @@ import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.ActivityEvolucaoAnualBinding
 import com.jesse.finly.utils.CurrencyFormatter
+import com.jesse.finly.utils.IdiomaUtils
 import com.jesse.finly.utils.Moeda
 import com.jesse.finly.utils.UserPreferencesManager
 import kotlinx.coroutines.Dispatchers
@@ -43,15 +42,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.util.Calendar
-import java.util.Locale
 import kotlin.math.abs
 
-@RequiresApi(Build.VERSION_CODES.O)
 class EvolucaoAnualActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEvolucaoAnualBinding
     private lateinit var prefsManager: UserPreferencesManager
     private var moedaAtual: Moeda = Moeda.EUR
-    private val mesesArray = arrayOf("Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez")
     private val mesesNomes = arrayOf("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro")
 
     private val listaAnos by lazy {
@@ -88,7 +84,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         configurarSeletorAno()
         configurarGraficoVazio()
 
-        val anoInicial = Calendar.getInstance().get(Calendar.YEAR)
+        val anoInicial = Calendar.getInstance()[Calendar.YEAR]
         carregarDadosAnuais(anoInicial)
     }
 
@@ -146,7 +142,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         val adapterAno = ArrayAdapter(this, R.layout.dropdown_item, listaAnos)
         binding.autoCompleteAno.setAdapter(adapterAno)
 
-        val anoAtual = Calendar.getInstance().get(Calendar.YEAR).toString()
+        val anoAtual = Calendar.getInstance()[Calendar.YEAR].toString()
         binding.autoCompleteAno.setText(anoAtual, false)
 
         binding.autoCompleteAno.setOnItemClickListener { _, _, position, _ ->
@@ -170,11 +166,20 @@ class EvolucaoAnualActivity : AppCompatActivity() {
             val isDark = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
             val textColor = if (isDark) Color.WHITE else Color.BLACK
 
+            val mesesAbreviados = arrayOf(
+                getString(R.string.mes_abrev_jan), getString(R.string.mes_abrev_fev),
+                getString(R.string.mes_abrev_mar), getString(R.string.mes_abrev_abr),
+                getString(R.string.mes_abrev_mai), getString(R.string.mes_abrev_jun),
+                getString(R.string.mes_abrev_jul), getString(R.string.mes_abrev_ago),
+                getString(R.string.mes_abrev_set), getString(R.string.mes_abrev_out),
+                getString(R.string.mes_abrev_nov), getString(R.string.mes_abrev_dez)
+            )
+
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
                 granularity = 1f
-                valueFormatter = IndexAxisValueFormatter(mesesArray)
+                valueFormatter = IndexAxisValueFormatter(mesesAbreviados)
                 this.textColor = textColor
                 textSize = 10f
                 axisMinimum = -0.5f
@@ -190,7 +195,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
 
                 // Destaque da Linha de Base Zero
                 setDrawZeroLine(true)
-                zeroLineColor = if (isDark) Color.parseColor("#80FFFFFF") else Color.parseColor("#80000000")
+                zeroLineColor = if (isDark) "#80FFFFFF".toColorInt() else "#80000000".toColorInt()
                 zeroLineWidth = 1.5f
 
                 valueFormatter = object : ValueFormatter() {
@@ -246,7 +251,8 @@ class EvolucaoAnualActivity : AppCompatActivity() {
                     val corNegativo = ContextCompat.getColor(context, R.color.colorNegative)
 
                     val balancoStr = CurrencyFormatter.formatarComSinal(balanco, moedaAtual, forcarSinalPositivo = (balanco > 0))
-                    tvMarkerText?.text = "$mesNome: $balancoStr"
+                    val mesTraduzido = IdiomaUtils.formatarNomeMes(context, mesNome)
+                    tvMarkerText?.text = context.getString(R.string.chart_marker_mes_balanco, mesTraduzido, balancoStr)
 
                     if (balanco < 0) {
                         tvMarkerText?.setTextColor(corNegativo)
@@ -331,7 +337,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
                 atualizarGrafico(entriesSaldo, coresSaldo)
 
                 // 2. DEPOIS atualizar o Card de Detalhe do mês atual
-                val mesAtualIndex = Calendar.getInstance().get(Calendar.MONTH)
+                val mesAtualIndex = Calendar.getInstance()[Calendar.MONTH]
                 atualizarCardDetalheMes(mesAtualIndex)
             }
         }
@@ -368,7 +374,8 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         val corPositivo = ContextCompat.getColor(this, R.color.colorPositive)
         val corNegativo = ContextCompat.getColor(this, R.color.colorNegative)
 
-        binding.tvTituloDetalheMes.text = getString(R.string.detalhes_mes_ano_format, mesNome, anoAtualSelecionado)
+        val mesTraduzido = IdiomaUtils.formatarNomeMes(this, mesNome)
+        binding.tvTituloDetalheMes.text = getString(R.string.detalhes_mes_ano_format, mesTraduzido, anoAtualSelecionado)
         binding.tvRendaMesDetalhe.text = CurrencyFormatter.formatarComSinal(renda, moedaAtual, forcarSinalPositivo = true)
         binding.tvDespesaMesDetalhe.text = CurrencyFormatter.formatarComSinal(-despesa, moedaAtual)
 
@@ -379,7 +386,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         if (binding.barChartAnual.data != null) {
             try {
                 binding.barChartAnual.highlightValue(Highlight(index.toFloat(), 0f, 0), false)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Prevenir exceção do gráfico
             }
         }
@@ -389,11 +396,11 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         val isDark = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
         val textColor = if (isDark) Color.WHITE else Color.BLACK
 
-        val setSaldo = BarDataSet(saldos, "Saldo mensal").apply {
+        val setSaldo = BarDataSet(saldos, getString(R.string.chart_label_saldo_mensal)).apply {
             this.colors = cores
             setDrawValues(true)
             valueTextColor = textColor
-            valueTextSize = 10f
+            valueTextSize = 9f
             highLightColor = Color.WHITE
             highLightAlpha = 80
             valueFormatter = object : ValueFormatter() {
@@ -414,7 +421,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
             setVisibleXRangeMaximum(6f)
             isDragEnabled = true
 
-            val mesAtualIndex = Calendar.getInstance().get(Calendar.MONTH)
+            val mesAtualIndex = Calendar.getInstance()[Calendar.MONTH]
             val movePos = (mesAtualIndex - 2).coerceIn(0, 6).toFloat()
             moveViewToX(movePos)
             invalidate()

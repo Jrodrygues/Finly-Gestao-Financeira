@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Utilizador"
+        android:text="@string/utilizador_convidado"
         android:textColor="@color/textColorPrimary"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -64,7 +64,7 @@
             android:layout_marginStart="8dp"
             android:layout_gravity="center_vertical"
             android:src="@drawable/ic_cloud_done"
-            android:contentDescription="Status da Nuvem"
+            android:contentDescription="@string/desc_status_nuvem"
             app:tint="@color/colorPrimary" />
     </LinearLayout>
 

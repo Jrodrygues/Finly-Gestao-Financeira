@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
+import com.jesse.finly.R
 import com.jesse.finly.models.Transacao
 import java.io.File
 import java.io.FileOutputStream
@@ -30,12 +31,13 @@ class PdfExporter(private val context: Context) {
         paint.color = Color.parseColor("#121212")
         paint.textSize = 18f
         paint.isFakeBoldText = true
-        canvas.drawText("Relatório Financeiro - $mesAnoFormatado", 40f, 50f, paint)
+        val tituloPdf = "${context.getString(R.string.pdf_titulo)} - $mesAnoFormatado"
+        canvas.drawText(tituloPdf, 40f, 50f, paint)
 
         paint.isFakeBoldText = false
         paint.textSize = 11f
         paint.color = Color.DKGRAY
-        canvas.drawText("Moeda selecionada: ${moeda.nome}", 40f, 70f, paint)
+        canvas.drawText(context.getString(R.string.pdf_moeda_selecionada, moeda.nome), 40f, 70f, paint)
 
         // 2. Tabela de Transações
         var yPosition = 110f
@@ -44,11 +46,11 @@ class PdfExporter(private val context: Context) {
         paint.textSize = 10f
 
         // Cabeçalhos das colunas
-        canvas.drawText("Data", 40f, yPosition, paint)
-        canvas.drawText("Descrição", 100f, yPosition, paint)
-        canvas.drawText("Categoria", 280f, yPosition, paint)
-        canvas.drawText("Valor", 430f, yPosition, paint)
-        canvas.drawText("Estado", 510f, yPosition, paint)
+        canvas.drawText(context.getString(R.string.col_vencimento), 40f, yPosition, paint)
+        canvas.drawText(context.getString(R.string.col_item), 100f, yPosition, paint)
+        canvas.drawText(context.getString(R.string.col_categoria), 280f, yPosition, paint)
+        canvas.drawText(context.getString(R.string.col_valor), 430f, yPosition, paint)
+        canvas.drawText(context.getString(R.string.col_pago), 510f, yPosition, paint)
 
         // Linha divisória
         paint.strokeWidth = 1f
@@ -61,7 +63,7 @@ class PdfExporter(private val context: Context) {
 
         for (item in transacoes) {
             val valorFormatado = CurrencyFormatter.formatar(item.valor, moeda)
-            val estadoStr = if (item.status) "Pago" else "Pendente"
+            val estadoStr = if (item.status) context.getString(R.string.label_pago) else context.getString(R.string.label_pendente)
 
             canvas.drawText(item.vencimento, 40f, yPosition, paint)
             canvas.drawText(item.item.take(25), 100f, yPosition, paint)
@@ -85,12 +87,12 @@ class PdfExporter(private val context: Context) {
 
         paint.color = Color.BLACK
         paint.isFakeBoldText = true
-        canvas.drawText("Total de Rendas: ${CurrencyFormatter.formatar(totalRenda, moeda)}", 40f, yPosition, paint)
-        canvas.drawText("Total de Despesas: ${CurrencyFormatter.formatar(totalDespesa, moeda)}", 220f, yPosition, paint)
+        canvas.drawText("${context.getString(R.string.total_rendas)}${CurrencyFormatter.formatar(totalRenda, moeda)}", 40f, yPosition, paint)
+        canvas.drawText("${context.getString(R.string.total_despesas)}${CurrencyFormatter.formatar(totalDespesa, moeda)}", 220f, yPosition, paint)
 
         // Destaque para Saldo
         paint.color = if (saldoFinal >= 0) Color.parseColor("#00897B") else Color.RED
-        canvas.drawText("Saldo: ${CurrencyFormatter.formatar(saldoFinal, moeda)}", 420f, yPosition, paint)
+        canvas.drawText("${context.getString(R.string.saldo_final_label)}${CurrencyFormatter.formatar(saldoFinal, moeda)}", 420f, yPosition, paint)
 
         pdfDocument.finishPage(page)
 

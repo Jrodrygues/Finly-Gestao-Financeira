@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.jesse.finly.R
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.utils.showToast
@@ -37,14 +38,14 @@ class NotificationActionReceiver : BroadcastReceiver() {
                         FirebaseManager.salvarTransacaoNoFirestore(atualizada)
 
                         withContext(Dispatchers.Main) {
-                            context.showToast("${trans.item} marcada como paga!")
+                            context.showToast(context.getString(R.string.toast_transacao_marcada_paga, trans.item))
                             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                             notificationManager.cancel(1)
                         }
                     }
                 } catch (_: Exception) {
                     withContext(Dispatchers.Main) {
-                        context.showToast("Erro ao atualizar transação.")
+                        context.showToast(context.getString(R.string.toast_erro_atualizar_transacao))
                     }
                 } finally {
                     pendingResult.finish()

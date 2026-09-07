@@ -27,7 +27,7 @@ import kotlinx.coroutines.tasks.await
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.LoginBinding
 import com.jesse.finly.notifications.NotificationHelper
-import com.jesse.finly.utils.showToast
+import com.jesse.finly.utils.ToastHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -97,8 +97,9 @@ class LoginActivity : AppCompatActivity() {
     private fun formatarTextoCriarConta() {
         val textoCompleto = getString(R.string.criar_conta_link)
         val spannable = SpannableString(textoCompleto)
+        val trechoDestaque = getString(R.string.criar_conta_trecho_destaque)
 
-        val indexCrieAqui = textoCompleto.indexOf("Crie aqui")
+        val indexCrieAqui = textoCompleto.indexOf(trechoDestaque)
         if (indexCrieAqui != -1) {
             spannable.setSpan(
                 ForegroundColorSpan(ContextCompat.getColor(this, R.color.textColorSecondary)),
@@ -109,13 +110,13 @@ class LoginActivity : AppCompatActivity() {
             spannable.setSpan(
                 ForegroundColorSpan(ContextCompat.getColor(this, R.color.colorPrimary)),
                 indexCrieAqui,
-                textoCompleto.length,
+                indexCrieAqui + trechoDestaque.length,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             spannable.setSpan(
                 StyleSpan(Typeface.BOLD),
                 indexCrieAqui,
-                textoCompleto.length,
+                indexCrieAqui + trechoDestaque.length,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
@@ -217,7 +218,7 @@ class LoginActivity : AppCompatActivity() {
                             }
                         }
 
-                        finalizarSessaoLogin(email, utilizador?.nome ?: "Utilizador")
+                        finalizarSessaoLogin(email, utilizador?.nome ?: getString(R.string.utilizador_padrao_nome))
                     }
                 }
             } catch (_: Exception) {
@@ -258,23 +259,23 @@ class LoginActivity : AppCompatActivity() {
         input.setText(emailAtual)
 
         // Criar o ícone com verde manualmente para garantir visibilidade no tema claro
-        val icon = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_help)?.mutate()
-        icon?.setTint(androidx.core.content.ContextCompat.getColor(this, R.color.colorPrimary))
+        val icon = ContextCompat.getDrawable(this, R.drawable.ic_help)?.mutate()
+        icon?.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
 
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.dialog_recuperar_senha_titulo))
             .setIcon(icon)
             .setMessage(getString(R.string.introduza_email_recuperacao))
             .setView(view)
-            .setPositiveButton("Enviar") { _, _ ->
+            .setPositiveButton(getString(R.string.btn_enviar)) { _, _ ->
                 val email = input.text.toString().trim()
                 if (email.isNotEmpty()) {
                     enviarEmailRecuperacao(email)
                 } else {
-                    showToast("Introduza um e-mail válido")
+                    showToast(getString(R.string.toast_introduza_email_valido))
                 }
             }
-            .setNegativeButton("Cancelar", null)
+            .setNegativeButton(getString(R.string.btn_cancelar), null)
             .show()
     }
 
@@ -309,6 +310,9 @@ class LoginActivity : AppCompatActivity() {
                 remove("EMAIL_LEMBRADO")
             }
         }
+        lifecycleScope.launch(Dispatchers.IO) {
+            FirebaseManager.removerCampoSenhaDoFirestore(email)
+        }
         prosseguirParaApp()
     }
 
@@ -323,7 +327,7 @@ class LoginActivity : AppCompatActivity() {
                 }
                 prosseguirParaApp()
             }
-            .setNegativeButton("Cancelar", null)
+            .setNegativeButton(getString(R.string.btn_cancelar), null)
             .create()
 
         dialog.show()
@@ -348,5 +352,9 @@ class LoginActivity : AppCompatActivity() {
         // Agora vamos diretamente para o Resumo Mensal (ResumoActivity)
         startActivity(Intent(this, ResumoActivity::class.java))
         finish()
+    }
+
+    private fun showToast(msg: String, isLong: Boolean = false) {
+        ToastHelper.showCustomToast(this, msg, isLong)
     }
 }

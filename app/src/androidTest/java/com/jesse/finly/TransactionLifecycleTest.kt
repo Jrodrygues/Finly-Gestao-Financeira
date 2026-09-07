@@ -39,10 +39,9 @@ class TransactionLifecycleTest {
 
         // 5. Clicar para ver detalhes
         onView(withText("Almoço Teste")).perform(click())
-        // Usar um matcher mais flexível para o valor, pois o separador decimal muda conforme o idioma do telemóvel
-        onView(withId(R.id.tvEmailDetail)).check(matches(withText(containsString("15"))))
-        onView(withId(R.id.tvEmailDetail)).check(matches(withText(containsString("50"))))
-
+// Usar um matcher mais flexível para o valor, pois o separador decimal muda conforme o idioma do telemóvel
+        onView(withId(R.id.tvValorHighlight)).check(matches(withText(containsString("15"))))
+        onView(withId(R.id.tvValorHighlight)).check(matches(withText(containsString("50"))))
         // 6. Editar a transação
         onView(withId(R.id.btnEditarTransacao)).perform(click())
         onView(withId(R.id.regNameText)).perform(replaceText("Almoço Editado"), closeSoftKeyboard())

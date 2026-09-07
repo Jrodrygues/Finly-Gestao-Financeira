@@ -16,8 +16,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jesse.finly.database.FirebaseManager
@@ -27,17 +25,15 @@ import com.jesse.finly.models.Transacao
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.BiometricUtils
 import com.jesse.finly.notifications.NotificationHelper
-import com.jesse.finly.notifications.NotificationWorker
 import com.jesse.finly.utils.CurrencyFormatter
+import com.jesse.finly.utils.IdiomaUtils
 import com.jesse.finly.utils.Moeda
+import com.jesse.finly.utils.ToastHelper
 import com.jesse.finly.utils.UserPreferencesManager
-import com.jesse.finly.utils.showToast
-import java.util.Locale
-import kotlin.math.abs
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
 
 class DetalhesPageActivity : AppCompatActivity() {
 
@@ -74,7 +70,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             ativarNotificacoes()
         } else {
             binding.switchNotifications.isChecked = false
-            showToast("Permissão de notificações negada")
+            showToast(getString(R.string.toast_permissao_notif_negada))
         }
     }
 
@@ -184,7 +180,7 @@ class DetalhesPageActivity : AppCompatActivity() {
 
         // Campo 1: Categoria
         binding.tvLabelField1.text = getString(R.string.label_categoria_simples)
-        binding.tvValueField1.text = transCat
+        binding.tvValueField1.text = IdiomaUtils.formatarNomeCategoria(this, transCat)
         binding.ivIconField1.setImageResource(obterIconeParaCategoria(transCat))
 
         // Campo 2: Data de Vencimento
@@ -198,9 +194,13 @@ class DetalhesPageActivity : AppCompatActivity() {
         binding.tvLabelField3.text = getString(R.string.label_recorrencia)
         binding.ivIconField3.setImageResource(R.drawable.ic_repeat)
         binding.tvValueField3.text = if (transIsRecorrente) {
-            if (transParcelasTotais == -1) "Repetir Sempre" else "Repetir por $transParcelasTotais meses"
+            if (transParcelasTotais == -1) {
+                getString(R.string.recorrencia_repetir_sempre)
+            } else {
+                getString(R.string.recorrencia_repetir_meses, transParcelasTotais)
+            }
         } else {
-            "Única (Não recorrente)"
+            getString(R.string.recorrencia_unica)
         }
 
         // Campo 4: Estado do Pagamento com Switch
@@ -254,11 +254,11 @@ class DetalhesPageActivity : AppCompatActivity() {
         binding.llField4.visibility = View.GONE
 
         // Configurar Campo 1 para E-mail
-        binding.tvLabelField1.text = "E-mail"
+        binding.tvLabelField1.text = getString(R.string.label_email)
         binding.ivIconField1.setImageResource(R.drawable.ic_email)
 
         // Configurar Campo 2 para Telemóvel
-        binding.tvLabelField2.text = "Telemóvel"
+        binding.tvLabelField2.text = getString(R.string.label_telemovel)
         binding.ivIconField2.setImageResource(R.drawable.ic_phone)
 
         val currentEmail = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "") ?: ""
@@ -275,7 +275,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             binding.llField2.visibility = View.GONE
             binding.btnEditarPerfil.visibility = View.GONE
             binding.btnExcluirConta.visibility = View.GONE
-            configurarVisualSemFoto("Convidado")
+            configurarVisualSemFoto(getString(R.string.utilizador_convidado))
         } else {
             if (userNameStr.isNotEmpty()) {
                 atualizarUIPerfil()
@@ -429,8 +429,8 @@ class DetalhesPageActivity : AppCompatActivity() {
                 if (BiometricUtils.isBiometricAvailable(this)) {
                     BiometricUtils.promptBiometria(
                         this,
-                        title = "Ativar Biometria",
-                        subtitle = "Confirme a sua identidade para ativar o bloqueio por biometria",
+                        title = getString(R.string.biometria_prompt_titulo),
+                        subtitle = getString(R.string.biometria_prompt_subtitulo),
                         onSuccess = {
                             prefs.edit { putBoolean("pref_biometric_ativa", true) }
                             atualizarPreferenciaUtilizador(true, "BIOMETRIA")
@@ -500,17 +500,62 @@ class DetalhesPageActivity : AppCompatActivity() {
                 showToast(getString(R.string.toast_moeda_alterada_brl))
             }
         }
+        // Exibir o nome do idioma atual na linha
+        binding.tvIdiomaAtual.text = IdiomaUtils.obterNomeIdiomaAtual(this)
+
+        // Abrir diálogo de seleção ao clicar
+        binding.llConfigIdioma.setOnClickListener { view ->
+            FinanceiroUtils.dispararHapticFeedback(view)
+            mostrarDialogEscolhaIdioma()
+        }
     }
 
+    private fun mostrarDialogEscolhaIdioma() {
+        val opcoes = arrayOf(
+            "Português (Portugal)",
+            "Português (Brasil)",
+            "English (US)",
+            "Español"
+        )
+
+        val tags = arrayOf(
+            "pt-PT",
+            "pt-BR",
+            "en-US",
+            "es"
+        )
+
+        val idiomaAtual = IdiomaUtils.obterTagIdiomaAtual()
+        var indexSelecionado = tags.indexOfFirst {
+            idiomaAtual.startsWith(it, ignoreCase = true)
+        }
+        if (indexSelecionado == -1) indexSelecionado = 0 // Pré-selecionado por padrão: Português (Portugal)
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.titulo_dialog_idioma))
+            .setSingleChoiceItems(opcoes, indexSelecionado) { dialog, which ->
+                val tagEscolhida = tags[which]
+                dialog.dismiss()
+                IdiomaUtils.aplicarIdioma(tagEscolhida)
+            }
+            .setNegativeButton(getString(R.string.btn_cancelar), null)
+            .show()
+    }
+
+
     private fun atualizarTextoModoEscuro(isAtivo: Boolean) {
-        binding.tvDarkModeLabel.text = if (isAtivo) "Modo Escuro Ativado" else "Ativar Modo Escuro"
+        binding.tvDarkModeLabel.text = if (isAtivo) {
+            getString(R.string.dark_mode_ativado)
+        } else {
+            getString(R.string.dark_mode_desativado)
+        }
     }
 
     private fun verificarToastTemaPendente() {
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         if (prefs.getBoolean("SHOULD_SHOW_THEME_TOAST", false)) {
             val isDark = prefs.getBoolean("DARK_MODE", false)
-            showToast(if (isDark) "Modo escuro ativado" else "Modo claro ativado")
+            showToast(if (isDark) getString(R.string.toast_modo_escuro_ativado) else getString(R.string.toast_modo_claro_ativado))
             prefs.edit { remove("SHOULD_SHOW_THEME_TOAST") }
         }
     }
@@ -549,6 +594,8 @@ class DetalhesPageActivity : AppCompatActivity() {
     private fun cancelarWorkerNotificacoes() {
         NotificationHelper.cancelarWorkerNotificacoes(this)
     }
+
+
 
     private fun atualizarPreferenciaUtilizador(valor: Boolean, tipo: String) {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -747,11 +794,10 @@ class DetalhesPageActivity : AppCompatActivity() {
             .setTitle(getString(R.string.dialog_sair_titulo))
             .setIcon(icon)
             .setMessage(getString(R.string.dialog_sair_msg))
-            .setPositiveButton("Sim") { _, _ ->
-                // ENCERRAR NO FIREBASE
+            .setPositiveButton(getString(R.string.dialog_sair_btn_sim)) { _, _ ->
                 com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
 
-                getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { 
+                getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                     remove(KEY_EMAIL)
                 }
                 val intent = Intent(this, LoginActivity::class.java)
@@ -759,7 +805,7 @@ class DetalhesPageActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             }
-            .setNegativeButton("Não", null)
+            .setNegativeButton(getString(R.string.dialog_sair_btn_nao), null)
             .show()
     }
 
@@ -771,7 +817,7 @@ class DetalhesPageActivity : AppCompatActivity() {
             .setTitle(getString(R.string.dialog_eliminar_conta_titulo))
             .setIcon(icon)
             .setMessage(getString(R.string.dialog_eliminar_conta_msg))
-            .setPositiveButton("Sim, Eliminar") { _, _ ->
+            .setPositiveButton(getString(R.string.dialog_btn_sim_eliminar)) { _, _ ->
                 lifecycleScope.launch(Dispatchers.IO) {
                     val sucessoNuvem = FirebaseManager.excluirContaTotal(emailStr)
                     if (sucessoNuvem) {
@@ -791,12 +837,16 @@ class DetalhesPageActivity : AppCompatActivity() {
                         }
                     } else {
                         withContext(Dispatchers.Main) {
-                            showToast("Erro ao eliminar conta da nuvem")
+                            showToast(getString(R.string.toast_erro_eliminar_conta_nuvem))
                         }
                     }
                 }
             }
-            .setNegativeButton("Cancelar", null)
+            .setNegativeButton(getString(R.string.btn_cancelar), null)
             .show()
+    }
+
+    private fun showToast(msg: String, isLong: Boolean = false) {
+        ToastHelper.showCustomToast(this, msg, isLong)
     }
 }

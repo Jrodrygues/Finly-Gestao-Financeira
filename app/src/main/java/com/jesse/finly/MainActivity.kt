@@ -15,7 +15,6 @@ import android.widget.Button
 import android.widget.LinearLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.chip.ChipGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -32,11 +31,12 @@ import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.HomeBinding
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.utils.FinanceiroUtils
-import com.jesse.finly.utils.showToast
 import com.google.android.material.tabs.TabLayout
 import com.jesse.finly.utils.UserPreferencesManager
 import com.jesse.finly.utils.CurrencyFormatter
+import com.jesse.finly.utils.IdiomaUtils
 import com.jesse.finly.utils.Moeda
+import com.jesse.finly.utils.ToastHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -371,7 +371,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun atualizarTituloMes() {
-        binding.tvMainTitle.text = String.format(Locale.getDefault(), "%s %d", mesFiltro?.uppercase(Locale.getDefault()), anoFiltro)
+        val mesTraduzido = IdiomaUtils.formatarNomeMes(this, mesFiltro)
+        binding.tvMainTitle.text = "$mesTraduzido $anoFiltro".uppercase(Locale.getDefault())
     }
 
     private fun carregarLista() {
@@ -528,26 +529,38 @@ class MainActivity : AppCompatActivity() {
                 // Aba Despesas
                 val corDespesa = if (abs(totalGeralDespesas) < 0.001) colorPadrao else colorNegativo
                 val valorDespesaStr = CurrencyFormatter.formatarComSinal(-totalGeralDespesas, moedaAtual)
-                setSaldoColorido("Total Despesas: ", valorDespesaStr, corDespesa)
+                setSaldoColorido(getString(R.string.main_saldo_total_despesas_prefix), valorDespesaStr, corDespesa)
 
                 val pagasStr = CurrencyFormatter.formatar(totalPago, moedaAtual)
                 val aPagarStr = CurrencyFormatter.formatar(totalAPagar, moedaAtual)
-                binding.tvDetalheSaldo.text = "Pagas: $pagasStr  |  A Pagar: $aPagarStr  ($percentagemPaga% pagas)"
+                binding.tvDetalheSaldo.text = getString(R.string.main_saldo_detalhe_despesas, pagasStr, aPagarStr, percentagemPaga)
                 binding.tvDetalheSaldo.visibility = View.VISIBLE
             }
             2 -> {
                 // Aba Rendas
                 val corRenda = if (abs(saldoInicial) < 0.001) colorPadrao else colorPositivo
                 val valorRendaStr = CurrencyFormatter.formatarComSinal(saldoInicial, moedaAtual, forcarSinalPositivo = true)
-                setSaldoColorido("Total Rendas: ", valorRendaStr, corRenda)
+                setSaldoColorido(getString(R.string.main_saldo_total_rendas_prefix), valorRendaStr, corRenda)
                 binding.tvDetalheSaldo.visibility = View.GONE
             }
             else -> {
                 // Aba Todas
                 val (prefixo, corSaldo, valorSaldoStr) = when {
-                    abs(saldoDisponivel) < 0.001 -> Triple("Saldo Disponível: ", colorPadrao, CurrencyFormatter.formatar(0.0, moedaAtual))
-                    saldoDisponivel < -0.001 -> Triple("Défice / A Descoberto: ", colorNegativo, CurrencyFormatter.formatarComSinal(saldoDisponivel, moedaAtual))
-                    else -> Triple("Saldo Disponível: ", colorPositivo, CurrencyFormatter.formatarComSinal(saldoDisponivel, moedaAtual, forcarSinalPositivo = true))
+                    abs(saldoDisponivel) < 0.001 -> Triple(
+                        getString(R.string.main_saldo_disponivel_prefix),
+                        colorPadrao,
+                        CurrencyFormatter.formatar(0.0, moedaAtual)
+                    )
+                    saldoDisponivel < -0.001 -> Triple(
+                        getString(R.string.main_saldo_defice_prefix),
+                        colorNegativo,
+                        CurrencyFormatter.formatarComSinal(saldoDisponivel, moedaAtual)
+                    )
+                    else -> Triple(
+                        getString(R.string.main_saldo_disponivel_prefix),
+                        colorPositivo,
+                        CurrencyFormatter.formatarComSinal(saldoDisponivel, moedaAtual, forcarSinalPositivo = true)
+                    )
                 }
 
                 setSaldoColorido(prefixo, valorSaldoStr, corSaldo)
@@ -556,7 +569,7 @@ class MainActivity : AppCompatActivity() {
                 val pagoStr = CurrencyFormatter.formatar(totalPago, moedaAtual)
                 val aPagarStr = CurrencyFormatter.formatar(totalAPagar, moedaAtual)
 
-                binding.tvDetalheSaldo.text = "Inicial: $inicialStr  |  Pago: $pagoStr ($percentagemPaga%)  |  A Pagar: $aPagarStr"
+                binding.tvDetalheSaldo.text = getString(R.string.main_saldo_detalhe_todas, inicialStr, pagoStr, percentagemPaga, aPagarStr)
                 binding.tvDetalheSaldo.visibility = View.VISIBLE
             }
         }
@@ -617,5 +630,9 @@ class MainActivity : AppCompatActivity() {
                 FirebaseManager.salvarTransacaoNoFirestore(transacaoComId)
             }
         }
+    }
+
+    private fun showToast(msg: String, isLong: Boolean = false) {
+        ToastHelper.showCustomToast(this, msg, isLong)
     }
 }

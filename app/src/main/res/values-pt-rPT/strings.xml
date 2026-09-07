@@ -13,16 +13,16 @@
 
     <!-- Guia do Utilizador -->
     <string name="guia_titulo">GUIA DO UTILIZADOR</string>
-    <string name="guia_sec1_titulo">1. Resumo Mensal &amp; Gráfico</string>
+    <string name="guia_sec1_titulo">1. Resumo Mensal &amp; Gráficos</string>
     <string name="guia_sec1_desc">Tenha uma visão geral das finanças do mês selecionado através do seletor no topo. O gráfico circular e a lista detalham a distribuição exata dos seus gastos por categoria e percentagens.</string>
     <string name="guia_sec2_titulo">2. Meta de Poupança &amp; Progresso</string>
     <string name="guia_sec2_desc">Defina a sua meta mensal de poupança. A barra de progresso é preenchida automaticamente com as transações da categoria \'Poupança\' e sincroniza-se em tempo real entre os seus telemóveis.</string>
     <string name="guia_sec3_titulo">3. Listagem Detalhada &amp; Filtros</string>
-    <string name="guia_sec3_desc">Aceda à lista completa de transações. Pesquise por texto, filtre por tipo através das abas e utilize o botão de voltar dedicado no cabeçalho para regressar rapidamente ao resumo.</string>
+    <string name="guia_sec3_desc">Aceda à lista completa de transações. Pesquise por texto, filtre por tipo através dos separadores e utilize o botão de voltar no cabeçalho para regressar rapidamente ao resumo.</string>
     <string name="guia_sec4_titulo">4. Adicionar &amp; Editar Transações</string>
-    <string name="guia_sec4_desc">Prima o botão \'+\' na Listagem para registar um novo ‘item’ (Renda ou Despesa) utilizando o seletor rápido (toggle group). O campo de valor adapta-se à moeda selecionada (€ ou R$) com máscara automática de centavos durante a digitação e ícones dinâmicos por categoria.</string>
+    <string name="guia_sec4_desc">Prima o botão \'+\' na Listagem para registar um novo item (Rendimento ou Despesa) utilizando o seletor rápido. O campo de valor adapta-se à moeda selecionada (€ ou R$) com formatação automática de cêntimos durante a digitação e ícones dinâmicos por categoria.</string>
     <string name="guia_sec5_titulo">5. Recorrência Inteligente</string>
-    <string name="guia_sec5_desc">Ative a opção de recorrência para transações fixas ou parceladas. Ao editar ou eliminar uma transação recorrente, escolha flexivelmente se deseja aplicar a alteração apenas ao mês selecionado ou a este e a todos os meses futuros.</string>
+    <string name="guia_sec5_desc">Ative a opção de recorrência para transações fixas ou em prestações. Ao editar ou eliminar uma transação recorrente, escolha se deseja aplicar a alteração apenas ao mês selecionado ou a este e a todos os meses futuros.</string>
     <string name="guia_sec6_titulo">6. Categorias Personalizadas</string>
     <string name="guia_sec6_desc">Crie e gira as suas categorias no menu \'Gerir Categorias\' ou ao registar itens. O campo de categoria herda automaticamente o ícone correspondente à categoria escolhida.</string>
     <string name="guia_sec7_titulo">7. Notificações de Vencimento</string>
@@ -32,26 +32,24 @@
     <string name="guia_sec9_titulo">9. Evolução Anual</string>
     <string name="guia_sec9_desc">Aceda ao menu lateral para ver o gráfico de barras anual. Permite comparar os seus ganhos e gastos reais mês a mês durante todo o ano.</string>
     <string name="guia_sec10_titulo">10. Sincronização em Tempo Real</string>
-    <string name="guia_sec10_desc">Ao criar conta, as suas transações, metas de poupança e categorias são sincronizadas com segurança na nuvem com criptografia de ponta a ponta entre todos os seus telemóveis.</string>
+    <string name="guia_sec10_desc">Ao criar conta, as suas transações, metas de poupança e categorias são sincronizadas com segurança na nuvem com encriptação de ponta a ponta entre todos os seus telemóveis.</string>
     <string name="guia_sec11_titulo">11. Modo Convidado (100% Local)</string>
     <string name="guia_sec11_desc">Experimente todas as funcionalidades da aplicação sem criar conta. No Modo Convidado, os seus dados são guardados exclusivamente na memória do seu dispositivo com total privacidade.</string>
     <string name="guia_sec12_titulo">12. Modo Escuro / Claro</string>
-    <string name="guia_sec12_desc">Adapte a ‘interface’ às suas preferências visuais. Ative ou desative o Modo Escuro no seu perfil para uma experiência de utilização confortável a qualquer hora.</string>
+    <string name="guia_sec12_desc">Adapte a interface às suas preferências visuais. Ative ou desative o Modo Escuro no seu perfil para uma experiência visual confortável a qualquer hora.</string>
     <string name="guia_sec13_titulo">13. Segurança &amp; Privacidade</string>
     <string name="guia_sec13_desc">A sua privacidade é a nossa prioridade. O Finly utiliza encriptação de ponta para garantir que apenas você tem acesso aos seus dados financeiros.</string>
     <string name="guia_sec14_titulo">14. Bloqueio por Biometria / Impressão Digital</string>
     <string name="guia_sec14_desc">Proteja a sua aplicação contra acessos não autorizados. Ative o bloqueio por biometria no seu perfil para exigir a confirmação da sua identidade (impressão digital ou PIN) sempre que abrir o Finly. O estado da biometria é sincronizado no seu perfil no Firebase.</string>
-    <string name="guia_sec15_titulo">15. Inteligência &amp; Intuições Financeiros</string>
-    <string name="guia_sec15_desc">Consulte alertas automáticos de teto orçamental quando os gastos ultrapassarem 100% da renda, badges de comparação percentual em relação ao mês anterior e a previsão de saldo ao final do mês com base em pendências.</string>
+    <string name="guia_sec15_titulo">15. Análise &amp; Indicadores Financeiros</string>
+    <string name="guia_sec15_desc">Consulte alertas automáticos de teto orçamental quando os gastos ultrapassarem 100% dos rendimentos, indicadores de comparação percentual em relação ao mês anterior e a previsão de saldo no final do mês com base em pendências.</string>
     <string name="guia_sec16_titulo">16. Seleção de Período em Grelha &amp; Exportação</string>
-    <string name="guia_sec16_desc">Toque no título do mês para abrir o modal em grelha rígida 4x3 (JAN..DEZ) e seletor horizontal de anos. O período selecionado sincroniza automaticamente entre o Resumo e a Listagem. Exporte relatórios formatados em PDF ou CSV (Excel) guardados na pasta Downloads.</string>
-    <string name="guia_sec17_titulo">17. Sistema Multi-Moeda &amp; Onboarding</string>
-    <string name="guia_sec17_desc">Ao entrar na aplicação ou criar conta, escolha a sua moeda principal (€ EUR ou R$ BRL) no modal de boas-vindas. Todos os ecrãs, gráficos, formulários e relatórios (PDF/CSV) adaptam-se dinamicamente com máscara de centavos e sincronizam-se em tempo real em todos os seus telemóveis.</string>
+    <string name="guia_sec16_desc">Toque no título do mês para abrir a grelha de seleção (JAN..DEZ) e o seletor horizontal de anos. O período selecionado sincroniza automaticamente entre o Resumo e a Listagem. Exporte relatórios formatados em PDF ou CSV (Excel) guardados na pasta Transferências.</string>
+    <string name="guia_sec17_titulo">17. Sistema Multi-Moeda &amp; Boas-Vindas</string>
+    <string name="guia_sec17_desc">Ao entrar na aplicação ou criar conta, escolha a sua moeda principal (€ EUR ou R$ BRL) no ecrã de boas-vindas. Todos os ecrãs, gráficos, formulários e relatórios (PDF/CSV) adaptam-se dinamicamente com formatação de cêntimos e sincronizam-se em tempo real em todos os seus telemóveis.</string>
     <string name="snackbar_item_removido">Item removido: %1$s</string>
     <string name="btn_desfazer">DESFAZER</string>
     <string name="btn_voltar">Voltar</string>
-
-
 
     <!-- Login -->
     <string name="lembrar_email">Lembrar e-mail</string>
@@ -60,8 +58,8 @@
     <string name="ou_separador">OU</string>
     <string name="bem_vindo_finly">Bem-vindo ao Finly</string>
     <string name="criar_conta_link">Não tem conta? Crie aqui</string>
-    <string name="esqueceu_senha">Esqueceu a palavra-passe?</string>
-    <string name="msg_modo_convidado_aviso">Como convidado, os seus dados não serão sincronizados na nuvem e podem ser perdidos se desinstalar a aplicação. Deseja continuar?</string>
+    <string name="esqueceu_senha">Esqueceu-se da palavra-passe?</string>
+    <string name="msg_modo_convidado_aviso">Como convidado, os seus dados não serão sincronizados na nuvem e podem perder-se se desinstalar a aplicação. Deseja continuar?</string>
     <string name="btn_continuar_convidado">Continuar</string>
     <string name="hint_confirmar_palavra_passe">Confirmar Palavra-passe</string>
     <string name="email_recuperacao_enviado">E-mail de recuperação enviado!</string>
@@ -71,7 +69,7 @@
     <string name="hint_palavra_passe">Palavra-passe</string>
     <string name="hint_palavra_passe_atual">Palavra-passe Atual</string>
 
-    <!-- Registo / Novo ‘Item’ -->
+    <!-- Registo / Novo Item -->
     <string name="nova_transacao">Nova Transação</string>
     <string name="editar_item">Editar Item</string>
     <string name="criar_nova_conta">Criar Nova Conta</string>
@@ -86,19 +84,19 @@
     <string name="label_categoria">Categoria:</string>
     <string name="label_mes_referencia">Mês de Referência:</string>
     <string name="rb_despesa">DESPESA</string>
-    <string name="rb_renda">RENDA</string>
+    <string name="rb_renda">RENDIMENTO</string>
     <string name="cb_repetir_sempre">Repetir todos os meses (Fixo)</string>
-    <string name="cb_repetir_vezes">Repetir quantidade de vezes</string>
+    <string name="cb_repetir_vezes">Repetir número de vezes</string>
     <string name="hint_parcelas">Quantos meses?</string>
 
     <!-- Resumo -->
-    <string name="percentagem_renda_gasta">PERCENTAGEM DA RENDA GASTA</string>
+    <string name="percentagem_renda_gasta">PERCENTAGEM DO RENDIMENTO GASTO</string>
     <string name="ver_listagem_detalhada">VER LISTAGEM DETALHADA</string>
     <string name="label_periodo">Período:</string>
     <string name="label_resumo_categoria">RESUMO POR CATEGORIA</string>
     <string name="label_meta_poupanca">Meta de Poupança</string>
     <string name="btn_definir_meta">DEFINIR META</string>
-    <string name="label_total_renda">Total mensal de renda: </string>
+    <string name="label_total_renda">Total mensal de rendimentos: </string>
     <string name="label_total_despesas">Total mensal de despesas: </string>
     <string name="label_total_poupanca">Total poupança: </string>
     <string name="label_total_exterior">Total exterior: </string>
@@ -110,14 +108,14 @@
     <string name="exportar_sub_pdf">Documento formatado em alta definição com gráficos</string>
     <string name="exportar_sub_csv">Tabela estruturada pronta para Excel ou Google Sheets</string>
     <string name="aviso_teto_orcamental">⚠️ Atenção: despesas superiores às receitas</string>
-    <string name="previsao_fim_mes_titulo">Previsão de Fim de Mês</string>
+    <string name="previsao_fim_mes_titulo">Previsão de Final de Mês</string>
 
     <!-- Listagem (Home) -->
     <string name="hint_pesquisar">Pesquisar&#8230;</string>
 
     <string name="tab_todas">TODAS</string>
     <string name="tab_despesas">DESPESAS</string>
-    <string name="tab_rendas">RENDAS</string>
+    <string name="tab_rendas">RENDIMENTOS</string>
     <string name="col_item">Descrição</string>
     <string name="col_valor">Valor</string>
     <string name="col_vencimento">Data</string>
@@ -128,9 +126,9 @@
     <string name="btn_minha_listagem">A MINHA LISTAGEM</string>
     <string name="btn_editar_dados">EDITAR DADOS DA CONTA</string>
     <string name="btn_terminar_sessao">TERMINAR SESSÃO</string>
-    <string name="btn_eliminar_registo">ELIMINAR REGISTO</string>
-    <string name="dialog_eliminar_titulo">Eliminar Registo</string>
-    <string name="dialog_eliminar_msg">Tem a certeza que deseja apagar a sua conta? Todas as suas transações serão eliminadas permanentemente.</string>
+    <string name="btn_eliminar_registo">ELIMINAR CONTA</string>
+    <string name="dialog_eliminar_titulo">Eliminar Conta</string>
+    <string name="dialog_eliminar_msg">Tem a certeza de que deseja apagar a sua conta? Todas as suas transações serão eliminadas permanentemente.</string>
     <string name="toast_conta_eliminada">Conta eliminada com sucesso</string>
 
     <!-- Transação -->
@@ -138,13 +136,11 @@
     <string name="btn_eliminar_este_item">ELIMINAR ESTE ITEM</string>
     <string name="btn_voltar_listagem">VOLTAR À LISTAGEM</string>
     <string name="utilizador_convidado">Utilizador Convidado</string>
-    <string name="dados_apenas_locais">Dados apenas locais (‘Offline’)</string>
+    <string name="dados_apenas_locais">Dados apenas locais (Offline)</string>
     <string name="sem_email_sincronizado">Sem e-mail sincronizado</string>
 
-
-
     <string name="toast_convidado_perfil">Convidado: Sem perfil para editar</string>
-    <string name="meta_atingida">Meta Atingida! Parabéns! 🎉</string>
+    <string name="meta_atingida">Meta Alcançada! Parabéns! 🎉</string>
     <string name="valor_label">Valor: %1$.2f € (%2$s)</string>
     <string name="data_label">Data: %1$s</string>
     <string name="categoria_mes_label">Categoria: %1$s | Mês: %2$s</string>
@@ -158,13 +154,13 @@
 
     <!-- Labels Listagem/Resumo -->
     <string name="total_despesas">Total Despesas: </string>
-    <string name="total_rendas">Total Rendas: </string>
+    <string name="total_rendas">Total Rendimentos: </string>
     <string name="saldo_final_label">Saldo Final: </string>
 
     <!-- PDF -->
     <string name="pdf_titulo">Relatório Financeiro Finly</string>
     <string name="pdf_periodo">Período: %1$s / %2$s</string>
-    <string name="pdf_renda_total">Renda Total: %1$s</string>
+    <string name="pdf_renda_total">Rendimento Total: %1$s</string>
     <string name="pdf_despesa_total">Despesa Total: %1$s</string>
     <string name="pdf_poupanca_total">Total Poupança Real: %1$s</string>
     <string name="pdf_meta_definida">Meta de Poupança Definida: %1$s</string>
@@ -197,7 +193,7 @@
     <string name="saldo_anual_label">Saldo Anual</string>
     <string name="label_ano">Ano</string>
     <string name="aviso_convidado_titulo">Aviso de Convidado</string>
-    <string name="aviso_convidado_msg">Como convidado, os seus dados são locais. Deseja continuar?</string>
+    <string name="aviso_convidado_msg">Como convidado, os seus dados são guardados apenas localmente. Deseja continuar?</string>
     <string name="marker_separator">"  |  "</string>
     <string name="default_year">2026</string>
     <string name="default_value_currency">0,00 €</string>
@@ -236,7 +232,7 @@
 
     <!-- Erros de Autenticação / Registos -->
     <string name="erro_auth_email_em_uso">Este e-mail já está a ser utilizado.</string>
-    <string name="erro_auth_senha_fraca">A palavra-passe deve ter pelo menos 6 caracteres.</string>
+    <string name="erro_auth_senha_fraca">A palavra-passe deve ter pelo menos 6 carateres.</string>
     <string name="erro_auth_email_invalido">O formato do e-mail é inválido.</string>
     <string name="erro_auth_credenciais_invalidas">E-mail ou palavra-passe incorretos.</string>
     <string name="erro_auth_utilizador_nao_encontrado">Conta não encontrada.</string>
@@ -245,10 +241,10 @@
 
     <!-- Mensagens Toast -->
     <string name="toast_permissao_notificacao_negada">Permissão de notificações negada</string>
-    <string name="toast_biometria_ativada">Bloqueio com biometria ativado!</string>
+    <string name="toast_biometria_ativada">Bloqueio por biometria ativado!</string>
     <string name="toast_biometria_cancelada">Autenticação cancelada ou indisponível</string>
-    <string name="toast_biometria_indisponivel">Biometria não disponível ou configurada neste dispositivo</string>
-    <string name="toast_biometria_desativada">Bloqueio com biometria desativado</string>
+    <string name="toast_biometria_indisponivel">Biometria indisponível ou não configurada neste dispositivo</string>
+    <string name="toast_biometria_desativada">Bloqueio por biometria desativado</string>
     <string name="toast_modo_escuro_ativado">Modo escuro ativado</string>
     <string name="toast_modo_claro_ativado">Modo claro ativado</string>
     <string name="toast_notificacoes_ativadas">Notificações ativadas!</string>
@@ -264,12 +260,12 @@
     <string name="toast_senha_atual_incorreta">Palavra-passe atual incorreta!</string>
     <string name="toast_introduza_vencimento">Introduza a data de vencimento</string>
     <string name="toast_data_invalida">Data inválida. Use o formato DD/MM</string>
-    <string name="toast_dados_guardados">Dados guardados!</string>
-    <string name="toast_campos_obrigatorios">Introduza todos os campos obrigatórios</string>
+    <string name="toast_dados_guardados">Dados guardados com sucesso!</string>
+    <string name="toast_campos_obrigatorios">Preencha todos os campos obrigatórios</string>
     <string name="toast_senhas_nao_coincidem">As palavras-passe não coincidem</string>
-    <string name="toast_conta_criada">Conta criada!</string>
+    <string name="toast_conta_criada">Conta criada com sucesso!</string>
     <string name="toast_nome_email_obrigatorios">Nome e E-mail são obrigatórios</string>
-    <string name="toast_perfil_atualizado">Perfil atualizado!</string>
+    <string name="toast_perfil_atualizado">Perfil atualizado com sucesso!</string>
 
     <string name="toast_meta_guardada">Meta guardada para %1$s!</string>
     <string name="toast_modo_convidado_nuvem">Modo Convidado: Dados guardados apenas no dispositivo.</string>
@@ -277,11 +273,11 @@
     <string name="toast_erro_guardar_pdf">Erro ao guardar o relatório PDF.</string>
     <string name="toast_erro_gerar_pdf">Erro ao gerar PDF: %1$s</string>
     <string name="toast_sem_transacoes_exportar">Sem transações para exportar em %1$s/%2$d</string>
-    <string name="toast_ficheiro_csv_salvo">Ficheiro CSV salvo em Downloads!</string>
+    <string name="toast_ficheiro_csv_salvo">Ficheiro CSV guardado nas Transferências!</string>
     <string name="toast_erro_guardar_csv">Erro ao guardar o ficheiro CSV.</string>
     <string name="toast_erro_exportar_csv">Erro ao exportar CSV: %1$s</string>
     <string name="toast_moeda_configurada">Moeda %1$s configurada com sucesso!</string>
-    <string name="toast_carregando_perfil">A carregar perfil&#8230; Tente novamente.</string>
+    <string name="toast_carregando_perfil">A carregar perfil&#8230; Aguarde um momento.</string>
     <string name="toast_transacao_paga">%1$s marcada como paga!</string>
     <string name="toast_erro_atualizar_transacao">Erro ao atualizar transação.</string>
 
@@ -293,20 +289,20 @@
     <string name="dialog_recuperar_senha_titulo">Recuperar Palavra-passe</string>
     <string name="dialog_modo_convidado_titulo">Modo Convidado</string>
     <string name="dialog_eliminar_categoria_titulo">Eliminar Categoria</string>
-    <string name="dialog_eliminar_categoria_msg">Tem a certeza que deseja eliminar a categoria \'%1$s\'?</string>
+    <string name="dialog_eliminar_categoria_msg">Tem a certeza de que deseja eliminar a categoria \'%1$s\'?</string>
     <string name="dialog_categoria_em_uso_titulo">Categoria em uso</string>
     <string name="dialog_categoria_em_uso_msg">A categoria \'%1$s\' está em uso por %2$d transação(ões). Deseja mudar estas transações para \'Geral\' e eliminar a categoria?</string>
     <string name="dialog_meta_poupanca_titulo">Meta de Poupança</string>
     <string name="dialog_meta_poupanca_msg">Quanto deseja poupar em %1$s?</string>
     <string name="dialog_senha_atual_titulo">Palavra-passe Atual</string>
     <string name="dialog_senha_atual_msg">Por motivos de segurança, introduza a sua palavra-passe atual para definir uma nova.</string>
-    <string name="dialog_autenticacao_requerida_titulo">Autenticação Requerida</string>
-    <string name="dialog_autenticacao_requerida_msg">É necessário autenticar para aceder à sua conta.</string>
+    <string name="dialog_autenticacao_requerida_titulo">Autenticação Necessária</string>
+    <string name="dialog_autenticacao_requerida_msg">É necessário autenticar-se para aceder à sua conta.</string>
     <string name="dialog_btn_enviar">Enviar</string>
 
     <!-- Labels e Badges Globais -->
     <string name="label_despesa">Despesa</string>
-    <string name="label_renda">Renda</string>
+    <string name="label_renda">Rendimento</string>
     <string name="label_pago">Pago</string>
     <string name="label_pendente">Pendente</string>
     <string name="label_categoria_simples">Categoria</string>
@@ -314,7 +310,7 @@
     <string name="label_recorrencia">Recorrência</string>
     <string name="label_estado_pagamento">Estado do Pagamento</string>
     <string name="gasto_total_format">Gasto total: %1$s</string>
-    <string name="gasto_sem_teto_format">Gasto: %1$s (Sem teto definido)</string>
+    <string name="gasto_sem_teto_format">Gasto: %1$s (Sem limite definido)</string>
     <string name="detalhes_mes_ano_format">Detalhes: %1$s de %2$d</string>
     <string name="tag_no_verde">🟢 No Verde</string>
     <string name="tag_no_vermelho">🔴 No Vermelho</string>
@@ -333,9 +329,9 @@
     <string name="notif_titulo_multiplas">%1$s (%2$d pendências)</string>
 
     <!-- Textos Principais / Linhas -->
-    <string name="notif_texto_vence_hoje">O seu %1$s (%2$s) vence hoje.</string>
-    <string name="notif_texto_em_atraso">O seu %1$s (%2$s) está em atraso há %3$d dia(s).</string>
-    <string name="notif_texto_vence_dias">O seu %1$s (%2$s) vence em %3$d dias.</string>
+    <string name="notif_texto_vence_hoje">A sua conta %1$s (%2$s) vence hoje.</string>
+    <string name="notif_texto_em_atraso">A sua conta %1$s (%2$s) está em atraso há %3$d dia(s).</string>
+    <string name="notif_texto_vence_dias">A sua conta %1$s (%2$s) vence em %3$d dias.</string>
 
     <string name="notif_inbox_vence_hoje">vence hoje</string>
     <string name="notif_inbox_atraso">%1$dd atraso</string>
@@ -357,10 +353,10 @@
     <string name="btn_eliminar">Eliminar</string>
     <string name="dialog_sair_btn_sim">Sim</string>
     <string name="dialog_sair_btn_nao">Não</string>
-    <string name="toast_digite_nome_categoria">Digite o nome da categoria</string>
+    <string name="toast_digite_nome_categoria">Introduza o nome da categoria</string>
     <string name="toast_nuvem_convidado">Modo Convidado: Dados guardados apenas no dispositivo.</string>
     <string name="toast_nuvem_sincronizado">Sincronizado: Os seus dados estão seguros na nuvem.</string>
-    <string name="toast_carregar_perfil">A carregar perfil... Tente novamente.</string>
+    <string name="toast_carregar_perfil">A carregar perfil... Aguarde um momento.</string>
     <string name="toast_moeda_configurada_sucesso">Moeda %1$s configurada com sucesso!</string>
     <string name="moeda_real_nome_completo">Real (R$)</string>
     <string name="moeda_euro_nome_completo">Euro (€)</string>
@@ -371,12 +367,12 @@
 
     <!-- PDF & CSV & Exportação -->
     <string name="pdf_relatorio_subtitulo">Relatório Financeiro Mensal • %1$s / %2$s</string>
-    <string name="pdf_rodape_gerado">Gerado por Finly em %1$s</string>
+    <string name="pdf_rodape_gerado">Gerado pelo Finly a %1$s</string>
     <string name="pdf_rodape_pagina">Página %1$d</string>
-    <string name="pdf_card_total_rendas">TOTAL RENDAS</string>
+    <string name="pdf_card_total_rendas">TOTAL RENDIMENTOS</string>
     <string name="pdf_card_total_despesas">TOTAL DESPESAS</string>
     <string name="pdf_card_saldo_final">SALDO FINAL</string>
-    <string name="pdf_card_previsao_fim_mes">Previsão Fim de Mês: %1$s (%2$s)</string>
+    <string name="pdf_card_previsao_fim_mes">Previsão Final de Mês: %1$s (%2$s)</string>
     <string name="pdf_previsao_status_verde">No Verde</string>
     <string name="pdf_previsao_status_vermelho">No Vermelho</string>
     <string name="pdf_previsao_contas_em_dia">Contas em dia</string>
@@ -385,14 +381,14 @@
     <string name="pdf_col_categoria">Categoria</string>
     <string name="pdf_col_total_gasto">Total Gasto</string>
     <string name="pdf_col_percent_total">%% do Total</string>
-    <string name="pdf_secao_rendas">RENDAS (ENTRADAS)</string>
+    <string name="pdf_secao_rendas">RENDIMENTOS (ENTRADAS)</string>
     <string name="pdf_secao_despesas">DESPESAS (SAÍDAS)</string>
     <string name="pdf_col_item_desc">Item / Descrição</string>
     <string name="pdf_col_data">Data</string>
     <string name="pdf_col_valor">Valor</string>
-    <string name="pdf_sem_rendas">Nenhuma renda registada para este período.</string>
+    <string name="pdf_sem_rendas">Nenhum rendimento registado para este período.</string>
     <string name="pdf_sem_despesas">Nenhuma despesa registada para este período.</string>
-    <string name="toast_relatorio_pdf_salvo">Relatório salvo em Downloads!</string>
+    <string name="toast_relatorio_pdf_salvo">Relatório guardado nas Transferências!</string>
     <string name="toast_relatorio_pdf_erro_guardar">Erro ao guardar o relatório PDF.</string>
     <string name="toast_relatorio_pdf_erro_gerar">Erro ao gerar PDF: %1$s</string>
     <string name="toast_csv_sem_transacoes">Sem transações para exportar em %1$s/%2$s</string>
@@ -400,9 +396,10 @@
     <string name="toast_csv_erro_guardar">Erro ao guardar o ficheiro CSV.</string>
     <string name="toast_csv_erro_exportar">Erro ao exportar CSV: %1$s</string>
 
+
     <!-- MainActivity - Rodapé e Saldos -->
     <string name="main_saldo_total_despesas_prefix">Total Despesas: </string>
-    <string name="main_saldo_total_rendas_prefix">Total Rendas: </string>
+    <string name="main_saldo_total_rendas_prefix">Total Rendimentos: </string>
     <string name="main_saldo_disponivel_prefix">Saldo Disponível: </string>
     <string name="main_saldo_defice_prefix">Défice / A Descoberto: </string>
 
@@ -441,7 +438,7 @@
     <string name="btn_confirmar">Confirmar</string>
 
     <string name="erro_campo_nome_obrigatorio">Insira um nome ou descrição</string>
-    <string name="erro_campo_valor_maior_zero">Insira um valor maior que zero</string>
+    <string name="erro_campo_valor_maior_zero">Insira um valor superior a zero</string>
 
     <!-- LoginActivity - Ações e Mensagens -->
     <string name="btn_enviar">Enviar</string>
@@ -468,10 +465,10 @@
     <!-- RegistoActivity / Transacoes -->
     <string name="label_repetir_transacao">Repetir Transação (Recorrente)</string>
     <string name="label_fixa_mensal">Fixa (Mensal)</string>
-    <string name="label_parcelada">Parcelada</string>
+    <string name="label_parcelada">Em prestações</string>
     <string name="btn_alterar_palavra_passe">Alterar palavra-passe</string>
     <string name="btn_cancelar_alteracao_palavra_passe">Cancelar alteração de palavra-passe</string>
-    <string name="msg_digite_nome_categoria">Digite o nome da categoria</string>
+    <string name="msg_digite_nome_categoria">Introduza o nome da categoria</string>
 
     <!-- Categorias / BottomSheet -->
     <string name="as_minhas_categorias">As Minhas Categorias</string>
@@ -536,11 +533,11 @@
     <string name="label_nao">Não</string>
 
     <!-- Splash Biometria & Outros -->
-    <string name="dialog_biometria_titulo">Autenticação Requerida</string>
-    <string name="dialog_biometria_msg">É necessário autenticar para aceder à sua conta.</string>
+    <string name="dialog_biometria_titulo">Autenticação Necessária</string>
+    <string name="dialog_biometria_msg">É necessário autenticar-se para aceder à sua conta.</string>
     <string name="btn_tentar_novamente">Tentar Novamente</string>
     <string name="btn_sair">Sair</string>
-    <string name="desc_status_nuvem">Status da Nuvem</string>
+    <string name="desc_status_nuvem">Estado da Nuvem</string>
     <string name="label_gasto_total">Gasto total: %1$s</string>
 
     <!-- Categorias -->
@@ -552,7 +549,7 @@
     <string name="cat_lazer">Lazer</string>
     <string name="cat_educacao">Educação</string>
     <string name="cat_compras">Compras</string>
-    <string name="cat_assinaturas">Assinaturas</string>
+    <string name="cat_assinaturas">Subscrições</string>
     <string name="cat_investimentos">Investimentos</string>
     <string name="cat_poupanca">Poupança</string>
     <string name="cat_exterior">Exterior</string>
@@ -562,4 +559,3 @@
     <string name="guia_sec18_titulo">18. Suporte Multi-Idioma (Per-App Language)</string>
     <string name="guia_sec18_desc">Aceda ao menu Perfil para alterar o idioma da aplicação em qualquer momento entre Português (Portugal), Português (Brasil), Inglês (US) e Espanhol. A interface, relatórios exportados, categorias e notificações adaptam-se instantaneamente sem necessidade de reiniciar o telemóvel.</string>
 </resources>
-

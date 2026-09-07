@@ -38,7 +38,7 @@
                 android:id="@+id/tvScreenTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Listagem Detalhada"
+                android:text="@string/ver_listagem_detalhada"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="20sp"
                 android:textStyle="bold"
