@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.jesse.finly.R
+import com.jesse.finly.SplashActivity
 import com.jesse.finly.ResumoActivity
 import com.jesse.finly.DetalhesPageActivity
 import com.jesse.finly.database.FirebaseManager
@@ -113,8 +114,9 @@ class NotificationWorker(
             manager.createNotificationChannel(channel)
         }
 
-        val intent = Intent(applicationContext, ResumoActivity::class.java).apply {
+        val intent = Intent(applicationContext, SplashActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("TARGET_ACTIVITY", "RESUMO")
         }
 
         val pendingIntent = PendingIntent.getActivity(
@@ -167,6 +169,7 @@ class NotificationWorker(
         val builder = NotificationCompat.Builder(applicationContext, channelId)
             .setSmallIcon(R.drawable.ic_finly_notification)
             .setColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
+            .setSubText(applicationContext.getString(R.string.app_name))
             .setContentTitle(titulo)
             .setContentText(textoResumo)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -225,8 +228,9 @@ class NotificationWorker(
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-            val detailIntent = Intent(applicationContext, DetalhesPageActivity::class.java).apply {
+            val detailIntent = Intent(applicationContext, SplashActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                putExtra("TARGET_ACTIVITY", "DETALHES")
                 putExtra("isTransactionDetail", true)
                 putExtra("id", t.id)
                 putExtra("item", t.item)

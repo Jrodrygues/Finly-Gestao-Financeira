@@ -62,13 +62,20 @@ class SplashActivity : AppCompatActivity() {
         val biometriaAtiva = sharedPref.getBoolean("pref_biometric_ativa", false)
 
         val navigateToMain = {
+            val targetIntent = when (intent.getStringExtra("TARGET_ACTIVITY")) {
+                "DETALHES" -> Intent(this, DetalhesPageActivity::class.java).apply {
+                    putExtras(this@SplashActivity.intent)
+                }
+                else -> Intent(this, ResumoActivity::class.java)
+            }
+
             if (biometriaAtiva && BiometricUtils.isBiometricAvailable(this)) {
                 BiometricUtils.promptBiometria(
                     this,
-                    title = "Desbloquear Finly",
-                    subtitle = "Autentique-se com a sua biometria ou PIN",
+                    title = getString(R.string.dialog_biometria_titulo),
+                    subtitle = getString(R.string.dialog_biometria_msg),
                     onSuccess = {
-                        startActivity(Intent(this, ResumoActivity::class.java))
+                        startActivity(targetIntent)
                         finish()
                     },
                     onError = {
@@ -86,7 +93,7 @@ class SplashActivity : AppCompatActivity() {
                     }
                 )
             } else {
-                startActivity(Intent(this, ResumoActivity::class.java))
+                startActivity(targetIntent)
                 finish()
             }
         }
