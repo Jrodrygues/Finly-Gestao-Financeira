@@ -409,13 +409,14 @@
     <string name="toast_csv_salvo">¡Archivo CSV guardado en Descargas!</string>
     <string name="toast_csv_erro_guardar">Error al guardar el archivo CSV.</string>
     <string name="toast_csv_erro_exportar">Error al exportar CSV: %1$s</string>
+    <string name="menu_backup">Copia de Seguridad</string>
     <string name="btn_exportar_backup">Exportar Backup</string>
     <string name="btn_importar_backup">Importar Backup</string>
     <string name="toast_backup_exportado">¡Copia de seguridad exportada con éxito!</string>
     <string name="toast_backup_importado">¡%1$d cuentas restauradas de la copia!</string>
     <string name="toast_erro_backup">Error al procesar la copia de seguridad.</string>
-    <string name="exportar_sub_backup">Guardar copia de seguridad encriptada (.finly)</string>
-    <string name="importar_sub_backup">Restaurar datos desde archivo (.finly)</string>
+    <string name="exportar_sub_backup">Guardar copia de seguridad encriptada</string>
+    <string name="importar_sub_backup">Restaurar datos desde archivo</string>
 
     <!-- MainActivity - Pie de página y Saldos -->
     <string name="main_saldo_total_despesas_prefix">Total Gastos: </string>

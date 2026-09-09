@@ -7,18 +7,26 @@
     android:orientation="vertical"
     android:padding="24dp">
 
+    <!-- Puxador Superior -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="12dp"
+        android:background="#DDDDDD" />
+
     <TextView
-        android:id="@+id/tvTituloExportar"
+        android:id="@+id/tvTituloBackup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/menu_exportar"
+        android:text="@string/menu_backup"
         android:textColor="@color/textColorPrimary"
         android:textSize="18sp"
         android:textStyle="bold" />
 
-    <!-- Botão 1: PDF -->
+    <!-- Botão 1: Exportar Backup -->
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardExportarPDF"
+        android:id="@+id/cardExportarBackup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -41,8 +49,8 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_pdf"
-                app:tint="#E53935" />
+                android:src="@drawable/ic_export"
+                app:tint="#1976D2" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -54,7 +62,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/exportar_btn_pdf"
+                    android:text="@string/btn_exportar_backup"
                     android:textColor="@color/textColorPrimary"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -63,16 +71,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="@string/exportar_sub_pdf"
+                    android:text="@string/exportar_sub_backup"
                     android:textColor="@color/textColorSecondary"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Botão 2: CSV -->
+    <!-- Botão 2: Importar Backup -->
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardExportarCSV"
+        android:id="@+id/cardImportarBackup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -95,8 +103,8 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_table"
-                app:tint="#2E7D32" />
+                android:src="@drawable/ic_import"
+                app:tint="#7E57C2" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -108,7 +116,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/exportar_btn_csv"
+                    android:text="@string/btn_importar_backup"
                     android:textColor="@color/textColorPrimary"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -117,7 +125,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="@string/exportar_sub_csv"
+                    android:text="@string/importar_sub_backup"
                     android:textColor="@color/textColorSecondary"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -125,7 +133,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCancelarExportar"
+        android:id="@+id/btnCancelarBackup"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

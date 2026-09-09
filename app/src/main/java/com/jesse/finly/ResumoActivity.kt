@@ -476,6 +476,9 @@ class ResumoActivity : AppCompatActivity() {
                 R.id.nav_exportar -> {
                     mostrarOpcoesExportacao()
                 }
+                R.id.nav_backup -> {
+                    mostrarOpcoesBackup()
+                }
                 R.id.nav_sair -> {
                     mostrarDialogSair()
                 }
@@ -1208,9 +1211,6 @@ class ResumoActivity : AppCompatActivity() {
         val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
         dialog.setContentView(dialogView)
 
-        val cardBackupExp = dialogView.findViewById<View>(R.id.cardExportarBackup)
-        val cardBackupImp = dialogView.findViewById<View>(R.id.cardImportarBackup)
-
         cardPDF.setOnClickListener {
             dialog.dismiss()
             exportarParaPDF()
@@ -1221,18 +1221,34 @@ class ResumoActivity : AppCompatActivity() {
             exportarParaCSV()
         }
 
-        cardBackupExp?.setOnClickListener {
+        btnCancelar.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun mostrarOpcoesBackup() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_backup, binding.root as? ViewGroup, false)
+        val cardExp = dialogView.findViewById<View>(R.id.cardExportarBackup)
+        val cardImp = dialogView.findViewById<View>(R.id.cardImportarBackup)
+        val btnCancelar = dialogView.findViewById<View>(R.id.btnCancelarBackup)
+
+        val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
+        dialog.setContentView(dialogView)
+
+        cardExp?.setOnClickListener {
             dialog.dismiss()
             val nomeFicheiro = "backup_finly_${System.currentTimeMillis()}.finly"
             exportarBackupLauncher.launch(nomeFicheiro)
         }
 
-        cardBackupImp?.setOnClickListener {
+        cardImp?.setOnClickListener {
             dialog.dismiss()
             importarBackupLauncher.launch(arrayOf("*/*"))
         }
 
-        btnCancelar.setOnClickListener {
+        btnCancelar?.setOnClickListener {
             dialog.dismiss()
         }
 

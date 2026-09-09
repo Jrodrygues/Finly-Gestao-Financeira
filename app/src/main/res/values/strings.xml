@@ -418,8 +418,9 @@
     <string name="toast_backup_exportado">Backup local exportado com sucesso!</string>
     <string name="toast_backup_importado">%1$d contas restauradas do backup!</string>
     <string name="toast_erro_backup">Erro ao processar o backup.</string>
-    <string name="exportar_sub_backup">Salvar cópia de segurança encriptada (.finly)</string>
-    <string name="importar_sub_backup">Restaurar dados a partir de ficheiro (.finly)</string>
+    <string name="menu_backup">Cópia de Segurança</string>
+    <string name="exportar_sub_backup">Guardar cópia de segurança encriptada</string>
+    <string name="importar_sub_backup">Restaurar dados a partir de ficheiro</string>
 
     <!-- MainActivity - Rodapé e Saldos -->
     <string name="main_saldo_total_despesas_prefix">Total Despesas: </string>
