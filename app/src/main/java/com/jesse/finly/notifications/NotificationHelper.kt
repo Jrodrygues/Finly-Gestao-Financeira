@@ -3,8 +3,10 @@ package com.jesse.finly.notifications
 import android.content.Context
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.jesse.finly.database.FirebaseManager
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -42,6 +44,13 @@ object NotificationHelper {
 
     fun cancelarWorkerNotificacoes(context: Context) {
         WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
+    }
+
+    fun dispararNotificacaoTeste(context: Context) {
+        val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
+            .setInputData(workDataOf("IS_TEST" to true))
+            .build()
+        WorkManager.getInstance(context).enqueue(workRequest)
     }
 
     private fun calcularDelayAteAsNoveHoras(): Long {

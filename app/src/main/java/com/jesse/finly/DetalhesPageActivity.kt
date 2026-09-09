@@ -1,7 +1,10 @@
 package com.jesse.finly
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -420,6 +423,17 @@ class DetalhesPageActivity : AppCompatActivity() {
             }
         }
 
+        binding.btnTestarNotificacao.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    return@setOnClickListener
+                }
+            }
+            NotificationHelper.dispararNotificacaoTeste(this)
+            showToast(getString(R.string.toast_notificacao_teste_enviada))
+        }
+
         val biometriaAtiva = prefs.getBoolean("pref_biometric_ativa", false)
         binding.switchBiometria.setOnCheckedChangeListener(null)
         binding.switchBiometria.isChecked = biometriaAtiva
@@ -561,9 +575,9 @@ class DetalhesPageActivity : AppCompatActivity() {
     }
 
     private fun verificarPermissaoNotificacao() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            val permission = android.Manifest.permission.POST_NOTIFICATIONS
-            if (ContextCompat.checkSelfPermission(this, permission) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val permission = Manifest.permission.POST_NOTIFICATIONS
+            if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
                 ativarNotificacoes()
             } else {
                 requestNotificationPermissionLauncher.launch(permission)

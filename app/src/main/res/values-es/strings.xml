@@ -349,7 +349,9 @@
     <!-- Botones de Acción -->
     <string name="notif_btn_marcar_paga">Marcar Pagada</string>
     <string name="notif_btn_marcar_pagas">Marcar Pagadas</string>
+    <string name="btn_testar_notificacao">Probar Notificación</string>
     <string name="toast_multiplas_marcadas_pagas">%1$d cuentas marcadas como pagadas!</string>
+    <string name="toast_notificacao_teste_enviada">¡Notificación de prueba enviada!</string>
     <string name="notif_btn_pagar_item">Pagar %1$s</string>
     <string name="notif_btn_ver_detalhes">Ver Detalles</string>
     <string name="notif_btn_ver_todas">Ver Todas</string>

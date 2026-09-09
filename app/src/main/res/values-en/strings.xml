@@ -349,7 +349,9 @@
     <!-- Action Buttons -->
     <string name="notif_btn_marcar_paga">Mark Paid</string>
     <string name="notif_btn_marcar_pagas">Mark Paid</string>
+    <string name="btn_testar_notificacao">Test Notification</string>
     <string name="toast_multiplas_marcadas_pagas">%1$d bills marked as paid!</string>
+    <string name="toast_notificacao_teste_enviada">Test notification sent!</string>
     <string name="notif_btn_pagar_item">Pay %1$s</string>
     <string name="notif_btn_ver_detalhes">View Details</string>
     <string name="notif_btn_ver_todas">View All</string>

@@ -379,6 +379,23 @@
                         android:layout_height="wrap_content" />
                 </LinearLayout>
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnTestarNotificacao"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/btn_testar_notificacao"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorPrimary"
+                    app:strokeColor="@color/colorPrimary"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="19dp"
+                    app:icon="@drawable/ic_finly_notification"
+                    app:iconTint="@color/colorPrimary"
+                    app:iconSize="16dp"
+                    android:paddingVertical="0dp"/>
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
