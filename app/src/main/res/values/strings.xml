@@ -212,6 +212,8 @@
     <string name="sem_categorias_custom">Ainda não adicionou categorias personalizadas.</string>
     <string name="toast_categoria_adicionada">Categoria \'%1$s\' adicionada!</string>
     <string name="toast_categoria_removida">Categoria \'%1$s\' removida!</string>
+    <string name="toast_categoria_limite_guardado">Limite guardado para %1$s!</string>
+    <string name="toast_alerta_teto_ultrapassado">Atenção! A categoria \'%1$s\' ultrapassou o limite de %2$s!</string>
 
     <!-- Onboarding Moeda & Perfil -->
     <string name="onboarding_moeda_titulo">Bem-vindo ao Finly! 🚀</string>

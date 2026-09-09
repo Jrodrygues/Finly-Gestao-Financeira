@@ -208,6 +208,8 @@
     <string name="sem_categorias_custom">You haven\'t added custom categories yet.</string>
     <string name="toast_categoria_adicionada">Category \'%1$s\' added!</string>
     <string name="toast_categoria_removida">Category \'%1$s\' removed!</string>
+    <string name="toast_categoria_limite_guardado">Budget limit saved for %1$s!</string>
+    <string name="toast_alerta_teto_ultrapassado">Warning! Category \'%1$s\' exceeded the limit of %2$s!</string>
 
     <!-- Onboarding Currency & Profile -->
     <string name="onboarding_moeda_titulo">Welcome to Finly! 🚀</string>

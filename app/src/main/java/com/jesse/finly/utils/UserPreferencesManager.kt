@@ -115,4 +115,24 @@ class UserPreferencesManager(private val context: Context) {
                 Log.e("UserPreferencesManager", "Falha ao sincronizar moeda: ${e.message}")
             }
     }
+
+    /**
+     * Guarda o limite de gasto mensal para uma categoria específica.
+     */
+    fun salvarLimiteCategoria(nomeCategoria: String, limite: Double) {
+        val email = prefs.getString(KEY_EMAIL, "") ?: ""
+        val key = "LIMITE_CAT_${email.trim().lowercase()}_$nomeCategoria"
+        prefs.edit {
+            putFloat(key, limite.toFloat())
+        }
+    }
+
+    /**
+     * Devolve o limite de gasto mensal configurado para uma categoria (0.0 se não tiver teto).
+     */
+    fun obterLimiteCategoria(nomeCategoria: String): Double {
+        val email = prefs.getString(KEY_EMAIL, "") ?: ""
+        val key = "LIMITE_CAT_${email.trim().lowercase()}_$nomeCategoria"
+        return prefs.getFloat(key, 0.0f).toDouble()
+    }
 }

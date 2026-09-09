@@ -63,6 +63,8 @@ import com.google.android.material.textfield.TextInputLayout
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.ActivityResumoBinding
+import com.jesse.finly.dialogs.EditarCategoriaBottomSheet
+import com.jesse.finly.models.Categoria
 import com.jesse.finly.models.MetaPoupanca
 import com.jesse.finly.models.Utilizador
 import com.jesse.finly.models.Transacao
@@ -1877,13 +1879,68 @@ class ResumoActivity : AppCompatActivity() {
 
     private fun adicionarItemCategoria(nome: String, valor: Double, percent: Int, cor: Int, moeda: Moeda) {
         val itemView = layoutInflater.inflate(R.layout.item_categoria_resumo, binding.llCategoryDetails, false)
-        
+        val prefs = UserPreferencesManager(this)
+        val limite = prefs.obterLimiteCategoria(nome)
+
         itemView.findViewById<View>(R.id.vColorIndicator).background.setTint(cor)
         itemView.findViewById<TextView>(R.id.tvCategoryName).text = IdiomaUtils.formatarNomeCategoria(this, nome)
-        itemView.findViewById<TextView>(R.id.tvCategoryValue).text = CurrencyFormatter.formatar(valor, moeda)
-        itemView.findViewById<TextView>(R.id.tvCategoryPercent).text = String.format(Locale.getDefault(), "(%d%%)", percent)
-        
+
+        val tvValRes = itemView.findViewById<TextView>(R.id.tvCategoryValue)
+        val tvPercent = itemView.findViewById<TextView>(R.id.tvCategoryPercent)
+
+        if (limite > 0.0) {
+            val valorStr = CurrencyFormatter.formatar(valor, moeda)
+            val limiteStr = CurrencyFormatter.formatar(limite, moeda)
+            tvValRes.text = "$valorStr / $limiteStr"
+
+            val pctLimite = ((valor / limite) * 100).toInt()
+            when {
+                pctLimite >= 100 -> {
+                    tvValRes.setTextColor(ContextCompat.getColor(this, R.color.colorNegative))
+                    tvPercent.text = "($pctLimite% ⚠️)"
+                    tvPercent.setTextColor(ContextCompat.getColor(this, R.color.colorNegative))
+                }
+                pctLimite >= 80 -> {
+                    tvValRes.setTextColor("#FF9800".toColorInt())
+                    tvPercent.text = "($pctLimite%)"
+                    tvPercent.setTextColor("#FF9800".toColorInt())
+                }
+                else -> {
+                    tvValRes.setTextColor(ContextCompat.getColor(this, R.color.colorPositive))
+                    tvPercent.text = "($pctLimite%)"
+                    tvPercent.setTextColor(ContextCompat.getColor(this, R.color.textColorSecondary))
+                }
+            }
+        } else {
+            tvValRes.text = CurrencyFormatter.formatar(valor, moeda)
+            tvPercent.text = String.format(Locale.getDefault(), "(%d%%)", percent)
+        }
+
+        itemView.setOnClickListener {
+            abrirEditarCategoria(nome, limite)
+        }
+
         binding.llCategoryDetails.addView(itemView)
+    }
+
+    private fun abrirEditarCategoria(nome: String, limiteAtual: Double) {
+        val sheet = EditarCategoriaBottomSheet().apply {
+            arguments = Bundle().apply {
+                putParcelable("categoria", Categoria(nome = nome, limiteMensal = limiteAtual))
+            }
+        }
+        sheet.onSalvarCategoriaListener = { novoNome, novoLimite ->
+            val prefs = UserPreferencesManager(this@ResumoActivity)
+            prefs.salvarLimiteCategoria(nome, novoLimite)
+            if (novoNome != nome && novoNome.isNotBlank()) {
+                prefs.salvarLimiteCategoria(novoNome, novoLimite)
+            }
+            val mesSel = lastLoadedMonth ?: obterMesSelecionadoCanonical()
+            val anoSel = lastLoadedYear ?: (binding.spinnerAno.selectedItem as? Int ?: anos[0])
+            carregarDados(mesSel, anoSel)
+            showToast(getString(R.string.toast_categoria_limite_guardado, IdiomaUtils.formatarNomeCategoria(this, nome)))
+        }
+        sheet.show(supportFragmentManager, "EditarCategoriaBottomSheet")
     }
 
 

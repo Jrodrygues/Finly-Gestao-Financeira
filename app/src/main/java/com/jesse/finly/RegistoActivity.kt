@@ -33,6 +33,7 @@ import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import kotlinx.coroutines.tasks.await
 import com.jesse.finly.databinding.ActivityRegistoBinding
+import com.jesse.finly.utils.CurrencyFormatter
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.models.Utilizador
 import com.jesse.finly.notifications.NotificationHelper
@@ -1134,7 +1135,25 @@ class RegistoActivity : AppCompatActivity() {
                 if (notifEnabled) {
                     NotificationHelper.agendarWorkerNotificacoes(this@RegistoActivity)
                 }
-                showToast(getString(R.string.toast_dados_guardados))
+
+                val prefs = UserPreferencesManager(this@RegistoActivity)
+                val limiteCat = prefs.obterLimiteCategoria(cat)
+                if (tipo == "DESPESA" && limiteCat > 0.0) {
+                    val totalGastoNoMes = db.utilizadorDao().obterTransacoesPorMes(dono, mes, ano)
+                        .filter { it.tipo == "DESPESA" && it.categoria == cat }
+                        .sumOf { it.valor }
+
+                    if (totalGastoNoMes > limiteCat) {
+                        val limiteFmt = CurrencyFormatter.formatar(limiteCat, prefs.obterMoedaAtual())
+                        val catNomeFmt = IdiomaUtils.formatarNomeCategoria(this@RegistoActivity, cat)
+                        showToast(getString(R.string.toast_alerta_teto_ultrapassado, catNomeFmt, limiteFmt))
+                    } else {
+                        showToast(getString(R.string.toast_dados_guardados))
+                    }
+                } else {
+                    showToast(getString(R.string.toast_dados_guardados))
+                }
+
                 finish()
             }
         }
