@@ -1,6 +1,7 @@
 package com.jesse.finly
 
 import android.Manifest
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -21,6 +22,7 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.Locale
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.DetalhesBinding
@@ -28,6 +30,7 @@ import com.jesse.finly.models.Transacao
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.BiometricUtils
 import com.jesse.finly.notifications.NotificationHelper
+import com.jesse.finly.utils.BackupManager
 import com.jesse.finly.utils.CurrencyFormatter
 import com.jesse.finly.utils.IdiomaUtils
 import com.jesse.finly.utils.Moeda
@@ -74,6 +77,36 @@ class DetalhesPageActivity : AppCompatActivity() {
         } else {
             binding.switchNotifications.isChecked = false
             showToast(getString(R.string.toast_permissao_notif_negada))
+        }
+    }
+
+    private val exportarBackupLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
+        if (uri != null) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val ok = BackupManager.exportarBackupParaUri(this@DetalhesPageActivity, uri)
+                withContext(Dispatchers.Main) {
+                    if (ok) {
+                        showToast(getString(R.string.toast_backup_exportado))
+                    } else {
+                        showToast(getString(R.string.toast_erro_backup))
+                    }
+                }
+            }
+        }
+    }
+
+    private val importarBackupLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val qtd = BackupManager.importarBackupDeUri(this@DetalhesPageActivity, uri)
+                withContext(Dispatchers.Main) {
+                    if (qtd > 0) {
+                        showToast(getString(R.string.toast_backup_importado, qtd))
+                    } else {
+                        showToast(getString(R.string.toast_erro_backup))
+                    }
+                }
+            }
         }
     }
 
@@ -396,9 +429,33 @@ class DetalhesPageActivity : AppCompatActivity() {
             }
         }
 
+        val userPrefs = UserPreferencesManager(this)
         val notifAtivas = prefs.getBoolean("NOTIFICATIONS", false)
         binding.switchNotifications.setOnCheckedChangeListener(null)
         binding.switchNotifications.isChecked = notifAtivas
+
+        val horaSalva = userPrefs.obterHoraNotificacao()
+        val minutoSalvo = userPrefs.obterMinutoNotificacao()
+        binding.tvHorarioNotificacaoVal.text = String.format(Locale.getDefault(), "%02d:%02d", horaSalva, minutoSalvo)
+
+        binding.tvHorarioNotificacaoVal.setOnClickListener {
+            val h = userPrefs.obterHoraNotificacao()
+            val m = userPrefs.obterMinutoNotificacao()
+            val timePicker = TimePickerDialog(
+                this,
+                { _, selectedHour, selectedMinute ->
+                    userPrefs.salvarHorarioNotificacao(selectedHour, selectedMinute)
+                    binding.tvHorarioNotificacaoVal.text = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute)
+                    if (binding.switchNotifications.isChecked) {
+                        NotificationHelper.agendarWorkerNotificacoes(this)
+                    }
+                },
+                h,
+                m,
+                true
+            )
+            timePicker.show()
+        }
         
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -488,6 +545,17 @@ class DetalhesPageActivity : AppCompatActivity() {
             prefsManager.salvarMoeda(Moeda.BRL) { _ ->
                 showToast(getString(R.string.toast_moeda_alterada_brl))
             }
+        }
+
+        binding.btnExportarBackup.setOnClickListener { view ->
+            FinanceiroUtils.dispararHapticFeedback(view)
+            val nomeFicheiro = "backup_finly_${System.currentTimeMillis()}.finly"
+            exportarBackupLauncher.launch(nomeFicheiro)
+        }
+
+        binding.btnImportarBackup.setOnClickListener { view ->
+            FinanceiroUtils.dispararHapticFeedback(view)
+            importarBackupLauncher.launch(arrayOf("*/*"))
         }
         // Exibir o nome do idioma atual na linha
         binding.tvIdiomaAtual.text = IdiomaUtils.obterNomeIdiomaAtual(this)

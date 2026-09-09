@@ -323,6 +323,7 @@
     <!-- Notificaciones de Vencimiento -->
     <string name="notif_canal_vencimento_nome">Recordatorios de Vencimiento</string>
     <string name="notif_canal_vencimento_desc">Notificaciones para cuentas por vencer hoy o vencidas</string>
+    <string name="label_horario_lembrete">Hora del Recordatorio</string>
 
     <!-- Títulos -->
     <string name="notif_titulo_vence_hoje">Cuenta vence hoy ⏰</string>
@@ -404,6 +405,11 @@
     <string name="toast_csv_salvo">¡Archivo CSV guardado en Descargas!</string>
     <string name="toast_csv_erro_guardar">Error al guardar el archivo CSV.</string>
     <string name="toast_csv_erro_exportar">Error al exportar CSV: %1$s</string>
+    <string name="btn_exportar_backup">Exportar Backup</string>
+    <string name="btn_importar_backup">Importar Backup</string>
+    <string name="toast_backup_exportado">¡Copia de seguridad exportada con éxito!</string>
+    <string name="toast_backup_importado">¡%1$d cuentas restauradas de la copia!</string>
+    <string name="toast_erro_backup">Error al procesar la copia de seguridad.</string>
 
     <!-- MainActivity - Pie de página y Saldos -->
     <string name="main_saldo_total_despesas_prefix">Total Gastos: </string>
@@ -456,6 +462,8 @@
     <!-- EvolucaoAnualActivity - Gráfico y Balance -->
     <string name="chart_marker_mes_balanco">%1$s: %2$s</string>
     <string name="chart_label_saldo_mensal">Saldo mensual</string>
+    <string name="label_projecao_3_meses">Proyección (+3 Meses)</string>
+    <string name="label_projecao_6_meses">Proyección (+6 Meses)</string>
     <string name="comparativo_mes_queda_fmt">↓ %1$d%% vs. %2$s</string>
     <string name="comparativo_mes_alta_fmt">↑ %1$d%% vs. %2$s</string>
     <string name="comparativo_mes_neutro_fmt">0%% vs. %1$s</string>

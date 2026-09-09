@@ -2055,6 +2055,16 @@ class ResumoActivity : AppCompatActivity() {
                 getString(R.string.saldo_estimado_fmt, "$valorSaldoStr • ${getString(R.string.previsao_contas_em_dia)}")
             }
         }
+
+        val balancoMensalEstimado = renda - despesa
+        val projecao3Meses = saldo + (balancoMensalEstimado * 3)
+        val projecao6Meses = saldo + (balancoMensalEstimado * 6)
+
+        binding.tvProjecao3Meses.text = CurrencyFormatter.formatarComSinal(projecao3Meses, moedaAtual, forcarSinalPositivo = true)
+        binding.tvProjecao3Meses.setTextColor(if (projecao3Meses >= 0) colorPositivo else colorNegativo)
+
+        binding.tvProjecao6Meses.text = CurrencyFormatter.formatarComSinal(projecao6Meses, moedaAtual, forcarSinalPositivo = true)
+        binding.tvProjecao6Meses.setTextColor(if (projecao6Meses >= 0) colorPositivo else colorNegativo)
     }
 
     private fun showToast(msg: String, isLong: Boolean = false) {

@@ -8,6 +8,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.jesse.finly.database.FirebaseManager
+import com.jesse.finly.utils.UserPreferencesManager
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -27,8 +28,8 @@ object NotificationHelper {
             .setRequiresBatteryNotLow(requiresBatteryNotLow = true)
             .build()
 
-        // Calcula o atraso para disparar exatamente às 09:00 locais
-        val initialDelayMillis = calcularDelayAteAsNoveHoras()
+        // Calcula o atraso para disparar exatamente no horário configurado
+        val initialDelayMillis = calcularDelayAteHorario(context)
 
         val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(24, TimeUnit.HOURS)
             .setConstraints(constraints)
@@ -46,11 +47,15 @@ object NotificationHelper {
         WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
     }
 
-    private fun calcularDelayAteAsNoveHoras(): Long {
+    private fun calcularDelayAteHorario(context: Context): Long {
+        val prefs = UserPreferencesManager(context)
+        val hora = prefs.obterHoraNotificacao()
+        val minuto = prefs.obterMinutoNotificacao()
+
         val agora = Calendar.getInstance()
         val alvo = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 9)
-            set(Calendar.MINUTE, 0)
+            set(Calendar.HOUR_OF_DAY, hora)
+            set(Calendar.MINUTE, minuto)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }

@@ -323,6 +323,7 @@
     <!-- Due Date Notifications -->
     <string name="notif_canal_vencimento_nome">Due Date Reminders</string>
     <string name="notif_canal_vencimento_desc">Notifications for bills due today or currently overdue</string>
+    <string name="label_horario_lembrete">Reminder Time</string>
 
     <!-- Titles -->
     <string name="notif_titulo_vence_hoje">Bill due today ⏰</string>
@@ -404,6 +405,11 @@
     <string name="toast_csv_salvo">CSV file saved to Downloads!</string>
     <string name="toast_csv_erro_guardar">Failed to save CSV file.</string>
     <string name="toast_csv_erro_exportar">Error exporting CSV: %1$s</string>
+    <string name="btn_exportar_backup">Export Backup</string>
+    <string name="btn_importar_backup">Import Backup</string>
+    <string name="toast_backup_exportado">Local backup exported successfully!</string>
+    <string name="toast_backup_importado">%1$d bills restored from backup!</string>
+    <string name="toast_erro_backup">Error processing backup.</string>
 
     <!-- MainActivity Footer & Balances -->
     <string name="main_saldo_total_despesas_prefix">Total Expenses: </string>
@@ -456,6 +462,8 @@
     <!-- EvolucaoAnualActivity Chart & Balance -->
     <string name="chart_marker_mes_balanco">%1$s: %2$s</string>
     <string name="chart_label_saldo_mensal">Monthly net</string>
+    <string name="label_projecao_3_meses">Forecast (+3 Months)</string>
+    <string name="label_projecao_6_meses">Forecast (+6 Months)</string>
     <string name="comparativo_mes_queda_fmt">↓ %1$d%% vs. %2$s</string>
     <string name="comparativo_mes_alta_fmt">↑ %1$d%% vs. %2$s</string>
     <string name="comparativo_mes_neutro_fmt">0%% vs. %1$s</string>

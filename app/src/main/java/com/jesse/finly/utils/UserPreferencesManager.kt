@@ -135,4 +135,19 @@ class UserPreferencesManager(private val context: Context) {
         val key = "LIMITE_CAT_${email.trim().lowercase()}_$nomeCategoria"
         return prefs.getFloat(key, 0.0f).toDouble()
     }
+
+    fun salvarHorarioNotificacao(hora: Int, minuto: Int) {
+        prefs.edit {
+            putInt("NOTIF_HORA", hora)
+            putInt("NOTIF_MINUTO", minuto)
+        }
+    }
+
+    fun obterHoraNotificacao(): Int {
+        return prefs.getInt("NOTIF_HORA", 9)
+    }
+
+    fun obterMinutoNotificacao(): Int {
+        return prefs.getInt("NOTIF_MINUTO", 0)
+    }
 }
