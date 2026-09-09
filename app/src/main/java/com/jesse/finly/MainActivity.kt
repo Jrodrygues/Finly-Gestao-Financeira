@@ -29,7 +29,6 @@ import kotlinx.coroutines.Job
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -714,17 +713,7 @@ class MainActivity : AppCompatActivity() {
             FirebaseManager.eliminarTransacaoDoFirestore(transacao)
 
             withContext(Dispatchers.Main) {
-                val snackbar = Snackbar.make(
-                    binding.root,
-                    getString(R.string.snackbar_item_removido, transacao.item),
-                    Snackbar.LENGTH_LONG
-                ).setAction(getString(R.string.btn_desfazer)) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        db.utilizadorDao().inserirTransacao(transacao)
-                        FirebaseManager.salvarTransacaoNoFirestore(transacao)
-                    }
-                }
-                snackbar.show()
+                showToast(getString(R.string.snackbar_item_removido, transacao.item))
             }
         }
     }
