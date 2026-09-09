@@ -472,13 +472,6 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
 
-        <!-- Confetti Overlay Animation -->
-        <com.jesse.finly.views.ConfettiView
-            android:id="@+id/confettiView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:elevation="10dp" />
-
     </FrameLayout>
 
     <!-- Menu Lateral (NavigationView) -->
