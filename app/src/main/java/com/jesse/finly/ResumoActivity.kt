@@ -92,7 +92,11 @@ import java.util.Calendar
 import java.util.Locale
 import kotlin.math.round
 
+import androidx.activity.viewModels
+import com.jesse.finly.viewmodels.ResumoViewModel
+
 class ResumoActivity : AppCompatActivity() {
+    private val viewModel: ResumoViewModel by viewModels()
     private lateinit var binding: ActivityResumoBinding
     private val meses = arrayOf("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro")
 
@@ -227,21 +231,14 @@ class ResumoActivity : AppCompatActivity() {
         val mesSel = binding.spinnerMes.selectedItem.toString()
         val anoSel = binding.spinnerAno.selectedItem as Int
         val emailClean = email.trim().lowercase()
-        
+
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
-            val dao = db.utilizadorDao()
-            
-            val metaExistente = dao.obterMetaPorMes(emailClean, mesSel, anoSel)
+            val metaExistente = db.utilizadorDao().obterMetaPorMes(emailClean, mesSel, anoSel)
             val metaObj = metaExistente?.copy(valor = valor)
                 ?: MetaPoupanca(mes = mesSel, ano = anoSel, valor = valor, donoEmail = emailClean)
-            
-            dao.salvarMeta(metaObj)
 
-            // Sincronizar com o Firebase Firestore se não for convidado
-            if (!FirebaseManager.isGuestEmail(emailClean)) {
-                FirebaseManager.salvarMetaNoFirestore(metaObj)
-            }
+            viewModel.salvarMeta(metaObj)
 
             withContext(Dispatchers.Main) {
                 carregarDados(mesSel, anoSel)

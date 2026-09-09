@@ -16,7 +16,10 @@ import android.widget.LinearLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
+import com.jesse.finly.viewmodels.MainViewModel
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -55,6 +58,7 @@ import java.util.Locale
 import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
+    private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: HomeBinding
     private lateinit var prefsManager: UserPreferencesManager
     private var moedaAtual: Moeda = Moeda.EUR
@@ -84,8 +88,9 @@ class MainActivity : AppCompatActivity() {
         moedaAtual = prefsManager.obterMoedaAtual()
 
 
-        // Configurar LayoutManager e Swipe-to-Action
+        // Configurar LayoutManager, Animação de Entrada e Swipe-to-Action
         binding.rvTransacoes.layoutManager = LinearLayoutManager(this)
+        binding.rvTransacoes.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_fall_down)
         configurarSwipeToActions()
 
         // Obter o mês e ano filtrado vindos do Resumo ou das preferências compartilhadas
@@ -468,6 +473,7 @@ class MainActivity : AppCompatActivity() {
                 toggleStatusTransacao(it)
             }
             binding.rvTransacoes.adapter = adapter
+            binding.rvTransacoes.scheduleLayoutAnimation()
         } else {
             adapter?.updateData(lista, codigoMoeda)
         }
@@ -602,20 +608,10 @@ class MainActivity : AppCompatActivity() {
         val index = todasTransacoes.indexOfFirst { it.id == transacao.id }
         if (index != -1) {
             val novaTransacao = transacao.copy(status = !transacao.status)
-            val novaLista = todasTransacoes.toMutableList()
-            novaLista[index] = novaTransacao
-            todasTransacoes = novaLista
-            filtrarLista(binding.tabFilter.selectedTabPosition)
-
             if (novaTransacao.status) {
                 showToast(getString(R.string.toast_conta_marcada_paga))
             }
-
-            lifecycleScope.launch(Dispatchers.IO) {
-                val db = MinhaBaseDados.getDatabase(this@MainActivity)
-                db.utilizadorDao().atualizarTransacao(novaTransacao)
-                FirebaseManager.salvarTransacaoNoFirestore(novaTransacao)
-            }
+            viewModel.toggleStatus(transacao)
         }
     }
 
@@ -704,18 +700,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun apagarTransacaoComUndo(transacao: Transacao) {
-        val email = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "") ?: ""
-        if (email.isEmpty()) return
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            val db = MinhaBaseDados.getDatabase(this@MainActivity)
-            db.utilizadorDao().apagarTransacao(transacao)
-            FirebaseManager.eliminarTransacaoDoFirestore(transacao)
-
-            withContext(Dispatchers.Main) {
-                showToast(getString(R.string.snackbar_item_removido, transacao.item))
-            }
-        }
+        viewModel.apagarTransacao(transacao)
+        showToast(getString(R.string.snackbar_item_removido, transacao.item))
     }
 
     private suspend fun processarRecorrencia(db: MinhaBaseDados, email: String, mesAlvo: String, anoAlvo: Int) {
