@@ -103,6 +103,7 @@ class ResumoActivity : AppCompatActivity() {
     
     private val recurrenceMutex = Mutex()
     private var lastLoadedMonth: String? = null
+    private var lastCelebratedMonth: String? = null
     private var resumoFlowJob: Job? = null
     private var lastLoadedYear: Int? = null
     private var metaAtual: Double = 0.0
@@ -1759,6 +1760,14 @@ class ResumoActivity : AppCompatActivity() {
             if (progresso >= 100) {
                 binding.tvMetaStatus.setTextColor(ContextCompat.getColor(this, R.color.colorPositive))
                 binding.tvMetaStatus.text = getString(R.string.meta_atingida)
+
+                val mesChaveCelebracao = "${lastLoadedMonth}_$lastLoadedYear"
+                if (lastCelebratedMonth != mesChaveCelebracao) {
+                    lastCelebratedMonth = mesChaveCelebracao
+                    binding.confettiView.post {
+                        binding.confettiView.dispararConfetes()
+                    }
+                }
             } else {
                 binding.tvMetaStatus.setTextColor(ContextCompat.getColor(this, R.color.textColorSecondary))
             }

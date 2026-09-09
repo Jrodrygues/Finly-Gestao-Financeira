@@ -21,7 +21,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Job
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -77,8 +80,9 @@ class MainActivity : AppCompatActivity() {
         moedaAtual = prefsManager.obterMoedaAtual()
 
 
-        // Configurar LayoutManager no onCreate apenas uma vez
+        // Configurar LayoutManager e Swipe-to-Action
         binding.rvTransacoes.layoutManager = LinearLayoutManager(this)
+        configurarSwipeToActions()
 
         // Obter o mês e ano filtrado vindos do Resumo ou das preferências compartilhadas
         val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
@@ -607,6 +611,58 @@ class MainActivity : AppCompatActivity() {
                 val db = MinhaBaseDados.getDatabase(this@MainActivity)
                 db.utilizadorDao().atualizarTransacao(novaTransacao)
                 FirebaseManager.salvarTransacaoNoFirestore(novaTransacao)
+            }
+        }
+    }
+
+    private fun configurarSwipeToActions() {
+        val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.bindingAdapterPosition
+                if (position == RecyclerView.NO_POSITION) return
+                val transacao = adapter?.getItemAt(position) ?: return
+
+                if (direction == ItemTouchHelper.RIGHT) {
+                    toggleStatusTransacao(transacao)
+                    adapter?.notifyItemChanged(position)
+                } else if (direction == ItemTouchHelper.LEFT) {
+                    apagarTransacaoComUndo(transacao)
+                }
+            }
+        }
+        ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(binding.rvTransacoes)
+    }
+
+    private fun apagarTransacaoComUndo(transacao: Transacao) {
+        val email = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "") ?: ""
+        if (email.isEmpty()) return
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val db = MinhaBaseDados.getDatabase(this@MainActivity)
+            db.utilizadorDao().apagarTransacao(transacao)
+            FirebaseManager.eliminarTransacaoDoFirestore(transacao)
+
+            withContext(Dispatchers.Main) {
+                val snackbar = Snackbar.make(
+                    binding.root,
+                    getString(R.string.snackbar_item_removido, transacao.item),
+                    Snackbar.LENGTH_LONG
+                ).setAction(getString(R.string.btn_desfazer)) {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        db.utilizadorDao().inserirTransacao(transacao)
+                        FirebaseManager.salvarTransacaoNoFirestore(transacao)
+                    }
+                }
+                snackbar.show()
             }
         }
     }

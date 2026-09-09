@@ -62,7 +62,7 @@ object FinanceiroUtils {
     fun filtrarTransacoes(lista: List<Transacao>, query: String, tipo: String? = null): List<Transacao> {
         return lista.filter { 
             (tipo == null || it.tipo == tipo) && 
-            it.item.contains(query, ignoreCase = true)
+            (it.item.contains(query, ignoreCase = true) || it.categoria.contains(query, ignoreCase = true))
         }
     }
 
