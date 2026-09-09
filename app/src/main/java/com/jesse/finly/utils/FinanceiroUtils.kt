@@ -3,6 +3,7 @@ package com.jesse.finly.utils
 import android.util.Patterns
 import android.view.View
 import android.view.HapticFeedbackConstants
+import com.jesse.finly.R
 import com.jesse.finly.models.Transacao
 import java.util.Calendar
 import java.util.Locale
@@ -63,6 +64,27 @@ object FinanceiroUtils {
         return lista.filter { 
             (tipo == null || it.tipo == tipo) && 
             (it.item.contains(query, ignoreCase = true) || it.categoria.contains(query, ignoreCase = true))
+        }
+    }
+
+    /**
+     * Mapeia o nome da categoria para o respetivo ícone vetorial padronizado do app.
+     */
+    fun obterIconeParaCategoria(nome: String): Int {
+        val clean = nome.trim().lowercase()
+        return when {
+            clean.contains("habita") || clean.contains("housing") || clean.contains("vivienda") -> R.drawable.ic_home
+            clean.contains("alimenta") || clean.contains("food") || clean.contains("comida") -> R.drawable.ic_restaurant
+            clean.contains("transpor") || clean.contains("car") -> R.drawable.ic_transport
+            clean.contains("saude") || clean.contains("saúde") || clean.contains("health") || clean.contains("salud") -> R.drawable.ic_health
+            clean.contains("lazer") || clean.contains("leisure") || clean.contains("deporte") -> R.drawable.ic_sports
+            clean.contains("educa") || clean.contains("education") -> R.drawable.ic_school
+            clean.contains("compras") || clean.contains("shopping") -> R.drawable.ic_list
+            clean.contains("assina") || clean.contains("subscrip") -> R.drawable.ic_pdf
+            clean.contains("invest") || clean.contains("poupanc") || clean.contains("poupança") || clean.contains("saving") -> R.drawable.ic_poupanca
+            clean.contains("exteri") || clean.contains("travel") || clean.contains("flight") -> R.drawable.ic_flight
+            clean.contains("geral") || clean.contains("general") -> R.drawable.ic_list
+            else -> R.drawable.ic_tag
         }
     }
 

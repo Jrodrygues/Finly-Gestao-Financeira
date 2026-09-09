@@ -116,21 +116,7 @@ class DetalhesPageActivity : AppCompatActivity() {
     }
 
     private fun obterIconeParaCategoria(nome: String): Int {
-        return when (nome.trim().lowercase()) {
-            "geral" -> R.drawable.ic_list
-            "habitação" -> R.drawable.ic_home
-            "alimentação" -> R.drawable.ic_restaurant
-            "transporte" -> R.drawable.ic_transport
-            "saúde" -> R.drawable.ic_health
-            "lazer" -> R.drawable.ic_sports
-            "educação" -> R.drawable.ic_school
-            "compras" -> R.drawable.ic_list
-            "assinaturas" -> R.drawable.ic_pdf
-            "investimentos" -> R.drawable.ic_euro
-            "poupança" -> R.drawable.ic_poupanca
-            "exterior" -> R.drawable.ic_flight
-            else -> R.drawable.ic_tag
-        }
+        return FinanceiroUtils.obterIconeParaCategoria(nome)
     }
 
     private fun configurarParaTransacao() {

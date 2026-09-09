@@ -57,7 +57,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:hint="@string/hint_teto_orcamental"
-        app:startIconDrawable="@drawable/ic_dashboard"
+        app:startIconDrawable="@drawable/ic_euro"
         app:startIconTint="@color/colorPrimary"
         app:prefixTextColor="@color/colorPrimary"
         app:boxCornerRadiusBottomEnd="12dp"
