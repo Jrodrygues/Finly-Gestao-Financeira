@@ -423,17 +423,6 @@ class DetalhesPageActivity : AppCompatActivity() {
             }
         }
 
-        binding.btnTestarNotificacao.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                    requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    return@setOnClickListener
-                }
-            }
-            NotificationHelper.dispararNotificacaoTeste(this)
-            showToast(getString(R.string.toast_notificacao_teste_enviada))
-        }
-
         val biometriaAtiva = prefs.getBoolean("pref_biometric_ativa", false)
         binding.switchBiometria.setOnCheckedChangeListener(null)
         binding.switchBiometria.isChecked = biometriaAtiva

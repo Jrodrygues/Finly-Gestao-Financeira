@@ -46,13 +46,6 @@ object NotificationHelper {
         WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
     }
 
-    fun dispararNotificacaoTeste(context: Context) {
-        val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
-            .setInputData(workDataOf("IS_TEST" to true))
-            .build()
-        WorkManager.getInstance(context).enqueue(workRequest)
-    }
-
     private fun calcularDelayAteAsNoveHoras(): Long {
         val agora = Calendar.getInstance()
         val alvo = Calendar.getInstance().apply {

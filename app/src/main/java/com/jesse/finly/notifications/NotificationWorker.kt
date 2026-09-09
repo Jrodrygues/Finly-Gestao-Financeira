@@ -92,25 +92,6 @@ class NotificationWorker(
             }
         }
 
-        val isTest = inputData.getBoolean("IS_TEST", false)
-        if (despesasVencendo.isEmpty() && isTest) {
-            val anoAtual = Calendar.getInstance()[Calendar.YEAR]
-            val mesAtualStr = mesesNomes.getOrNull(Calendar.getInstance()[Calendar.MONTH]) ?: "Setembro"
-
-            despesasVencendo.add(
-                ItemVencimento(
-                    Transacao(id = 99901, item = "Teste", valor = 5.00, vencimento = "09/09/$anoAtual", tipo = "DESPESA", status = false, categoria = "Outros", mes = mesAtualStr, ano = anoAtual, donoEmail = userEmail),
-                    0
-                )
-            )
-            despesasVencendo.add(
-                ItemVencimento(
-                    Transacao(id = 99902, item = "Teste", valor = 20.00, vencimento = "09/09/$anoAtual", tipo = "DESPESA", status = false, categoria = "Outros", mes = mesAtualStr, ano = anoAtual, donoEmail = userEmail),
-                    0
-                )
-            )
-        }
-
         if (despesasVencendo.isNotEmpty()) {
             enviarNotificacao(despesasVencendo)
         } else {

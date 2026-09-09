@@ -323,7 +323,7 @@
     <string name="notif_canal_vencimento_desc">Notificações para contas a vencer hoje ou em atraso</string>
 
     <!-- Títulos -->
-    <string name="notif_titulo_vence_hoje">Conta a vencer hoje ⏰</string>
+    <string name="notif_titulo_vence_hoje">Conta vence hoje ⏰</string>
     <string name="notif_titulo_vence_hoje_plural">%1$d contas a vencer hoje ⏰</string>
     <string name="notif_titulo_em_atraso">Conta em atraso ⚠️</string>
     <string name="notif_titulo_em_atraso_plural">%1$d contas em atraso ⚠️</string>
@@ -349,9 +349,7 @@
     <!-- Botões de Ação -->
     <string name="notif_btn_marcar_paga">Marcar Paga</string>
     <string name="notif_btn_marcar_pagas">Marcar Pagas</string>
-    <string name="btn_testar_notificacao">Testar Notificação</string>
     <string name="toast_multiplas_marcadas_pagas">%1$d contas marcadas como pagas!</string>
-    <string name="toast_notificacao_teste_enviada">Notificação de teste enviada!</string>
     <string name="notif_btn_pagar_item">Pagar %1$s</string>
     <string name="notif_btn_ver_detalhes">Ver Detalhes</string>
     <string name="notif_btn_ver_todas">Ver Todas</string>
