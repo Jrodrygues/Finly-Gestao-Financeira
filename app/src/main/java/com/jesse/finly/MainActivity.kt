@@ -17,6 +17,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.drawable.ColorDrawable
+import androidx.core.graphics.toColorInt
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
@@ -637,6 +642,63 @@ class MainActivity : AppCompatActivity() {
                 } else if (direction == ItemTouchHelper.LEFT) {
                     apagarTransacaoComUndo(transacao)
                 }
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    val itemView = viewHolder.itemView
+                    val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+                    if (dX > 0) {
+                        // Swipe para a Direita -> Fundo Verde com Texto "MARCAR PAGA"
+                        val bgDrawable = ColorDrawable("#4CAF50".toColorInt())
+                        bgDrawable.setBounds(itemView.left, itemView.top, itemView.left + dX.toInt(), itemView.bottom)
+                        bgDrawable.draw(c)
+
+                        paint.color = Color.WHITE
+                        paint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 13f, resources.displayMetrics)
+                        paint.isFakeBoldText = true
+
+                        val texto = getString(R.string.notif_btn_marcar_paga).uppercase()
+                        val textMargin = (20 * resources.displayMetrics.density).toInt()
+                        val textY = itemView.top + (itemView.height / 2f) - ((paint.descent() + paint.ascent()) / 2f)
+                        val textX = itemView.left + textMargin.toFloat()
+
+                        if (dX > textMargin) {
+                            c.drawText(texto, textX, textY, paint)
+                        }
+
+                    } else if (dX < 0) {
+                        // Swipe para a Esquerda -> Fundo Vermelho com Texto "ELIMINAR"
+                        val bgDrawable = ColorDrawable("#F44336".toColorInt())
+                        bgDrawable.setBounds(itemView.right + dX.toInt(), itemView.top, itemView.right, itemView.bottom)
+                        bgDrawable.draw(c)
+
+                        paint.color = Color.WHITE
+                        paint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 13f, resources.displayMetrics)
+                        paint.isFakeBoldText = true
+
+                        val texto = getString(R.string.btn_eliminar).uppercase()
+                        val textMargin = (20 * resources.displayMetrics.density).toInt()
+
+                        val textWidth = paint.measureText(texto)
+                        val textY = itemView.top + (itemView.height / 2f) - ((paint.descent() + paint.ascent()) / 2f)
+                        val textX = itemView.right - textMargin - textWidth
+
+                        if (abs(dX) > textMargin) {
+                            c.drawText(texto, textX, textY, paint)
+                        }
+                    }
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             }
         }
         ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(binding.rvTransacoes)

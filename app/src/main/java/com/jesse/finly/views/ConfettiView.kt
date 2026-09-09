@@ -1,5 +1,7 @@
 package com.jesse.finly.views
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -8,6 +10,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.core.graphics.toColorInt
+import androidx.core.graphics.withTranslation
 import kotlin.random.Random
 
 class ConfettiView @JvmOverloads constructor(
@@ -41,11 +44,16 @@ class ConfettiView @JvmOverloads constructor(
         "#E91E63".toColorInt()
     )
 
+    init {
+        isClickable = false
+        isFocusable = false
+    }
+
     fun dispararConfetes() {
         val w = width.coerceAtLeast(500).toFloat()
         particles.clear()
 
-        for (i in 0 until 80) {
+        repeat(80) {
             particles.add(
                 Particle(
                     x = Random.nextFloat() * w,
@@ -73,23 +81,35 @@ class ConfettiView @JvmOverloads constructor(
                 }
                 invalidate()
             }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    limpar()
+                }
+            })
             start()
         }
     }
 
+    fun limpar() {
+        animator?.cancel()
+        particles.clear()
+        invalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        if (particles.isEmpty()) return
+
         particles.forEach { p ->
             paint.color = p.color
-            canvas.save()
-            canvas.translate(p.x, p.y)
-            canvas.rotate(p.rotation)
-            if (p.shape == 0) {
-                canvas.drawRect(-p.size / 2, -p.size / 2, p.size / 2, p.size / 2, paint)
-            } else {
-                canvas.drawCircle(0f, 0f, p.size / 2, paint)
+            canvas.withTranslation(p.x, p.y) {
+                rotate(p.rotation)
+                if (p.shape == 0) {
+                    drawRect(-p.size / 2, -p.size / 2, p.size / 2, p.size / 2, paint)
+                } else {
+                    drawCircle(0f, 0f, p.size / 2, paint)
+                }
             }
-            canvas.restore()
         }
     }
 }

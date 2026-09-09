@@ -1363,6 +1363,7 @@ class ResumoActivity : AppCompatActivity() {
         val emailClean = email.trim().lowercase()
         if (emailClean.isEmpty()) return
 
+        binding.confettiView.limpar()
         resumoFlowJob?.cancel()
         resumoFlowJob = lifecycleScope.launch {
             val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
@@ -1769,9 +1770,11 @@ class ResumoActivity : AppCompatActivity() {
                     }
                 }
             } else {
+                binding.confettiView.limpar()
                 binding.tvMetaStatus.setTextColor(ContextCompat.getColor(this, R.color.textColorSecondary))
             }
         } else {
+            binding.confettiView.limpar()
             binding.pbMetaPoupanca.progress = 0
             binding.tvMetaStatus.text = getString(R.string.meta_definir_aviso)
             binding.tvMetaStatus.setTextColor(ContextCompat.getColor(this, R.color.textColorSecondary))
