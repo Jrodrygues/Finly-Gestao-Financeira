@@ -47,6 +47,10 @@
     <string name="guia_sec16_desc">Tap the month header to trigger a 4x3 month grid (JAN..DEC) with a horizontal year selector. Selection syncs smoothly between Overview and List. Export formatted PDF and CSV reports saved directly to your Downloads folder.</string>
     <string name="guia_sec17_titulo">17. Multi-Currency System &amp; Onboarding</string>
     <string name="guia_sec17_desc">Select your primary currency (€ EUR, $ USD, or R$ BRL) during initial onboarding. All views, charts, inputs, and reports adapt dynamically with fractional digit formatting and sync across devices.</string>
+    <string name="guia_sec19_titulo">19. Category Budget Limits</string>
+    <string name="guia_sec19_desc">Set a monthly spending limit for each category. Finly alerts you with dynamic colors (Green, Orange, Red) when approaching or exceeding your cap.</string>
+    <string name="guia_sec20_titulo">20. Encrypted Backup (.finly) &amp; Future Forecast</string>
+    <string name="guia_sec20_desc">Export and import encrypted backup files (.finly) in the side drawer, and check your projected balance for the next 3 and 6 months.</string>
     <string name="snackbar_item_removido">Item removed: %1$s</string>
     <string name="btn_desfazer">UNDO</string>
     <string name="btn_voltar">Back</string>
@@ -227,7 +231,7 @@
     <string name="toast_moeda_alterada_brl">Currency changed to Real (R$)</string>
 
     <!-- Category Cap Modal -->
-    <string name="titulo_editar_categoria_teto">Manage Category &amp; Spending Cap</string>
+    <string name="titulo_editar_categoria_teto">Budget Limit</string>
     <string name="hint_nome_categoria">Category Name</string>
     <string name="hint_teto_orcamental">Monthly Spending Cap</string>
     <string name="btn_cancelar_caps">CANCEL</string>
@@ -410,6 +414,8 @@
     <string name="toast_backup_exportado">Local backup exported successfully!</string>
     <string name="toast_backup_importado">%1$d bills restored from backup!</string>
     <string name="toast_erro_backup">Error processing backup.</string>
+    <string name="exportar_sub_backup">Save encrypted backup file (.finly)</string>
+    <string name="importar_sub_backup">Restore data from file (.finly)</string>
 
     <!-- MainActivity Footer & Balances -->
     <string name="main_saldo_total_despesas_prefix">Total Expenses: </string>

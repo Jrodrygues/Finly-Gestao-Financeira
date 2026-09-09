@@ -12,6 +12,7 @@ import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
 import android.os.Bundle
 import android.content.res.Configuration
 import android.os.Environment
@@ -93,6 +94,7 @@ import java.util.Locale
 import kotlin.math.round
 
 import androidx.activity.viewModels
+import com.jesse.finly.utils.BackupManager
 import com.jesse.finly.viewmodels.ResumoViewModel
 
 class ResumoActivity : AppCompatActivity() {
@@ -116,6 +118,39 @@ class ResumoActivity : AppCompatActivity() {
     private var transacoesAtuaisGrafico: List<Transacao> = emptyList()
     private var moedaAtual: Moeda = Moeda.EUR
     private var isShowingOnboardingMoeda = false
+
+    private val exportarBackupLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
+        if (uri != null) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val ok = BackupManager.exportarBackupParaUri(this@ResumoActivity, uri)
+                withContext(Dispatchers.Main) {
+                    if (ok) {
+                        showToast(getString(R.string.toast_backup_exportado))
+                    } else {
+                        showToast(getString(R.string.toast_erro_backup))
+                    }
+                }
+            }
+        }
+    }
+
+    private val importarBackupLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val qtd = BackupManager.importarBackupDeUri(this@ResumoActivity, uri)
+                withContext(Dispatchers.Main) {
+                    if (qtd > 0) {
+                        showToast(getString(R.string.toast_backup_importado, qtd))
+                        val mesSel = lastLoadedMonth ?: obterMesSelecionadoCanonical()
+                        val anoSel = lastLoadedYear ?: (binding.spinnerAno.selectedItem as? Int ?: anos[0])
+                        carregarDados(mesSel, anoSel)
+                    } else {
+                        showToast(getString(R.string.toast_erro_backup))
+                    }
+                }
+            }
+        }
+    }
 
 
     companion object {
@@ -1173,6 +1208,9 @@ class ResumoActivity : AppCompatActivity() {
         val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
         dialog.setContentView(dialogView)
 
+        val cardBackupExp = dialogView.findViewById<View>(R.id.cardExportarBackup)
+        val cardBackupImp = dialogView.findViewById<View>(R.id.cardImportarBackup)
+
         cardPDF.setOnClickListener {
             dialog.dismiss()
             exportarParaPDF()
@@ -1181,6 +1219,17 @@ class ResumoActivity : AppCompatActivity() {
         cardCSV.setOnClickListener {
             dialog.dismiss()
             exportarParaCSV()
+        }
+
+        cardBackupExp?.setOnClickListener {
+            dialog.dismiss()
+            val nomeFicheiro = "backup_finly_${System.currentTimeMillis()}.finly"
+            exportarBackupLauncher.launch(nomeFicheiro)
+        }
+
+        cardBackupImp?.setOnClickListener {
+            dialog.dismiss()
+            importarBackupLauncher.launch(arrayOf("*/*"))
         }
 
         btnCancelar.setOnClickListener {

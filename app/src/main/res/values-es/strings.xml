@@ -47,6 +47,10 @@
     <string name="guia_sec16_desc">Toque el título del mes para abrir la selección en cuadrícula (ENE..DIC) y el selector horizontal de años. El período seleccionado se sincroniza automáticamente entre el Resumen y el Listado. Exporte informes en PDF o CSV guardados en la carpeta Descargas.</string>
     <string name="guia_sec17_titulo">17. Sistema Multidivisa &amp; Bienvenida</string>
     <string name="guia_sec17_desc">Al entrar a la app o registrarse, seleccione su moneda principal (€ EUR, $ USD o R$ BRL) en la pantalla de bienvenida. Todas las vistas, gráficos, formularios e informes se adaptan dinámicamente con formato de decimales y se sincronizan en todos sus dispositivos.</string>
+    <string name="guia_sec19_titulo">19. Límite de Presupuesto por Categoría</string>
+    <string name="guia_sec19_desc">Defina un límite de gasto mensual para cada categoría. Finly le avisa con colores dinámicos (Verde, Naranja, Rojo) cuando esté cerca o supere el tope.</string>
+    <string name="guia_sec20_titulo">20. Copia Encriptada (.finly) y Proyección Futura</string>
+    <string name="guia_sec20_desc">Exporte e importe archivos de copia de seguridad encriptados (.finly) en el menú lateral y consulte la proyección estimada de su saldo para los próximos 3 y 6 meses.</string>
     <string name="snackbar_item_removido">Elemento eliminado: %1$s</string>
     <string name="btn_desfazer">DESHACER</string>
     <string name="btn_voltar">Volver</string>
@@ -227,7 +231,7 @@
     <string name="toast_moeda_alterada_brl">Moneda cambiada a Real (R$)</string>
 
     <!-- Modal Editar Categoría & Límite -->
-    <string name="titulo_editar_categoria_teto">Gestionar Categoría &amp; Límite de Gasto</string>
+    <string name="titulo_editar_categoria_teto">Límite de Presupuesto</string>
     <string name="hint_nome_categoria">Nombre de la Categoría</string>
     <string name="hint_teto_orcamental">Límite Mensual de Gasto</string>
     <string name="btn_cancelar_caps">CANCELAR</string>
@@ -410,6 +414,8 @@
     <string name="toast_backup_exportado">¡Copia de seguridad exportada con éxito!</string>
     <string name="toast_backup_importado">¡%1$d cuentas restauradas de la copia!</string>
     <string name="toast_erro_backup">Error al procesar la copia de seguridad.</string>
+    <string name="exportar_sub_backup">Guardar copia de seguridad encriptada (.finly)</string>
+    <string name="importar_sub_backup">Restaurar datos desde archivo (.finly)</string>
 
     <!-- MainActivity - Pie de página y Saldos -->
     <string name="main_saldo_total_despesas_prefix">Total Gastos: </string>

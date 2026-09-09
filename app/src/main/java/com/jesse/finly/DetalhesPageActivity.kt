@@ -80,36 +80,6 @@ class DetalhesPageActivity : AppCompatActivity() {
         }
     }
 
-    private val exportarBackupLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
-        if (uri != null) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val ok = BackupManager.exportarBackupParaUri(this@DetalhesPageActivity, uri)
-                withContext(Dispatchers.Main) {
-                    if (ok) {
-                        showToast(getString(R.string.toast_backup_exportado))
-                    } else {
-                        showToast(getString(R.string.toast_erro_backup))
-                    }
-                }
-            }
-        }
-    }
-
-    private val importarBackupLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val qtd = BackupManager.importarBackupDeUri(this@DetalhesPageActivity, uri)
-                withContext(Dispatchers.Main) {
-                    if (qtd > 0) {
-                        showToast(getString(R.string.toast_backup_importado, qtd))
-                    } else {
-                        showToast(getString(R.string.toast_erro_backup))
-                    }
-                }
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
@@ -545,17 +515,6 @@ class DetalhesPageActivity : AppCompatActivity() {
             prefsManager.salvarMoeda(Moeda.BRL) { _ ->
                 showToast(getString(R.string.toast_moeda_alterada_brl))
             }
-        }
-
-        binding.btnExportarBackup.setOnClickListener { view ->
-            FinanceiroUtils.dispararHapticFeedback(view)
-            val nomeFicheiro = "backup_finly_${System.currentTimeMillis()}.finly"
-            exportarBackupLauncher.launch(nomeFicheiro)
-        }
-
-        binding.btnImportarBackup.setOnClickListener { view ->
-            FinanceiroUtils.dispararHapticFeedback(view)
-            importarBackupLauncher.launch(arrayOf("*/*"))
         }
         // Exibir o nome do idioma atual na linha
         binding.tvIdiomaAtual.text = IdiomaUtils.obterNomeIdiomaAtual(this)
