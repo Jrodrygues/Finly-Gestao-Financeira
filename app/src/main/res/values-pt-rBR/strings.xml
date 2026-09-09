@@ -348,6 +348,8 @@
 
     <!-- Botões de Ação -->
     <string name="notif_btn_marcar_paga">Marcar Paga</string>
+    <string name="notif_btn_marcar_pagas">Marcar Pagas</string>
+    <string name="toast_multiplas_marcadas_pagas">%1$d contas marcadas como pagas!</string>
     <string name="notif_btn_pagar_item">Pagar %1$s</string>
     <string name="notif_btn_ver_detalhes">Ver Detalhes</string>
     <string name="notif_btn_ver_todas">Ver Todas</string>

@@ -94,6 +94,10 @@ class NotificationWorker(
 
         if (despesasVencendo.isNotEmpty()) {
             enviarNotificacao(despesasVencendo)
+        } else {
+            // Se não há mais contas pendentes (foram pagas noutro dispositivo), cancela a notificação ativa
+            val manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.cancel(1)
         }
 
         Result.success()
@@ -169,7 +173,6 @@ class NotificationWorker(
         val builder = NotificationCompat.Builder(applicationContext, channelId)
             .setSmallIcon(R.drawable.ic_finly_notification)
             .setColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
-            .setSubText(applicationContext.getString(R.string.app_name))
             .setContentTitle(titulo)
             .setContentText(textoResumo)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -193,9 +196,10 @@ class NotificationWorker(
 
             builder.setStyle(inboxStyle)
 
+            val allIds = itens.map { it.transacao.id }.toIntArray()
             val paidIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
                 action = NotificationActionReceiver.ACTION_MARK_AS_PAID
-                putExtra(NotificationActionReceiver.EXTRA_TRANS_ID, t.id)
+                putExtra(NotificationActionReceiver.EXTRA_TRANS_IDS, allIds)
             }
             val paidPendingIntent = PendingIntent.getBroadcast(
                 applicationContext,
@@ -206,7 +210,7 @@ class NotificationWorker(
 
             builder.addAction(
                 R.drawable.ic_finly_notification,
-                applicationContext.getString(R.string.notif_btn_marcar_paga),
+                applicationContext.getString(R.string.notif_btn_marcar_pagas),
                 paidPendingIntent
             )
             builder.addAction(
