@@ -77,6 +77,8 @@ import com.jesse.finly.utils.Moeda
 import com.jesse.finly.utils.MoneyTextWatcher
 import com.jesse.finly.utils.ToastHelper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -101,6 +103,7 @@ class ResumoActivity : AppCompatActivity() {
     
     private val recurrenceMutex = Mutex()
     private var lastLoadedMonth: String? = null
+    private var resumoFlowJob: Job? = null
     private var lastLoadedYear: Int? = null
     private var metaAtual: Double = 0.0
     private var isCategoriesExpanded = false
@@ -1350,8 +1353,28 @@ class ResumoActivity : AppCompatActivity() {
     private fun executarCarregamentoInterface() {
         val mesAtual = obterMesSelecionadoCanonical()
         val anoAtual = binding.spinnerAno.selectedItem as? Int ?: anos[0]
-        carregarDados(mesAtual, anoAtual)
+        iniciarObservacaoFlow(mesAtual, anoAtual)
         atualizarDrawerHeader()
+    }
+
+    private fun iniciarObservacaoFlow(mesSel: String, anoSel: Int) {
+        val email = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString("EMAIL", "") ?: ""
+        val emailClean = email.trim().lowercase()
+        if (emailClean.isEmpty()) return
+
+        resumoFlowJob?.cancel()
+        resumoFlowJob = lifecycleScope.launch {
+            val db = MinhaBaseDados.getDatabase(this@ResumoActivity)
+
+            val transacoesFlow = db.utilizadorDao().obterTransacoesPorMesFlow(emailClean, mesSel, anoSel)
+            val metaFlow = db.utilizadorDao().obterMetaPorMesFlow(emailClean, mesSel, anoSel)
+
+            transacoesFlow.combine(metaFlow) { _, _ ->
+                Pair(mesSel, anoSel)
+            }.collect {
+                carregarDados(mesSel, anoSel)
+            }
+        }
     }
 
     private fun mostrarBottomSheetMoedaInicial() {

@@ -8,6 +8,7 @@ import androidx.room.Update
 import com.jesse.finly.models.MetaPoupanca
 import com.jesse.finly.models.Transacao
 import com.jesse.finly.models.Utilizador
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UtilizadorDAO {
@@ -17,6 +18,9 @@ interface UtilizadorDAO {
 
     @Query("SELECT * FROM tabela_metas WHERE donoEmail = :email AND mes = :mes AND ano = :ano LIMIT 1")
     fun obterMetaPorMes(email: String, mes: String, ano: Int): MetaPoupanca?
+
+    @Query("SELECT * FROM tabela_metas WHERE donoEmail = :email AND mes = :mes AND ano = :ano LIMIT 1")
+    fun obterMetaPorMesFlow(email: String, mes: String, ano: Int): Flow<MetaPoupanca?>
 
     // --- Lógica de Utilizadores (Login/Contas) ---
     @Insert
@@ -54,8 +58,14 @@ interface UtilizadorDAO {
     @Query("SELECT * FROM tabela_transacoes WHERE donoEmail = :email ORDER BY id ASC")
     fun obterTransacoesPorDono(email: String): List<Transacao>
 
+    @Query("SELECT * FROM tabela_transacoes WHERE donoEmail = :email ORDER BY id ASC")
+    fun obterTransacoesPorDonoFlow(email: String): Flow<List<Transacao>>
+
     @Query("SELECT * FROM tabela_transacoes WHERE donoEmail = :email AND mes = :mes AND ano = :ano")
     fun obterTransacoesPorMes(email: String, mes: String, ano: Int): List<Transacao>
+
+    @Query("SELECT * FROM tabela_transacoes WHERE donoEmail = :email AND mes = :mes AND ano = :ano")
+    fun obterTransacoesPorMesFlow(email: String, mes: String, ano: Int): Flow<List<Transacao>>
 
     @Query("SELECT * FROM tabela_transacoes WHERE donoEmail = :email AND recorrente = 1")
     fun obterTransacoesRecorrentes(email: String): List<Transacao>

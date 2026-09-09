@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Job
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -53,6 +54,7 @@ class MainActivity : AppCompatActivity() {
     private var todasTransacoes = listOf<Transacao>()
     private var mesFiltro: String? = null
     private var anoFiltro: Int = 2026
+    private var flowJob: Job? = null
     
     private var adapter: TransacaoAdapter? = null
     
@@ -376,27 +378,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun carregarLista() {
-        val currentEmail = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "") ?: ""
+        iniciarObservacaoFlow()
+    }
 
-        lifecycleScope.launch(Dispatchers.IO) {
+    private fun iniciarObservacaoFlow() {
+        val currentEmail = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "") ?: ""
+        if (currentEmail.isEmpty() || currentEmail == "CONVIDADO" || mesFiltro == null) return
+
+        flowJob?.cancel()
+        flowJob = lifecycleScope.launch {
             val db = MinhaBaseDados.getDatabase(this@MainActivity)
 
-            recurrenceMutex.withLock {
-                mesFiltro?.let { processarRecorrencia(db, currentEmail, it, anoFiltro) }
+            withContext(Dispatchers.IO) {
+                recurrenceMutex.withLock {
+                    mesFiltro?.let { processarRecorrencia(db, currentEmail, it, anoFiltro) }
+                }
             }
 
-            val todasDoDono = db.utilizadorDao().obterTransacoesPorDono(currentEmail)
-
-            val transacoesFiltradas = if (mesFiltro != null) {
-                todasDoDono.filter { (it.mes == mesFiltro) && (it.ano == anoFiltro) }
-            } else {
-                todasDoDono
-            }
-
-            withContext(Dispatchers.Main) {
-                todasTransacoes = transacoesFiltradas
-                filtrarLista(binding.tabFilter.selectedTabPosition)
-            }
+            db.utilizadorDao().obterTransacoesPorMesFlow(currentEmail, mesFiltro!!, anoFiltro)
+                .collect { transacoes ->
+                    todasTransacoes = transacoes
+                    filtrarLista(binding.tabFilter.selectedTabPosition)
+                }
         }
     }
 

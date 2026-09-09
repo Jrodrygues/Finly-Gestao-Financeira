@@ -33,11 +33,13 @@ import androidx.core.content.edit
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.database.MinhaBaseDados
 import com.jesse.finly.databinding.ActivityEvolucaoAnualBinding
+import com.jesse.finly.models.Transacao
 import com.jesse.finly.utils.CurrencyFormatter
 import com.jesse.finly.utils.IdiomaUtils
 import com.jesse.finly.utils.Moeda
 import com.jesse.finly.utils.UserPreferencesManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
@@ -279,67 +281,75 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         }
     }
 
+    private var flowJob: Job? = null
+
     private fun carregarDadosAnuais(ano: Int) {
         anoAtualSelecionado = ano
         val email = getSharedPreferences("FinlyAppPrefs", MODE_PRIVATE).getString("EMAIL", "") ?: ""
+        if (email.isEmpty()) return
 
-        lifecycleScope.launch(Dispatchers.IO) {
+        flowJob?.cancel()
+        flowJob = lifecycleScope.launch {
             val db = MinhaBaseDados.getDatabase(this@EvolucaoAnualActivity)
-            val transacoes = db.utilizadorDao().obterTransacoesPorDono(email)
-                .filter { it.ano == ano }
+            db.utilizadorDao().obterTransacoesPorDonoFlow(email)
+                .collect { todasDoDono ->
+                    processarEExibirDados(todasDoDono.filter { it.ano == ano })
+                }
+        }
+    }
 
-            var somaRendaAnual = 0.0
-            var somaDespesaAnual = 0.0
+    private suspend fun processarEExibirDados(transacoes: List<Transacao>) {
+        var somaRendaAnual = 0.0
+        var somaDespesaAnual = 0.0
 
-            val tempRenda = FloatArray(12)
-            val tempDespesa = FloatArray(12)
+        val tempRenda = FloatArray(12)
+        val tempDespesa = FloatArray(12)
 
-            val entriesSaldo = mutableListOf<BarEntry>()
-            val coresSaldo = mutableListOf<Int>()
+        val entriesSaldo = mutableListOf<BarEntry>()
+        val coresSaldo = mutableListOf<Int>()
 
-            val corPositivo = ContextCompat.getColor(this@EvolucaoAnualActivity, R.color.colorPositive)
-            val corNegativo = ContextCompat.getColor(this@EvolucaoAnualActivity, R.color.colorNegative)
+        val corPositivo = ContextCompat.getColor(this@EvolucaoAnualActivity, R.color.colorPositive)
+        val corNegativo = ContextCompat.getColor(this@EvolucaoAnualActivity, R.color.colorNegative)
 
-            for (i in 0..11) {
-                val mesNome = mesesNomes[i]
-                val transMes = transacoes.filter { it.mes == mesNome }
+        for (i in 0..11) {
+            val mesNome = mesesNomes[i]
+            val transMes = transacoes.filter { it.mes == mesNome }
 
-                val totalRenda = transMes.asSequence()
-                    .filter { it.tipo == "RENDA" && it.categoria != "Poupança" && it.categoria != "Exterior" }
-                    .sumOf { it.valor }
-                    .toFloat()
+            val totalRenda = transMes.asSequence()
+                .filter { it.tipo == "RENDA" && it.categoria != "Poupança" && it.categoria != "Exterior" }
+                .sumOf { it.valor }
+                .toFloat()
 
-                val totalDespesa = transMes.asSequence()
-                    .filter { it.tipo == "DESPESA" }
-                    .sumOf { it.valor }
-                    .toFloat()
+            val totalDespesa = transMes.asSequence()
+                .filter { it.tipo == "DESPESA" }
+                .sumOf { it.valor }
+                .toFloat()
 
-                somaRendaAnual += totalRenda.toDouble()
-                somaDespesaAnual += totalDespesa.toDouble()
+            somaRendaAnual += totalRenda.toDouble()
+            somaDespesaAnual += totalDespesa.toDouble()
 
-                tempRenda[i] = totalRenda
-                tempDespesa[i] = totalDespesa
+            tempRenda[i] = totalRenda
+            tempDespesa[i] = totalDespesa
 
-                val saldoMes = totalRenda - totalDespesa
-                entriesSaldo.add(BarEntry(i.toFloat(), saldoMes))
-                coresSaldo.add(if (saldoMes >= 0) corPositivo else corNegativo)
-            }
+            val saldoMes = totalRenda - totalDespesa
+            entriesSaldo.add(BarEntry(i.toFloat(), saldoMes))
+            coresSaldo.add(if (saldoMes >= 0) corPositivo else corNegativo)
+        }
 
-            val saldoAnual = somaRendaAnual - somaDespesaAnual
+        val saldoAnual = somaRendaAnual - somaDespesaAnual
 
-            withContext(Dispatchers.Main) {
-                rendaPorMes = tempRenda
-                despesaPorMes = tempDespesa
+        withContext(Dispatchers.Main) {
+            rendaPorMes = tempRenda
+            despesaPorMes = tempDespesa
 
-                atualizarCardsResumoAnual(somaRendaAnual, somaDespesaAnual, saldoAnual)
+            atualizarCardsResumoAnual(somaRendaAnual, somaDespesaAnual, saldoAnual)
 
-                // 1. PRIMEIRO atualizar o gráfico para que barChartAnual.data esteja preenchido
-                atualizarGrafico(entriesSaldo, coresSaldo)
+            // 1. PRIMEIRO atualizar o gráfico para que barChartAnual.data esteja preenchido
+            atualizarGrafico(entriesSaldo, coresSaldo)
 
-                // 2. DEPOIS atualizar o Card de Detalhe do mês atual
-                val mesAtualIndex = Calendar.getInstance()[Calendar.MONTH]
-                atualizarCardDetalheMes(mesAtualIndex)
-            }
+            // 2. DEPOIS atualizar o Card de Detalhe do mês atual
+            val mesAtualIndex = Calendar.getInstance()[Calendar.MONTH]
+            atualizarCardDetalheMes(mesAtualIndex)
         }
     }
 
