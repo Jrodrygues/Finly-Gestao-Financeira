@@ -289,27 +289,33 @@
                             android:progress="0"
                             android:progressDrawable="@drawable/custom_progress_bar" />
 
-                        <TextView
-                            android:id="@+id/tvMetaStatus"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="@string/meta_definir_aviso"
-                            android:textColor="@color/textColorSecondary"
-                            android:textSize="12sp" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
-                        <Button
-                            android:id="@+id/btnDefinirMeta"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="end"
-                            android:layout_marginEnd="8dp"
-                            android:paddingStart="16dp"
-                            android:paddingEnd="16dp"
-                            android:text="@string/btn_definir_meta"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvMetaStatus"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/meta_definir_aviso"
+                                android:textColor="@color/textColorSecondary"
+                                android:textSize="12sp" />
+
+                            <Button
+                                android:id="@+id/btnDefinirMeta"
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="0dp"
+                                android:text="@string/btn_definir_meta"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -488,11 +494,13 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
+                                android:gravity="end"
                                 android:orientation="vertical">
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="end"
                                     android:text="@string/label_projecao_6_meses"
                                     android:textColor="@color/textColorSecondary"
                                     android:textSize="12sp" />
@@ -501,6 +509,7 @@
                                     android:id="@+id/tvProjecao6Meses"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="end"
                                     android:layout_marginTop="2dp"
                                     android:textColor="@color/colorPositive"
                                     android:textSize="14sp"

@@ -100,6 +100,9 @@
     <string name="label_resumo_categoria">BREAKDOWN BY CATEGORY</string>
     <string name="label_meta_poupanca">Savings Goal</string>
     <string name="btn_definir_meta">SET GOAL</string>
+    <string name="btn_alterar_meta">CHANGE GOAL</string>
+    <string name="toast_horario_lembrete_alterado">Reminder time changed!</string>
+    <string name="toast_convidado_acao_bloqueada">Unavailable in guest mode</string>
     <string name="label_total_renda">Total Monthly Income: </string>
     <string name="label_total_despesas">Total Monthly Expenses: </string>
     <string name="label_total_poupanca">Total Saved: </string>
@@ -234,6 +237,8 @@
     <string name="titulo_editar_categoria_teto">Budget Limit</string>
     <string name="hint_nome_categoria">Category Name</string>
     <string name="hint_teto_orcamental">Monthly Spending Cap</string>
+    <string name="btn_remover_teto">REMOVE BUDGET CAP</string>
+    <string name="toast_teto_removido">Budget cap removed!</string>
     <string name="btn_cancelar_caps">CANCEL</string>
 
     <!-- Authentication / Registration Errors -->
@@ -371,7 +376,7 @@
     <string name="toast_nuvem_convidado">Guest Mode: Data stored locally only.</string>
     <string name="toast_nuvem_sincronizado">Synced: Your data is safely stored in the cloud.</string>
     <string name="toast_carregar_perfil">Loading profile... Please wait.</string>
-    <string name="toast_moeda_configurada_sucesso">%1$s currency configured successfully!</string>
+    <string name="toast_moeda_configurada_sucesso">%1$s currency configured</string>
     <string name="moeda_real_nome_completo">Brazilian Real (R$)</string>
     <string name="moeda_euro_nome_completo">Euro (€)</string>
     <string name="btn_ver_mais_categorias">Show more categories</string>

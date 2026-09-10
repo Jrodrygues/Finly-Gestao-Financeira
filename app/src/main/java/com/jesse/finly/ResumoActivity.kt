@@ -73,7 +73,6 @@ import com.jesse.finly.notifications.NotificationHelper
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.UserPreferencesManager
 import com.jesse.finly.utils.CsvExporter
-import com.jesse.finly.utils.PdfExporter
 import com.jesse.finly.utils.CurrencyFormatter
 import com.jesse.finly.utils.IdiomaUtils
 import com.jesse.finly.utils.Moeda
@@ -234,15 +233,15 @@ class ResumoActivity : AppCompatActivity() {
             metaInputLayout.suffixText = " €"
         }
 
+        val watcher = MoneyTextWatcher(input, moedaAtual)
+        input.addTextChangedListener(watcher)
+
         val centavos = round(metaAtual * 100).toLong()
         if (centavos > 0) {
             input.setText(centavos.toString())
         } else {
             input.setText("")
         }
-
-        val watcher = MoneyTextWatcher(input, moedaAtual)
-        input.addTextChangedListener(watcher)
 
         // Criar o ícone com verde manualmente para garantir visibilidade
         val icon = ContextCompat.getDrawable(this, R.drawable.ic_dashboard)?.mutate()
@@ -474,7 +473,13 @@ class ResumoActivity : AppCompatActivity() {
                     mostrarBottomSheetGerirCategorias()
                 }
                 R.id.nav_exportar -> {
-                    mostrarOpcoesExportacao()
+                    val email = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString("EMAIL", "") ?: ""
+                    val emailClean = if (email.equals("CONVIDADO", ignoreCase = true) || email.isBlank()) "convidado" else email.trim().lowercase()
+                    if (emailClean == "convidado") {
+                        showToast(getString(R.string.toast_convidado_acao_bloqueada))
+                    } else {
+                        mostrarOpcoesExportacao()
+                    }
                 }
                 R.id.nav_backup -> {
                     mostrarOpcoesBackup()
@@ -1517,8 +1522,13 @@ class ResumoActivity : AppCompatActivity() {
                     intent.putExtra("phone", utilizador.telemovel)
                     intent.putExtra("senha", utilizador.senha)
                     startActivity(intent)
-                } else if (email == "CONVIDADO") {
-                    showToast(getString(R.string.toast_convidado_perfil))
+                } else if (email == "CONVIDADO" || email == "convidado" || emailClean == "convidado") {
+                    val intent = Intent(this@ResumoActivity, DetalhesPageActivity::class.java)
+                    intent.putExtra("isOwnProfile", true)
+                    intent.putExtra("isGuest", true)
+                    intent.putExtra("name", getString(R.string.utilizador_convidado))
+                    intent.putExtra("email", "convidado")
+                    startActivity(intent)
                 } else {
                     showToast(getString(R.string.toast_carregar_perfil))
                 }
@@ -1799,6 +1809,12 @@ class ResumoActivity : AppCompatActivity() {
     private fun atualizarBarraMeta(valorPoupado: Double) {
         val moedaAtual = UserPreferencesManager(this).obterMoedaAtual()
         binding.tvMetaValor.text = CurrencyFormatter.formatar(metaAtual, moedaAtual)
+
+        if (metaAtual > 0.0) {
+            binding.btnDefinirMeta.text = getString(R.string.btn_alterar_meta)
+        } else {
+            binding.btnDefinirMeta.text = getString(R.string.btn_definir_meta)
+        }
         
         if (metaAtual > 0) {
             val progresso = ((valorPoupado / metaAtual) * 100).toInt().coerceAtMost(100)
@@ -1986,7 +2002,9 @@ class ResumoActivity : AppCompatActivity() {
             val mesSel = lastLoadedMonth ?: obterMesSelecionadoCanonical()
             val anoSel = lastLoadedYear ?: (binding.spinnerAno.selectedItem as? Int ?: anos[0])
             carregarDados(mesSel, anoSel)
-            showToast(getString(R.string.toast_categoria_limite_guardado, IdiomaUtils.formatarNomeCategoria(this, nome)))
+            if (novoLimite > 0.0) {
+                showToast(getString(R.string.toast_categoria_limite_guardado, IdiomaUtils.formatarNomeCategoria(this, nome)))
+            }
         }
         sheet.show(supportFragmentManager, "EditarCategoriaBottomSheet")
     }

@@ -120,7 +120,7 @@ class NotificationWorker(
 
         val intent = Intent(applicationContext, SplashActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra("TARGET_ACTIVITY", "RESUMO")
+            putExtra("TARGET_ACTIVITY", "MAIN")
         }
 
         val pendingIntent = PendingIntent.getActivity(

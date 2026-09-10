@@ -24,6 +24,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.ColorDrawable
+import android.widget.TextView
 import androidx.core.graphics.toColorInt
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
@@ -635,7 +636,8 @@ class MainActivity : AppCompatActivity() {
                     toggleStatusTransacao(transacao)
                     adapter?.notifyItemChanged(position)
                 } else if (direction == ItemTouchHelper.LEFT) {
-                    apagarTransacaoComUndo(transacao)
+                    adapter?.notifyItemChanged(position)
+                    confirmarEliminacaoTransacao(transacao)
                 }
             }
 
@@ -699,9 +701,84 @@ class MainActivity : AppCompatActivity() {
         ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(binding.rvTransacoes)
     }
 
-    private fun apagarTransacaoComUndo(transacao: Transacao) {
-        viewModel.apagarTransacao(transacao)
-        showToast(getString(R.string.snackbar_item_removido, transacao.item))
+    private fun confirmarEliminacaoTransacao(transacao: Transacao) {
+        if (transacao.recorrente) {
+            val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
+            val view = layoutInflater.inflate(R.layout.bottom_sheet_eliminar, binding.root as? ViewGroup, false)
+
+            view.findViewById<TextView>(R.id.tvMensagemRecorrente).text =
+                getString(R.string.dialog_eliminar_recorrencia_msg, transacao.item)
+            
+            view.findViewById<View>(R.id.btnEliminarApenasEste).setOnClickListener {
+                viewModel.apagarTransacao(transacao)
+                showToast(getString(R.string.toast_item_removido))
+                dialog.dismiss()
+            }
+            
+            view.findViewById<View>(R.id.btnEliminarTudo).setOnClickListener {
+                executarEliminacaoFutura(transacao)
+                dialog.dismiss()
+            }
+            
+            view.findViewById<View>(R.id.btnCancelar).setOnClickListener {
+                dialog.dismiss()
+            }
+            
+            dialog.setContentView(view)
+            dialog.window?.setDimAmount(0.90f)
+            dialog.show()
+        } else {
+            val dialog = BottomSheetDialog(this, R.style.TransparentBottomSheetDialog)
+            val view = layoutInflater.inflate(R.layout.bottom_sheet_eliminar_simples, binding.root as? ViewGroup, false)
+
+            view.findViewById<TextView>(R.id.tvMensagemSimples).text =
+                getString(R.string.dialog_eliminar_item_msg, transacao.item)
+
+            view.findViewById<View>(R.id.btnConfirmarEliminar).setOnClickListener {
+                viewModel.apagarTransacao(transacao)
+                showToast(getString(R.string.toast_item_removido))
+                dialog.dismiss()
+            }
+
+            view.findViewById<View>(R.id.btnCancelarSimples).setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.setContentView(view)
+            dialog.window?.setDimAmount(0.90f)
+            dialog.show()
+        }
+    }
+
+    private fun executarEliminacaoFutura(transacao: Transacao) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val db = MinhaBaseDados.getDatabase(this@MainActivity)
+            val dao = db.utilizadorDao()
+            val todas = dao.obterTransacoesPorDono(transacao.donoEmail)
+            val mesesArray = arrayOf("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro")
+            val nomeAlvo = transacao.item.trim()
+            val indexAtual = mesesArray.indexOfFirst { it.equals(transacao.mes.trim(), ignoreCase = true) }
+
+            todas.forEach { t ->
+                if (t.item.trim().equals(nomeAlvo, ignoreCase = true)) {
+                    val indexT = mesesArray.indexOfFirst { it.equals(t.mes.trim(), ignoreCase = true) }
+                    val isFuturoOuAtual = (t.ano > transacao.ano) || (t.ano == transacao.ano && indexT >= indexAtual)
+                    if (isFuturoOuAtual) {
+                        dao.apagarTransacao(t)
+                        FirebaseManager.eliminarTransacaoDoFirestore(t)
+                    } else {
+                        if (t.recorrente) {
+                            val atualizada = t.copy(recorrente = false)
+                            dao.atualizarTransacao(atualizada)
+                            FirebaseManager.salvarTransacaoNoFirestore(atualizada)
+                        }
+                    }
+                }
+            }
+            withContext(Dispatchers.Main) {
+                showToast(getString(R.string.toast_item_removido))
+            }
+        }
     }
 
     private suspend fun processarRecorrencia(db: MinhaBaseDados, email: String, mesAlvo: String, anoAlvo: Int) {

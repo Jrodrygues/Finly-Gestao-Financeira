@@ -8,6 +8,7 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
@@ -30,7 +31,6 @@ import com.jesse.finly.models.Transacao
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.BiometricUtils
 import com.jesse.finly.notifications.NotificationHelper
-import com.jesse.finly.utils.BackupManager
 import com.jesse.finly.utils.CurrencyFormatter
 import com.jesse.finly.utils.IdiomaUtils
 import com.jesse.finly.utils.Moeda
@@ -254,19 +254,19 @@ class DetalhesPageActivity : AppCompatActivity() {
         binding.ivIconField2.setImageResource(R.drawable.ic_phone)
 
         val currentEmail = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_EMAIL, "") ?: ""
-        emailStr = if (currentEmail == "CONVIDADO") currentEmail else currentEmail.trim().lowercase()
+        emailStr = if (currentEmail == "CONVIDADO" || currentEmail == "convidado") currentEmail else currentEmail.trim().lowercase()
+        val isGuest = (emailStr.equals("CONVIDADO", ignoreCase = true) || emailStr.equals("convidado", ignoreCase = true) || intent.getBooleanExtra("isGuest", false))
 
         userNameStr = intent.getStringExtra("name") ?: ""
         phoneStr = intent.getStringExtra("phone") ?: ""
         senhaStr = intent.getStringExtra("senha") ?: ""
         userId = intent.getIntExtra("id", -1)
 
-        if (emailStr == "CONVIDADO") {
+        if (isGuest) {
             binding.userName.text = getString(R.string.utilizador_convidado)
             binding.tvValueField1.text = getString(R.string.sem_email_sincronizado)
             binding.llField2.visibility = View.GONE
-            binding.btnEditarPerfil.visibility = View.GONE
-            binding.btnExcluirConta.visibility = View.GONE
+            binding.divField1.visibility = View.GONE
             configurarVisualSemFoto(getString(R.string.utilizador_convidado))
         } else {
             if (userNameStr.isNotEmpty()) {
@@ -361,6 +361,11 @@ class DetalhesPageActivity : AppCompatActivity() {
     }
 
     private fun irParaEdicaoPerfil() {
+        val isGuest = (emailStr == "CONVIDADO" || emailStr == "convidado" || intent.getBooleanExtra("isGuest", false))
+        if (isGuest) {
+            showToast(getString(R.string.toast_convidado_acao_bloqueada))
+            return
+        }
         val intent = Intent(this, RegistoActivity::class.java)
         intent.putExtra("isUserEdit", true)
         intent.putExtra("id", userId)
@@ -371,15 +376,59 @@ class DetalhesPageActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun confirmarExclusaoConta() {
+        val isGuest = (emailStr == "CONVIDADO" || emailStr == "convidado" || intent.getBooleanExtra("isGuest", false))
+        if (isGuest) {
+            showToast(getString(R.string.toast_convidado_acao_bloqueada))
+            return
+        }
+        val icon = ContextCompat.getDrawable(this, R.drawable.ic_delete)?.mutate()
+        icon?.setTint(ContextCompat.getColor(this, R.color.colorNegative))
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.dialog_eliminar_conta_titulo))
+            .setIcon(icon)
+            .setMessage(getString(R.string.dialog_eliminar_conta_msg))
+            .setPositiveButton(getString(R.string.dialog_btn_sim_eliminar)) { _, _ ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val sucessoNuvem = FirebaseManager.excluirContaTotal(emailStr)
+                    if (sucessoNuvem) {
+                        val db = MinhaBaseDados.getDatabase(this@DetalhesPageActivity)
+                        val dao = db.utilizadorDao()
+                        dao.apagarTodasTransacoesDoDono(emailStr)
+                        val utilizador = dao.buscarPorEmail(emailStr)
+                        utilizador?.let { dao.apagarUtilizador(it) }
+
+                        withContext(Dispatchers.Main) {
+                            getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { clear() }
+                            val intent = Intent(this@DetalhesPageActivity, LoginActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(intent)
+                            showToast(getString(R.string.toast_conta_eliminada))
+                            finish()
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            showToast(getString(R.string.toast_erro_eliminar_conta_nuvem))
+                        }
+                    }
+                }
+            }
+            .setNegativeButton(getString(R.string.btn_cancelar), null)
+            .show()
+    }
+
     private fun configurarConfiguracoes() {
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val isGuest = (emailStr == "CONVIDADO" || emailStr == "convidado" || intent.getBooleanExtra("isGuest", false))
         
         val isDarkMode = prefs.getBoolean("DARK_MODE", false)
         binding.switchDarkMode.setOnCheckedChangeListener(null)
         binding.switchDarkMode.isChecked = isDarkMode
         atualizarTextoModoEscuro(isDarkMode)
 
-        binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
+        lateinit var darkModeListener: CompoundButton.OnCheckedChangeListener
+        darkModeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
             val currentMode = AppCompatDelegate.getDefaultNightMode()
             val isSystemDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
             val isCurrentlyDark = if (currentMode == AppCompatDelegate.MODE_NIGHT_UNSPECIFIED) isSystemDark else (currentMode == AppCompatDelegate.MODE_NIGHT_YES)
@@ -391,16 +440,19 @@ class DetalhesPageActivity : AppCompatActivity() {
             atualizarTextoModoEscuro(isChecked)
             
             // sincronizar PREFERÊNCIA NO FIREBASE
-            atualizarPreferenciaUtilizador(isChecked, "DARK_MODE")
+            if (!isGuest) {
+                atualizarPreferenciaUtilizador(isChecked, "DARK_MODE")
+            }
             
             if (isCurrentlyDark != isChecked) {
                 val desiredMode = if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
                 AppCompatDelegate.setDefaultNightMode(desiredMode)
             }
         }
+        binding.switchDarkMode.setOnCheckedChangeListener(darkModeListener)
 
         val userPrefs = UserPreferencesManager(this)
-        val notifAtivas = prefs.getBoolean("NOTIFICATIONS", false)
+        val notifAtivas = if (isGuest) false else prefs.getBoolean("NOTIFICATIONS", false)
         binding.switchNotifications.setOnCheckedChangeListener(null)
         binding.switchNotifications.isChecked = notifAtivas
 
@@ -408,7 +460,19 @@ class DetalhesPageActivity : AppCompatActivity() {
         val minutoSalvo = userPrefs.obterMinutoNotificacao()
         binding.tvHorarioNotificacaoVal.text = String.format(Locale.getDefault(), "%02d:%02d", horaSalva, minutoSalvo)
 
+        fun atualizarEstadoHorarioNotificacao(ativa: Boolean) {
+            binding.llHorarioNotificacao.isEnabled = ativa
+            binding.tvHorarioNotificacaoVal.isEnabled = ativa
+            binding.llHorarioNotificacao.alpha = if (ativa) 1.0f else 0.4f
+        }
+        atualizarEstadoHorarioNotificacao(notifAtivas)
+
         binding.tvHorarioNotificacaoVal.setOnClickListener {
+            if (isGuest) {
+                showToast(getString(R.string.toast_convidado_acao_bloqueada))
+                return@setOnClickListener
+            }
+            if (!binding.switchNotifications.isChecked) return@setOnClickListener
             val h = userPrefs.obterHoraNotificacao()
             val m = userPrefs.obterMinutoNotificacao()
             val timePicker = TimePickerDialog(
@@ -416,6 +480,7 @@ class DetalhesPageActivity : AppCompatActivity() {
                 { _, selectedHour, selectedMinute ->
                     userPrefs.salvarHorarioNotificacao(selectedHour, selectedMinute)
                     binding.tvHorarioNotificacaoVal.text = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute)
+                    showToast(getString(R.string.toast_horario_lembrete_alterado))
                     if (binding.switchNotifications.isChecked) {
                         NotificationHelper.agendarWorkerNotificacoes(this)
                     }
@@ -427,7 +492,16 @@ class DetalhesPageActivity : AppCompatActivity() {
             timePicker.show()
         }
         
-        binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
+        lateinit var notifListener: CompoundButton.OnCheckedChangeListener
+        notifListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            if (isGuest) {
+                showToast(getString(R.string.toast_convidado_acao_bloqueada))
+                binding.switchNotifications.setOnCheckedChangeListener(null)
+                binding.switchNotifications.isChecked = !isChecked
+                binding.switchNotifications.setOnCheckedChangeListener(notifListener)
+                return@OnCheckedChangeListener
+            }
+            atualizarEstadoHorarioNotificacao(isChecked)
             if (isChecked) {
                 verificarPermissaoNotificacao()
             } else {
@@ -435,12 +509,21 @@ class DetalhesPageActivity : AppCompatActivity() {
                 cancelarNotificacoes()
             }
         }
+        binding.switchNotifications.setOnCheckedChangeListener(notifListener)
 
-        val biometriaAtiva = prefs.getBoolean("pref_biometric_ativa", false)
+        val biometriaAtiva = if (isGuest) false else prefs.getBoolean("pref_biometric_ativa", false)
         binding.switchBiometria.setOnCheckedChangeListener(null)
         binding.switchBiometria.isChecked = biometriaAtiva
 
-        binding.switchBiometria.setOnCheckedChangeListener { buttonView, isChecked ->
+        lateinit var biometriaListener: CompoundButton.OnCheckedChangeListener
+        biometriaListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            if (isGuest) {
+                showToast(getString(R.string.toast_convidado_acao_bloqueada))
+                binding.switchBiometria.setOnCheckedChangeListener(null)
+                binding.switchBiometria.isChecked = !isChecked
+                binding.switchBiometria.setOnCheckedChangeListener(biometriaListener)
+                return@OnCheckedChangeListener
+            }
             if (isChecked) {
                 if (BiometricUtils.isBiometricAvailable(this)) {
                     BiometricUtils.promptBiometria(
@@ -453,24 +536,48 @@ class DetalhesPageActivity : AppCompatActivity() {
                             showToast(getString(R.string.toast_biometria_ativada))
                         },
                         onError = {
-                            buttonView.isChecked = false
+                            binding.switchBiometria.setOnCheckedChangeListener(null)
+                            binding.switchBiometria.isChecked = false
+                            binding.switchBiometria.setOnCheckedChangeListener(biometriaListener)
                             prefs.edit { putBoolean("pref_biometric_ativa", false) }
                             atualizarPreferenciaUtilizador(false, "BIOMETRIA")
                             showToast(getString(R.string.toast_biometria_cancelada))
                         }
                     )
                 } else {
-                    buttonView.isChecked = false
+                    binding.switchBiometria.setOnCheckedChangeListener(null)
+                    binding.switchBiometria.isChecked = false
+                    binding.switchBiometria.setOnCheckedChangeListener(biometriaListener)
                     prefs.edit { putBoolean("pref_biometric_ativa", false) }
                     atualizarPreferenciaUtilizador(false, "BIOMETRIA")
                     showToast(getString(R.string.toast_biometria_indisponivel))
                 }
             } else {
-                prefs.edit { putBoolean("pref_biometric_ativa", false) }
-                atualizarPreferenciaUtilizador(false, "BIOMETRIA")
-                showToast(getString(R.string.toast_biometria_desativada))
+                if (BiometricUtils.isBiometricAvailable(this)) {
+                    BiometricUtils.promptBiometria(
+                        this,
+                        title = getString(R.string.biometria_prompt_titulo),
+                        subtitle = getString(R.string.biometria_prompt_subtitulo),
+                        onSuccess = {
+                            prefs.edit { putBoolean("pref_biometric_ativa", false) }
+                            atualizarPreferenciaUtilizador(false, "BIOMETRIA")
+                            showToast(getString(R.string.toast_biometria_desativada))
+                        },
+                        onError = {
+                            binding.switchBiometria.setOnCheckedChangeListener(null)
+                            binding.switchBiometria.isChecked = true
+                            binding.switchBiometria.setOnCheckedChangeListener(biometriaListener)
+                            showToast(getString(R.string.toast_biometria_cancelada))
+                        }
+                    )
+                } else {
+                    prefs.edit { putBoolean("pref_biometric_ativa", false) }
+                    atualizarPreferenciaUtilizador(false, "BIOMETRIA")
+                    showToast(getString(R.string.toast_biometria_desativada))
+                }
             }
         }
+        binding.switchBiometria.setOnCheckedChangeListener(biometriaListener)
 
         val prefsManager = UserPreferencesManager(this)
         val moedaAtual = prefsManager.obterMoedaAtual()
@@ -822,43 +929,6 @@ class DetalhesPageActivity : AppCompatActivity() {
                 finish()
             }
             .setNegativeButton(getString(R.string.dialog_sair_btn_nao), null)
-            .show()
-    }
-
-    private fun confirmarExclusaoConta() {
-        val icon = ContextCompat.getDrawable(this, R.drawable.ic_delete)?.mutate()
-        icon?.setTint(ContextCompat.getColor(this, R.color.colorNegative))
-
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.dialog_eliminar_conta_titulo))
-            .setIcon(icon)
-            .setMessage(getString(R.string.dialog_eliminar_conta_msg))
-            .setPositiveButton(getString(R.string.dialog_btn_sim_eliminar)) { _, _ ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val sucessoNuvem = FirebaseManager.excluirContaTotal(emailStr)
-                    if (sucessoNuvem) {
-                        val db = MinhaBaseDados.getDatabase(this@DetalhesPageActivity)
-                        val dao = db.utilizadorDao()
-                        dao.apagarTodasTransacoesDoDono(emailStr)
-                        val utilizador = dao.buscarPorEmail(emailStr)
-                        utilizador?.let { dao.apagarUtilizador(it) }
-
-                        withContext(Dispatchers.Main) {
-                            getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit { clear() }
-                            val intent = Intent(this@DetalhesPageActivity, LoginActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            startActivity(intent)
-                            showToast(getString(R.string.toast_conta_eliminada))
-                            finish()
-                        }
-                    } else {
-                        withContext(Dispatchers.Main) {
-                            showToast(getString(R.string.toast_erro_eliminar_conta_nuvem))
-                        }
-                    }
-                }
-            }
-            .setNegativeButton(getString(R.string.btn_cancelar), null)
             .show()
     }
 

@@ -1,6 +1,8 @@
 package com.jesse.finly
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -56,16 +58,22 @@ class SplashActivity : AppCompatActivity() {
 
     private fun checkSessionAndNavigate() {
         val sharedPref = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val isDark = sharedPref.getBoolean("DARK_MODE", false)
+        AppCompatDelegate.setDefaultNightMode(if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO)
         val lastLogin = sharedPref.getLong(KEY_LAST_LOGIN, 0L)
         val currentTime = System.currentTimeMillis()
         val email = sharedPref.getString(KEY_EMAIL, "") ?: ""
         val biometriaAtiva = sharedPref.getBoolean("pref_biometric_ativa", false)
 
         val navigateToMain = {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancel(1)
+
             val targetIntent = when (intent.getStringExtra("TARGET_ACTIVITY")) {
                 "DETALHES" -> Intent(this, DetalhesPageActivity::class.java).apply {
                     putExtras(this@SplashActivity.intent)
                 }
+                "MAIN" -> Intent(this, MainActivity::class.java)
                 else -> Intent(this, ResumoActivity::class.java)
             }
 

@@ -100,6 +100,8 @@
     <string name="label_resumo_categoria">RESUMEN POR CATEGORÍA</string>
     <string name="label_meta_poupanca">Meta de Ahorro</string>
     <string name="btn_definir_meta">DEFINIR META</string>
+    <string name="btn_alterar_meta">CAMBIAR META</string>
+    <string name="toast_horario_lembrete_alterado">¡Hora de recordatorio cambiada con éxito!</string>
     <string name="label_total_renda">Total mensual de ingresos: </string>
     <string name="label_total_despesas">Total mensual de gastos: </string>
     <string name="label_total_poupanca">Total ahorrado: </string>
@@ -234,6 +236,8 @@
     <string name="titulo_editar_categoria_teto">Límite de Presupuesto</string>
     <string name="hint_nome_categoria">Nombre de la Categoría</string>
     <string name="hint_teto_orcamental">Límite Mensual de Gasto</string>
+    <string name="btn_remover_teto">ELIMINAR LÍMITE</string>
+    <string name="toast_teto_removido">¡Límite de presupuesto eliminado!</string>
     <string name="btn_cancelar_caps">CANCELAR</string>
 
     <!-- Errores de Autenticación / Registro -->
@@ -370,8 +374,8 @@
     <string name="toast_digite_nome_categoria">Introduzca el nombre de la categoría</string>
     <string name="toast_nuvem_convidado">Modo Invitado: Datos guardados únicamente en el dispositivo.</string>
     <string name="toast_nuvem_sincronizado">Sincronizado: Sus datos están seguros en la nube.</string>
-    <string name="toast_carregar_perfil">Cargando perfil... Espere un momento.</string>
-    <string name="toast_moeda_configurada_sucesso">¡Moneda %1$s configurada con éxito!</string>
+    <string name="toast_carregar_perfil">Perfil no encontrado.</string>
+    <string name="toast_moeda_configurada_sucesso">Moneda %1$s configurada</string>
     <string name="moeda_real_nome_completo">Real Brasileño (R$)</string>
     <string name="moeda_euro_nome_completo">Euro (€)</string>
     <string name="btn_ver_mais_categorias">Ver más categorías</string>

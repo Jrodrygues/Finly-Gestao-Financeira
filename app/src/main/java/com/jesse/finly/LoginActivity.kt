@@ -322,9 +322,11 @@ class LoginActivity : AppCompatActivity() {
             .setMessage(getString(R.string.msg_modo_convidado_aviso))
             .setPositiveButton(getString(R.string.btn_continuar_convidado)) { _, _ ->
                 getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
-                    putString(KEY_EMAIL, "CONVIDADO")
+                    putString(KEY_EMAIL, "convidado")
+                    putBoolean("DARK_MODE", false)
                     putLong(KEY_LAST_LOGIN, System.currentTimeMillis())
                 }
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 prosseguirParaApp()
             }
             .setNegativeButton(getString(R.string.btn_cancelar), null)
