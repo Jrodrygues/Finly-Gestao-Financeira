@@ -3,10 +3,8 @@ package com.jesse.finly.notifications
 import android.content.Context
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.workDataOf
 import com.jesse.finly.database.FirebaseManager
 import com.jesse.finly.utils.UserPreferencesManager
 import java.util.Calendar
@@ -38,7 +36,7 @@ object NotificationHelper {
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             WORK_NAME,
-            ExistingPeriodicWorkPolicy.UPDATE,
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             workRequest,
         )
     }

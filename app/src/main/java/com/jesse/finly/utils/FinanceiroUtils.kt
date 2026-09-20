@@ -41,11 +41,12 @@ object FinanceiroUtils {
     }
 
     /**
-     * Calcula o saldo final baseado apenas nas transações que já foram marcadas como PAGAS (status = true).
+     * Calcula o saldo final baseado apenas nas transações que já foram marcadas como PAGAS (status = true),
+     * excluindo transações da categoria Poupança para mantê-la separada das despesas gerais do mês.
      */
     fun calcularSaldoPago(transacoes: List<Transacao>): Double {
-        val rendaPaga = transacoes.filter { it.tipo == "RENDA" && it.status }.sumOf { it.valor }
-        val despesaPaga = transacoes.filter { it.tipo == "DESPESA" && it.status }.sumOf { it.valor }
+        val rendaPaga = transacoes.filter { it.tipo == "RENDA" && !isCategoriaPoupanca(it.categoria) && it.status }.sumOf { it.valor }
+        val despesaPaga = transacoes.filter { it.tipo == "DESPESA" && !isCategoriaPoupanca(it.categoria) && it.status }.sumOf { it.valor }
         return rendaPaga - despesaPaga
     }
 
@@ -158,5 +159,30 @@ object FinanceiroUtils {
             }
         }
         return novasTransacoes
+    }
+
+    /**
+     * Verifica se uma categoria corresponde a Poupança/Ahorro/Savings.
+     */
+    fun isCategoriaPoupanca(categoria: String): Boolean {
+        val clean = categoria.trim().lowercase()
+        return clean.contains("poupanc") || clean.contains("poupança") || 
+               clean.contains("saving") || clean.contains("ahorro")
+    }
+
+    /**
+     * Calcula o total acumulado de poupança baseado no tipo de transação selecionado pelo utilizador:
+     * - RENDA na Poupança = Entrada / Aporte de dinheiro (+valor).
+     * - DESPESA na Poupança = Saída / Retirada de dinheiro (-valor).
+     * - O saldo total de poupança nunca fica negativo (para no mínimo 0.0).
+     */
+    fun calcularTotalPoupanca(transacoes: List<Transacao>): Double {
+        val total = transacoes.asSequence()
+            .filter { isCategoriaPoupanca(it.categoria) }
+            .sumOf { t ->
+                val valorAbs = abs(t.valor)
+                if (t.tipo == "RENDA") valorAbs else -valorAbs
+            }
+        return total.coerceAtLeast(0.0)
     }
 }

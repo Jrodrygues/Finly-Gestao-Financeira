@@ -12,15 +12,16 @@ import java.util.Calendar
 class FinanceiroUtilsTest {
 
     @Test
-    fun `Calcular saldo pago deve subtrair despesas de rendas apenas se status for true`() {
+    fun `Calcular saldo pago deve subtrair despesas de rendas apenas se status for true e ignorar poupanca`() {
         val transacoes = listOf(
             Transacao(item = "Salário", valor = 1000.0, tipo = "RENDA", status = true, mes = "Janeiro", ano = 2026, vencimento = "01/01", donoEmail = "t@t.com"),
             Transacao(item = "Freelance", valor = 200.0, tipo = "RENDA", status = false, mes = "Janeiro", ano = 2026, vencimento = "05/01", donoEmail = "t@t.com"),
             Transacao(item = "Aluguer", valor = 400.0, tipo = "DESPESA", status = true, mes = "Janeiro", ano = 2026, vencimento = "10/01", donoEmail = "t@t.com"),
-            Transacao(item = "Luz", valor = 50.0, tipo = "DESPESA", status = false, mes = "Janeiro", ano = 2026, vencimento = "15/01", donoEmail = "t@t.com")
+            Transacao(item = "Luz", valor = 50.0, tipo = "DESPESA", status = false, mes = "Janeiro", ano = 2026, vencimento = "15/01", donoEmail = "t@t.com"),
+            Transacao(item = "Aporte Poupança", valor = 150.0, tipo = "DESPESA", categoria = "Poupança", status = true, mes = "Janeiro", ano = 2026, vencimento = "20/01", donoEmail = "t@t.com")
         )
 
-        // Deve somar 1000 (renda paga) e subtrair 400 (despesa paga) = 600
+        // Deve somar 1000 (renda paga) e subtrair 400 (despesa paga), ignorando 150 de poupança = 600
         val saldo = FinanceiroUtils.calcularSaldoPago(transacoes)
         assertEquals(600.0, saldo, 0.01)
     }
@@ -118,5 +119,31 @@ class FinanceiroUtilsTest {
         assertTrue(positivoEUR.startsWith("+"))
         assertTrue(!positivoSemSinalEUR.startsWith("+"))
         assertTrue(negativoEUR.startsWith("-"))
+    }
+
+    @Test
+    fun `calcularTotalPoupanca deve somar transacoes de RENDA e subtrair transacoes de DESPESA`() {
+        val transacoes = listOf(
+            Transacao(item = "Aporte 500", valor = 500.0, tipo = "RENDA", categoria = "Poupança", status = true),
+            Transacao(item = "Aporte 200", valor = 200.0, tipo = "RENDA", categoria = "Poupança", status = true),
+            Transacao(item = "Retirada 150", valor = 150.0, tipo = "DESPESA", categoria = "Poupança", status = true),
+            Transacao(item = "Outro Gasto Geral", valor = 100.0, tipo = "DESPESA", categoria = "Alimentação", status = true)
+        )
+
+        // 500 (RENDA) + 200 (RENDA) - 150 (DESPESA) = 550
+        val totalPoupanca = FinanceiroUtils.calcularTotalPoupanca(transacoes)
+        assertEquals(550.0, totalPoupanca, 0.01)
+    }
+
+    @Test
+    fun `calcularTotalPoupanca nao deve ficar negativo se retiradas superarem aportes`() {
+        val transacoes = listOf(
+            Transacao(item = "Aporte", valor = 50.0, tipo = "RENDA", categoria = "Poupança", status = true),
+            Transacao(item = "Retirada", valor = 150.0, tipo = "DESPESA", categoria = "Poupança", status = true)
+        )
+
+        // 50 - 150 = -100, deve limitar em 0.0
+        val totalPoupanca = FinanceiroUtils.calcularTotalPoupanca(transacoes)
+        assertEquals(0.0, totalPoupanca, 0.01)
     }
 }

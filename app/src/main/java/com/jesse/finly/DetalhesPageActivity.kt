@@ -874,20 +874,26 @@ class DetalhesPageActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             val db = MinhaBaseDados.getDatabase(this@DetalhesPageActivity)
             val t = db.utilizadorDao().obterTransacaoPorId(transId)
-            t?.let {
+            if (t != null) {
                 withContext(Dispatchers.Main) {
-                    transItem = it.item
-                    transValor = it.valor
-                    transData = it.vencimento
-                    transTipo = it.tipo
-                    transCat = it.categoria
-                    transMes = it.mes
-                    transAno = it.ano
-                    transStatus = it.status
-                    transIsRecorrente = it.recorrente
-                    transParcelasTotais = it.parcelasTotais
-                    transParcelasRestantes = it.parcelasRestantes
+                    transItem = t.item
+                    transValor = t.valor
+                    transData = t.vencimento
+                    transTipo = t.tipo
+                    transCat = t.categoria
+                    transMes = t.mes
+                    transAno = t.ano
+                    transStatus = t.status
+                    transIsRecorrente = t.recorrente
+                    transParcelasTotais = t.parcelasTotais
+                    transParcelasRestantes = t.parcelasRestantes
                     atualizarUITransacao()
+                }
+            } else {
+                // Se a transação foi apagada (ex: pela lixeira no RegistoActivity),
+                // fecha esta tela de detalhes para retornar diretamente à listagem principal
+                withContext(Dispatchers.Main) {
+                    finish()
                 }
             }
         }

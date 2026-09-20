@@ -887,6 +887,7 @@ class RegistoActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     ocultarLoadingOverlay()
                     showToast(getString(R.string.toast_item_removido_sucesso))
+                    setResult(RESULT_OK)
                     finish()
                 }
             }

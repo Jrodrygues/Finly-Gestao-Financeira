@@ -500,15 +500,15 @@ class MainActivity : AppCompatActivity() {
         atualizarAparenciaCabecalho()
 
         val rendaTotal = todasTransacoes.asSequence()
-            .filter { it.tipo == "RENDA" && it.categoria != "Poupança" && it.categoria != "Exterior" }
+            .filter { it.tipo == "RENDA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) && it.categoria != "Exterior" }
             .sumOf { it.valor }
 
         val despesasPagas = todasTransacoes.asSequence()
-            .filter { it.tipo == "DESPESA" && it.status }
+            .filter { it.tipo == "DESPESA" && it.status && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) }
             .sumOf { it.valor }
 
         val despesasAPagar = todasTransacoes.asSequence()
-            .filter { it.tipo == "DESPESA" && !it.status }
+            .filter { it.tipo == "DESPESA" && !it.status && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) }
             .sumOf { it.valor }
 
         val saldoDisponivel = rendaTotal - despesasPagas

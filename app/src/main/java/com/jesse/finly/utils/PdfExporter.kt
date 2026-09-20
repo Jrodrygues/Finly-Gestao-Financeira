@@ -81,8 +81,8 @@ class PdfExporter(private val context: Context) {
         canvas.drawLine(40f, yPosition, 555f, yPosition, paint)
         yPosition += 25f
 
-        val totalRenda = transacoes.filter { it.tipo == "RENDA" }.sumOf { it.valor }
-        val totalDespesa = transacoes.filter { it.tipo == "DESPESA" }.sumOf { it.valor }
+        val totalRenda = transacoes.filter { it.tipo == "RENDA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) }.sumOf { it.valor }
+        val totalDespesa = transacoes.filter { it.tipo == "DESPESA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) }.sumOf { it.valor }
         val saldoFinal = totalRenda - totalDespesa
 
         paint.color = Color.BLACK

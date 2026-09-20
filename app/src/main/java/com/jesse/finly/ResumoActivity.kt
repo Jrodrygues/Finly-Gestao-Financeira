@@ -1,5 +1,7 @@
 package com.jesse.finly
 
+import android.animation.ObjectAnimator
+import android.view.animation.DecelerateInterpolator
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -948,8 +950,8 @@ class ResumoActivity : AppCompatActivity() {
         canvas.drawRoundRect(30f, 100f, 565f, 190f, 10f, 10f, cardBgPaint)
         canvas.drawRoundRect(30f, 100f, 565f, 190f, 10f, 10f, cardBorderPaint)
 
-        val totalRendaVal = transacoes.filter { it.tipo == "RENDA" && it.categoria != "Poupança" && it.categoria != "Exterior" }.sumOf { it.valor }
-        val despesas = transacoes.filter { it.tipo == "DESPESA" }
+        val totalRendaVal = transacoes.filter { it.tipo == "RENDA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) && it.categoria != "Exterior" }.sumOf { it.valor }
+        val despesas = transacoes.filter { it.tipo == "DESPESA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) }
         val totalDespesasVal = despesas.sumOf { it.valor }
         val saldoVal = FinanceiroUtils.calcularSaldoPago(transacoes)
 
@@ -1747,19 +1749,21 @@ class ResumoActivity : AppCompatActivity() {
             val transacoes = db.utilizadorDao().obterTransacoesPorMes(email, mesSelecionado, anoSelecionado)
             
             // Totais Absolutos (Para os cards de categoria)
-            // ‘BUG’ FIX: Poupança e Exterior não somam mais no card de Renda Geral
+            // ‘BUG’ FIX: Poupança e Exterior não somam mais no card de Renda Geral nem no de Despesas Gerais
             val totalRenda = transacoes.asSequence()
-                .filter { it.tipo == "RENDA" && it.categoria != "Poupança" && it.categoria != "Exterior" }
+                .filter { it.tipo == "RENDA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) && it.categoria != "Exterior" }
                 .sumOf { it.valor }
                 
-            val totalDespesas = transacoes.asSequence().filter { it.tipo == "DESPESA" }.sumOf { it.valor }
+            val totalDespesas = transacoes.asSequence()
+                .filter { it.tipo == "DESPESA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) }
+                .sumOf { it.valor }
             
             // Poupança realizada no mês atual (para a barra de Meta do Mês)
-            val poupancaNoMes = transacoes.asSequence().filter { it.categoria == "Poupança" }.sumOf { it.valor }
+            val poupancaNoMes = FinanceiroUtils.calcularTotalPoupanca(transacoes)
             
             // Total Acumulado Geral de Poupança (para o campo 'Total poupança' no Balanço)
             val todasTransacoesDono = db.utilizadorDao().obterTransacoesPorDono(email)
-            val totalPoupancaGeral = todasTransacoesDono.asSequence().filter { it.categoria == "Poupança" }.sumOf { it.valor }
+            val totalPoupancaGeral = FinanceiroUtils.calcularTotalPoupanca(todasTransacoesDono)
 
             val totalExterior = transacoes.asSequence().filter { it.categoria == "Exterior" }.sumOf { it.valor }
             
@@ -1768,9 +1772,9 @@ class ResumoActivity : AppCompatActivity() {
             val percentagemGasta = FinanceiroUtils.calcularPercentagemGasta(totalRenda, totalDespesas)
 
             // Cálculos para Previsão de Fim de Mês
-            val despesasPendentes = transacoes.filter { it.tipo == "DESPESA" && !it.status }
+            val despesasPendentes = transacoes.filter { it.tipo == "DESPESA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) && !it.status }
             val totalDespesasPendentes = despesasPendentes.sumOf { it.valor }
-            val rendasPendentes = transacoes.filter { it.tipo == "RENDA" && !it.status }
+            val rendasPendentes = transacoes.filter { it.tipo == "RENDA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) && !it.status }
             val totalRendasPendentes = rendasPendentes.sumOf { it.valor }
             val saldoProjetado = saldoPaga - totalDespesasPendentes + totalRendasPendentes
 
@@ -1783,7 +1787,9 @@ class ResumoActivity : AppCompatActivity() {
             }
 
             val transacoesAnteriores = db.utilizadorDao().obterTransacoesPorMes(email, prevMesNome, prevAno)
-            val despesasAnteriores = transacoesAnteriores.asSequence().filter { it.tipo == "DESPESA" }.sumOf { it.valor }
+            val despesasAnteriores = transacoesAnteriores.asSequence()
+                .filter { it.tipo == "DESPESA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) }
+                .sumOf { it.valor }
 
             withContext(Dispatchers.Main) {
                 atualizarInterface(
@@ -1802,7 +1808,34 @@ class ResumoActivity : AppCompatActivity() {
                 configurarGrafico(transacoes)
                 // A barra de meta do mês utiliza a poupança realizada neste mês específico
                 atualizarBarraMeta(poupancaNoMes)
+                animarEntradaCards()
             }
+        }
+    }
+
+    private var jaAnimouCards = false
+
+    private fun animarEntradaCards() {
+        if (jaAnimouCards) return
+        jaAnimouCards = true
+
+        val cards = listOf(
+            binding.cardRendaGasta,
+            binding.cardResumoCategoria,
+            binding.cardMetaPoupanca,
+            binding.cardBalancoeSaldo
+        )
+
+        cards.forEachIndexed { index, view ->
+            view.alpha = 0f
+            view.translationY = 30f
+            view.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setStartDelay(index * 70L)
+                .setDuration(400L)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
         }
     }
 
@@ -1817,9 +1850,17 @@ class ResumoActivity : AppCompatActivity() {
         }
         
         if (metaAtual > 0) {
-            val progresso = ((valorPoupado / metaAtual) * 100).toInt().coerceAtMost(100)
-            binding.pbMetaPoupanca.progress = progresso
-            val valorPoupadoFmt = CurrencyFormatter.formatar(valorPoupado, moedaAtual)
+            val valorRealPoupado = valorPoupado.coerceAtLeast(0.0)
+            val progresso = ((valorRealPoupado / metaAtual) * 100).toInt().coerceIn(0, 100)
+            
+            // Animação suave na barra de progresso (Ideia 1)
+            ObjectAnimator.ofInt(binding.pbMetaPoupanca, "progress", binding.pbMetaPoupanca.progress, progresso).apply {
+                duration = 500L
+                interpolator = DecelerateInterpolator()
+                start()
+            }
+
+            val valorPoupadoFmt = CurrencyFormatter.formatar(valorRealPoupado, moedaAtual)
             binding.tvMetaStatus.text = getString(R.string.poupado_label, valorPoupadoFmt, progresso)
             
             if (progresso >= 100) {
@@ -1837,7 +1878,7 @@ class ResumoActivity : AppCompatActivity() {
 
     private fun configurarGrafico(transacoes: List<Transacao>) {
         transacoesAtuaisGrafico = transacoes
-        val despesas = transacoes.filter { it.tipo == "DESPESA" }
+        val despesas = transacoes.filter { it.tipo == "DESPESA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) }
         val gastosPorCategoria = despesas.groupBy { it.categoria }
             .mapValues { it.value.sumOf { t -> t.valor }.toFloat() }
             .toList()
@@ -2057,8 +2098,10 @@ class ResumoActivity : AppCompatActivity() {
         binding.tvTotalDespesas.text = CurrencyFormatter.formatarComSinal(-despesa, moedaAtual)
         binding.tvTotalDespesas.setTextColor(if (isDespesaZero) colorPadrao else colorNegativo)
 
+        val colorPrimaryBrand = ContextCompat.getColor(this, R.color.colorPrimary)
+        val isPoupancaZero = abs(poupanca) < 0.005
         binding.tvTotalPoupanca.text = CurrencyFormatter.formatar(poupanca, moedaAtual)
-        binding.tvTotalPoupanca.setTextColor(colorPadrao)
+        binding.tvTotalPoupanca.setTextColor(if (isPoupancaZero) colorPadrao else colorPrimaryBrand)
 
         val isSaldoZero = abs(saldo) < 0.005
         binding.tvSaldoFinal.text = CurrencyFormatter.formatarComSinal(saldo, moedaAtual, forcarSinalPositivo = true)

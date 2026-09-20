@@ -39,9 +39,9 @@ class CsvExporter(private val context: Context) {
                 writer.append("${t.vencimento};\"${t.item.replace("\"", "\"\"")}\";\"${t.categoria.replace("\"", "\"\"")}\";$tipoStr;$valorStr;$pagoStr\n")
             }
 
-            // Totais no rodapé do CSV
-            val totalRenda = transacoes.filter { it.tipo == "RENDA" }.sumOf { it.valor }
-            val totalDespesa = transacoes.filter { it.tipo == "DESPESA" }.sumOf { it.valor }
+            // Totais no rodapé do CSV (excluindo Poupança para alinhamento com os relatórios)
+            val totalRenda = transacoes.filter { it.tipo == "RENDA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) }.sumOf { it.valor }
+            val totalDespesa = transacoes.filter { it.tipo == "DESPESA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) }.sumOf { it.valor }
             val saldo = totalRenda - totalDespesa
 
             writer.append("\n")

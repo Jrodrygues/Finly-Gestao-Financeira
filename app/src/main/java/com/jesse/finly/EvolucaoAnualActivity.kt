@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import com.jesse.finly.utils.FinanceiroUtils
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -316,12 +317,12 @@ class EvolucaoAnualActivity : AppCompatActivity() {
             val transMes = transacoes.filter { it.mes == mesNome }
 
             val totalRenda = transMes.asSequence()
-                .filter { it.tipo == "RENDA" && it.categoria != "Poupança" && it.categoria != "Exterior" }
+                .filter { it.tipo == "RENDA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) && it.categoria != "Exterior" }
                 .sumOf { it.valor }
                 .toFloat()
 
             val totalDespesa = transMes.asSequence()
-                .filter { it.tipo == "DESPESA" }
+                .filter { it.tipo == "DESPESA" && !FinanceiroUtils.isCategoriaPoupanca(it.categoria) }
                 .sumOf { it.valor }
                 .toFloat()
 
