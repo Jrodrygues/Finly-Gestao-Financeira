@@ -268,6 +268,14 @@ class RegistoActivity : AppCompatActivity() {
         val emailClean = userEmail.trim().lowercase()
 
         val customSet = prefs.getStringSet("CUSTOM_CATEGORIES_$emailClean", emptySet())?.toMutableSet() ?: mutableSetOf()
+        
+        val userPrefs = UserPreferencesManager(this)
+        if (!userPrefs.isPremium() && customSet.size >= 3 && !customSet.contains(catClean)) {
+            showToast("Limite de 3 categorias personalizadas no plano Grátis. Seja Finly Premium!")
+            PaywallActivity.abrir(this)
+            return
+        }
+
         customSet.add(catClean)
         prefs.edit { putStringSet("CUSTOM_CATEGORIES_$emailClean", customSet) }
 

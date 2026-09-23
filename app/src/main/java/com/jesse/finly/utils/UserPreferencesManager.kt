@@ -160,4 +160,12 @@ class UserPreferencesManager(private val context: Context) {
     fun isPremium(): Boolean {
         return prefs.getBoolean("IS_PREMIUM", false)
     }
+
+    fun obterQuantidadeTetosConfigurados(): Int {
+        val email = prefs.getString(KEY_EMAIL, "") ?: ""
+        val prefix = "LIMITE_CAT_${email.trim().lowercase()}_"
+        return prefs.all.keys.count { key ->
+            key.startsWith(prefix) && (prefs.getFloat(key, 0.0f) > 0.0f)
+        }
+    }
 }

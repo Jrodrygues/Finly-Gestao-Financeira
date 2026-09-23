@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.jesse.finly.PaywallActivity
 import com.jesse.finly.R
 import com.jesse.finly.databinding.BottomSheetEditarCategoriaBinding
 import com.jesse.finly.models.Categoria
@@ -165,6 +166,17 @@ class EditarCategoriaBottomSheet : BottomSheetDialogFragment() {
             return
         } else {
             binding.tilNomeCategoria.error = null
+        }
+
+        // Bloqueio Freemium: Se o utilizador for Grátis, limita a 2 tetos orçamentais
+        if (limiteValor > 0.0 && !prefsManager.isPremium()) {
+            val limiteAtual = prefsManager.obterLimiteCategoria(nome)
+            val tetosAtivos = prefsManager.obterQuantidadeTetosConfigurados()
+            if (limiteAtual <= 0.0 && tetosAtivos >= 2) {
+                ToastHelper.showCustomToast(requireContext(), "Limite de 2 tetos no plano Grátis. Seja Finly Premium!")
+                PaywallActivity.abrir(requireContext())
+                return
+            }
         }
 
         onSalvarCategoriaListener?.invoke(nome, limiteValor)
