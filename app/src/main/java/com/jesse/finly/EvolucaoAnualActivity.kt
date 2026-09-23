@@ -232,7 +232,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
                             val indexMinimoGratis = (mesAtualIndex - 2).coerceAtLeast(0)
 
                             if (!userPrefs.isPremium() && index < indexMinimoGratis) {
-                                ToastHelper.showCustomToast(this@EvolucaoAnualActivity, "Histórico 12 meses (Finly Premium) 🌟")
+                                ToastHelper.showCustomToast(this@EvolucaoAnualActivity, getString(R.string.toast_historico_12_meses_premium))
                                 PaywallActivity.abrir(this@EvolucaoAnualActivity)
                             } else {
                                 atualizarCardDetalheMes(index)

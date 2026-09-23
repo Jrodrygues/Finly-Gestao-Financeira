@@ -542,7 +542,7 @@ class ResumoActivity : AppCompatActivity() {
 
         val userPrefs = UserPreferencesManager(this)
         if (!userPrefs.isPremium() && customSet.size >= 3 && !customSet.contains(catClean)) {
-            showToast("Limite de 3 categorias no plano Grátis 🌟")
+            showToast(getString(R.string.toast_limite_categorias_gratis))
             PaywallActivity.abrir(this)
             return
         }

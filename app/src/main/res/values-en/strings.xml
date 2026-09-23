@@ -621,4 +621,7 @@
     <string name="paywall_toast_ativado">Finly Premium activated!</string>
     <string name="paywall_toast_restaurando">Checking active subscriptions on Google Play...</string>
     <string name="toast_evolucao_premium">Annual Evolution (Finly Premium) 🌟</string>
+    <string name="toast_limite_tetos_gratis">2 budget caps limit in Free plan 🌟</string>
+    <string name="toast_limite_categorias_gratis">3 categories limit in Free plan 🌟</string>
+    <string name="toast_historico_12_meses_premium">12-month history (Finly Premium) 🌟</string>
 </resources>

@@ -620,4 +620,7 @@
     <string name="paywall_toast_ativado">Finly Premium ativado!</string>
     <string name="paywall_toast_restaurando">Verificando assinaturas ativas no Google Play...</string>
     <string name="toast_evolucao_premium">Evolução Anual (Finly Premium) 🌟</string>
+    <string name="toast_limite_tetos_gratis">Limite de 2 tetos no plano Grátis 🌟</string>
+    <string name="toast_limite_categorias_gratis">Limite de 3 categorias no plano Grátis 🌟</string>
+    <string name="toast_historico_12_meses_premium">Histórico 12 meses (Finly Premium) 🌟</string>
 </resources>
