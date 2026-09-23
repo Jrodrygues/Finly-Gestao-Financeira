@@ -16,6 +16,7 @@ import com.jesse.finly.billing.BillingManager
 import com.jesse.finly.databinding.ActivityPaywallBinding
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.ToastHelper
+import com.jesse.finly.utils.UserPreferencesManager
 
 class PaywallActivity : AppCompatActivity() {
 
@@ -112,7 +113,9 @@ class PaywallActivity : AppCompatActivity() {
             val iniciado = billingManager.iniciarCompraAssinatura(this, productId)
             if (!iniciado) {
                 val plano = if (binding.rbPlanoAnual.isChecked) "Anual (19,99 €/ano)" else "Mensal (2,99 €/mês)"
-                ToastHelper.showCustomToast(this, "A iniciar teste grátis do Finly Premium: $plano")
+                UserPreferencesManager(this).salvarIsPremium(true)
+                ToastHelper.showCustomToast(this, "Finly Premium ativado ($plano)!")
+                finish()
             }
         }
 
