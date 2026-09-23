@@ -112,9 +112,8 @@ class PaywallActivity : AppCompatActivity() {
             }
             val iniciado = billingManager.iniciarCompraAssinatura(this, productId)
             if (!iniciado) {
-                val plano = if (binding.rbPlanoAnual.isChecked) "Anual (19,99 €/ano)" else "Mensal (2,99 €/mês)"
                 UserPreferencesManager(this).salvarIsPremium(true)
-                ToastHelper.showCustomToast(this, "Finly Premium ativado ($plano)!")
+                ToastHelper.showCustomToast(this, "Finly Premium ativado!")
                 finish()
             }
         }
