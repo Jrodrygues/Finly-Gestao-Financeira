@@ -759,6 +759,10 @@ class ResumoActivity : AppCompatActivity() {
         val tvEmail = headerView.findViewById<TextView>(R.id.nav_header_email)
         val tvInitial = headerView.findViewById<TextView>(R.id.nav_header_initial)
         val ivCloud = headerView.findViewById<ImageView>(R.id.ivCloudStatus)
+        val tvPremiumBadge = headerView.findViewById<TextView>(R.id.tvNavHeaderPremiumBadge)
+
+        val isPremium = UserPreferencesManager(this).isPremium()
+        tvPremiumBadge?.visibility = if (isPremium) View.VISIBLE else View.GONE
 
         val email = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString("EMAIL", "") ?: ""
         val emailClean = email.trim().lowercase()
