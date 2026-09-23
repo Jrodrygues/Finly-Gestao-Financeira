@@ -2215,12 +2215,32 @@ class ResumoActivity : AppCompatActivity() {
         val balancoMensalEstimado = renda - despesa
         val projecao3Meses = saldo + (balancoMensalEstimado * 3)
         val projecao6Meses = saldo + (balancoMensalEstimado * 6)
+        val projecao12Meses = saldo + (balancoMensalEstimado * 12)
 
         binding.tvProjecao3Meses.text = CurrencyFormatter.formatarComSinal(projecao3Meses, moedaAtual, forcarSinalPositivo = true)
         binding.tvProjecao3Meses.setTextColor(if (projecao3Meses >= 0) colorPositivo else colorNegativo)
 
         binding.tvProjecao6Meses.text = CurrencyFormatter.formatarComSinal(projecao6Meses, moedaAtual, forcarSinalPositivo = true)
         binding.tvProjecao6Meses.setTextColor(if (projecao6Meses >= 0) colorPositivo else colorNegativo)
+
+        val isPremiumUser = UserPreferencesManager(this).isPremium()
+        binding.llProjecao12MesesLocked.setOnClickListener {
+            if (!isPremiumUser) {
+                PaywallActivity.abrir(this)
+            }
+        }
+
+        if (isPremiumUser) {
+            binding.tvProjecao12Titulo.text = "Projeção 12 Meses"
+            binding.tvProjecao12MesesVal.text = CurrencyFormatter.formatarComSinal(projecao12Meses, moedaAtual, forcarSinalPositivo = true)
+            binding.tvProjecao12MesesVal.setTextColor(if (projecao12Meses >= 0) colorPositivo else colorNegativo)
+            binding.ivChevron12.visibility = View.GONE
+        } else {
+            binding.tvProjecao12Titulo.text = "Projeção 12 Meses (Finly Premium)"
+            binding.tvProjecao12MesesVal.text = "Desbloquear com o Finly Premium 🌟"
+            binding.tvProjecao12MesesVal.setTextColor(colorPrimaryBrand)
+            binding.ivChevron12.visibility = View.VISIBLE
+        }
     }
 
     private fun showToast(msg: String, isLong: Boolean = false) {

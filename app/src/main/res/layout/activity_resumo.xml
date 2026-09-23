@@ -517,6 +517,56 @@
                                     tools:text="+ 2 400,00 €" />
                             </LinearLayout>
                         </LinearLayout>
+
+                        <!-- Projeção 12 Meses (Teaser Locked) -->
+                        <LinearLayout
+                            android:id="@+id/llProjecao12MesesLocked"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/badge_padrao_background"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="10dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🔒"
+                                android:textSize="16sp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvProjecao12Titulo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Projeção 12 Meses (Finly Premium)"
+                                    android:textColor="@color/textColorPrimary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvProjecao12MesesVal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Desbloquear com o Finly Premium 🌟"
+                                    android:textColor="@color/colorPrimary"
+                                    android:textSize="11sp" />
+                            </LinearLayout>
+
+                            <ImageView
+                                android:id="@+id/ivChevron12"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_chevron_right"
+                                app:tint="@color/colorPrimary" />
+                        </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
