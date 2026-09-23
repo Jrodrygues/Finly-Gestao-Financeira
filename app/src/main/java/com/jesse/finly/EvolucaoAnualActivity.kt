@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import com.jesse.finly.PaywallActivity
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.ToastHelper
 import androidx.activity.enableEdgeToEdge
@@ -72,6 +73,13 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         prefsManager = UserPreferencesManager(this)
+        if (!prefsManager.isPremium()) {
+            ToastHelper.showCustomToast(this, "Evolução Anual é exclusiva do Finly Premium 🌟")
+            PaywallActivity.abrir(this)
+            finish()
+            return
+        }
+
         moedaAtual = prefsManager.obterMoedaAtual()
 
         atualizarAparenciaCabecalho()

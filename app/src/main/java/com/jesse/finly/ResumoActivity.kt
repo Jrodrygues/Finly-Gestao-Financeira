@@ -473,7 +473,13 @@ class ResumoActivity : AppCompatActivity() {
                     startActivity(Intent(this@ResumoActivity, GuiaActivity::class.java))
                 }
                 R.id.nav_evolucao -> {
-                    startActivity(Intent(this@ResumoActivity, EvolucaoAnualActivity::class.java))
+                    val isPremium = UserPreferencesManager(this@ResumoActivity).isPremium()
+                    if (isPremium) {
+                        startActivity(Intent(this@ResumoActivity, EvolucaoAnualActivity::class.java))
+                    } else {
+                        ToastHelper.showCustomToast(this@ResumoActivity, "Evolução Anual é exclusiva do Finly Premium 🌟")
+                        PaywallActivity.abrir(this@ResumoActivity)
+                    }
                 }
                 R.id.nav_premium -> {
                     PaywallActivity.abrir(this@ResumoActivity)
