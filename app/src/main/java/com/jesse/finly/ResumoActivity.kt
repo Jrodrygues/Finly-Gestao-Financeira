@@ -766,7 +766,11 @@ class ResumoActivity : AppCompatActivity() {
         if (isPremium) {
             val dias = userPrefs.obterDiasRestantesTrial()
             tvPremiumBadge?.visibility = View.VISIBLE
-            tvPremiumBadge?.text = if (dias > 0) "TESTE (${dias}d) 🌟" else "PREMIUM 🌟"
+            tvPremiumBadge?.text = when {
+                dias > 1 -> getString(R.string.trial_badge_dias, dias)
+                dias == 1 -> getString(R.string.trial_badge_singular)
+                else -> getString(R.string.premium_badge)
+            }
         } else {
             tvPremiumBadge?.visibility = View.GONE
         }

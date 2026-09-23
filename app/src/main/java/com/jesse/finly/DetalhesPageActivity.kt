@@ -462,12 +462,19 @@ class DetalhesPageActivity : AppCompatActivity() {
         if (isPremium) {
             val diasRestantes = userPrefs.obterDiasRestantesTrial()
             binding.cardTrialStatus.visibility = View.VISIBLE
+            binding.cardTrialStatus.setOnClickListener {
+                PaywallActivity.abrir(this)
+            }
             if (diasRestantes > 0) {
-                binding.tvTrialTitle.text = "Finly Premium (Teste Grátis)"
-                binding.tvTrialDaysLeft.text = "Restam $diasRestantes dia(s) de teste gratuito."
+                binding.tvTrialTitle.text = getString(R.string.trial_card_titulo)
+                binding.tvTrialDaysLeft.text = if (diasRestantes <= 1) {
+                    getString(R.string.trial_card_subtitulo_ultimo_dia)
+                } else {
+                    getString(R.string.trial_card_subtitulo_plural, diasRestantes)
+                }
             } else {
-                binding.tvTrialTitle.text = "Finly Premium Ativo 🌟"
-                binding.tvTrialDaysLeft.text = "Subscrição Premium em vigor."
+                binding.tvTrialTitle.text = getString(R.string.premium_ativo_titulo)
+                binding.tvTrialDaysLeft.text = getString(R.string.premium_ativo_subtitulo)
             }
         } else {
             binding.cardTrialStatus.visibility = View.GONE

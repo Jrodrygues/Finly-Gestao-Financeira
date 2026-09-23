@@ -619,10 +619,17 @@
                             android:id="@+id/tvTrialDaysLeft"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Restam 7 dias de teste gratuito."
+                            android:text="Tem 7 dias de acesso total gratuito"
                             android:textColor="@color/colorPrimary"
                             android:textSize="12sp" />
                     </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="8dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/colorPrimary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

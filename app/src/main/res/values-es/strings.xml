@@ -585,4 +585,14 @@
     <!-- Guia Seção 18 -->
     <string name="guia_sec18_titulo">18. Soporte Multilingüe (Per-App Language)</string>
     <string name="guia_sec18_desc">Acceda al menú Perfil para cambiar el idioma de la aplicación en cualquier momento entre Español, Inglés (US), Portugués (Portugal) y Portugués (Brasil). La interfaz, informes exportados, categorías y notificaciones se adaptan al instante sin necesidad de reiniciar su dispositivo.</string>
+
+    <!-- Premium & Trial Strings -->
+    <string name="trial_badge_dias">PRUEBA • %1$d DÍAS 🌟</string>
+    <string name="trial_badge_singular">PRUEBA • 1 DÍA 🌟</string>
+    <string name="premium_badge">PREMIUM 🌟</string>
+    <string name="trial_card_titulo">Finly Premium • Período de Prueba</string>
+    <string name="trial_card_subtitulo_plural">Tienes %1$d días de acceso total gratuito</string>
+    <string name="trial_card_subtitulo_ultimo_dia">Último día de prueba gratuita • Activar ahora</string>
+    <string name="premium_ativo_titulo">Finly Premium Activo 🌟</string>
+    <string name="premium_ativo_subtitulo">Suscripción Premium en vigor.</string>
 </resources>
