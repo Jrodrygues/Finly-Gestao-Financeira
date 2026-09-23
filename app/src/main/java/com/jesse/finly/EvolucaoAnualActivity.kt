@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import android.view.View
 import com.jesse.finly.PaywallActivity
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.ToastHelper
@@ -73,13 +74,6 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         prefsManager = UserPreferencesManager(this)
-        if (!prefsManager.isPremium()) {
-            ToastHelper.showCustomToast(this, getString(R.string.toast_evolucao_premium))
-            PaywallActivity.abrir(this)
-            finish()
-            return
-        }
-
         moedaAtual = prefsManager.obterMoedaAtual()
 
         atualizarAparenciaCabecalho()
@@ -93,6 +87,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
             insets
         }
 
+        configurarEfeitoPremiumOverlay()
         configurarSeletorAno()
         configurarGraficoVazio()
 
@@ -150,16 +145,43 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         }
     }
 
+    private fun configurarEfeitoPremiumOverlay() {
+        val isPremium = prefsManager.isPremium()
+        if (!isPremium) {
+            binding.cardOverlayPremiumEvolucao.visibility = View.VISIBLE
+            binding.barChartAnual.alpha = 0.40f
+
+            binding.btnVerPlanosEvolucao.setOnClickListener { view ->
+                FinanceiroUtils.dispararHapticFeedback(view)
+                PaywallActivity.abrir(this)
+            }
+            binding.cardOverlayPremiumEvolucao.setOnClickListener { view ->
+                FinanceiroUtils.dispararHapticFeedback(view)
+                PaywallActivity.abrir(this)
+            }
+        } else {
+            binding.cardOverlayPremiumEvolucao.visibility = View.GONE
+            binding.barChartAnual.alpha = 1.0f
+        }
+    }
+
     private fun configurarSeletorAno() {
         val adapterAno = ArrayAdapter(this, R.layout.dropdown_item, listaAnos)
         binding.autoCompleteAno.setAdapter(adapterAno)
 
-        val anoAtual = Calendar.getInstance()[Calendar.YEAR].toString()
-        binding.autoCompleteAno.setText(anoAtual, false)
+        val anoAtualStr = Calendar.getInstance()[Calendar.YEAR].toString()
+        binding.autoCompleteAno.setText(anoAtualStr, false)
 
         binding.autoCompleteAno.setOnItemClickListener { _, _, position, _ ->
             val anoSelecionado = listaAnos[position]
-            carregarDadosAnuais(anoSelecionado)
+            val anoAtualInt = Calendar.getInstance()[Calendar.YEAR]
+            if (!prefsManager.isPremium() && anoSelecionado < anoAtualInt) {
+                ToastHelper.showCustomToast(this, "Anos anteriores no Finly Premium 🌟")
+                binding.autoCompleteAno.setText(anoAtualInt.toString(), false)
+                PaywallActivity.abrir(this)
+            } else {
+                carregarDadosAnuais(anoSelecionado)
+            }
         }
     }
 

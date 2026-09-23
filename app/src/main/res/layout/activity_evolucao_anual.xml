@@ -227,6 +227,69 @@
         app:layout_constraintBottom_toTopOf="@+id/cardDetalheMes"
         app:layout_constraintTop_toBottomOf="@+id/cardResumoAnual" />
 
+    <!-- Card Flutuante Teaser Premium de Evolução Anual -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardOverlayPremiumEvolucao"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:visibility="gone"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="8dp"
+        app:strokeColor="@color/colorPrimary"
+        app:strokeWidth="1.5dp"
+        app:cardBackgroundColor="@color/surfaceColor"
+        app:layout_constraintTop_toTopOf="@+id/barChartAnual"
+        app:layout_constraintBottom_toBottomOf="@+id/barChartAnual">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔒"
+                android:textSize="32sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Histórico Anual Completo"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="Acompanhe a evolução de todos os 12 meses e anos anteriores com o Finly Premium."
+                android:textColor="@color/textColorSecondary"
+                android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVerPlanosEvolucao"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:paddingHorizontal="24dp"
+                android:text="VER PLANOS PREMIUM 🌟"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:cornerRadius="22dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <!-- Card de Detalhe do Mês Selecionado -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardDetalheMes"

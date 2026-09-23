@@ -473,13 +473,7 @@ class ResumoActivity : AppCompatActivity() {
                     startActivity(Intent(this@ResumoActivity, GuiaActivity::class.java))
                 }
                 R.id.nav_evolucao -> {
-                    val isPremium = UserPreferencesManager(this@ResumoActivity).isPremium()
-                    if (isPremium) {
-                        startActivity(Intent(this@ResumoActivity, EvolucaoAnualActivity::class.java))
-                    } else {
-                        ToastHelper.showCustomToast(this@ResumoActivity, getString(R.string.toast_evolucao_premium))
-                        PaywallActivity.abrir(this@ResumoActivity)
-                    }
+                    startActivity(Intent(this@ResumoActivity, EvolucaoAnualActivity::class.java))
                 }
                 R.id.nav_premium -> {
                     PaywallActivity.abrir(this@ResumoActivity)
