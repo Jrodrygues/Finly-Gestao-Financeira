@@ -154,11 +154,27 @@ class UserPreferencesManager(private val context: Context) {
     fun salvarIsPremium(isPremium: Boolean) {
         prefs.edit {
             putBoolean("IS_PREMIUM", isPremium)
+            if (isPremium && !prefs.contains("TRIAL_START_TIME")) {
+                putLong("TRIAL_START_TIME", System.currentTimeMillis())
+            }
         }
     }
 
     fun isPremium(): Boolean {
         return prefs.getBoolean("IS_PREMIUM", false)
+    }
+
+    fun obterDiasRestantesTrial(): Int {
+        val startTime = prefs.getLong("TRIAL_START_TIME", 0L)
+        if (startTime <= 0L) return 7
+        val diffMillis = System.currentTimeMillis() - startTime
+        val diasPassados = (diffMillis / (1000 * 60 * 60 * 24)).toInt()
+        val restantes = 7 - diasPassados
+        return restantes.coerceIn(0, 7)
+    }
+
+    fun isTrialAtivo(): Boolean {
+        return isPremium() && obterDiasRestantesTrial() > 0
     }
 
     fun obterQuantidadeTetosConfigurados(): Int {

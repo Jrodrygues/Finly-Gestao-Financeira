@@ -459,6 +459,20 @@ class DetalhesPageActivity : AppCompatActivity() {
         val isPremium = userPrefs.isPremium()
         binding.btnFinlyPremium.visibility = if (isPremium) View.GONE else View.VISIBLE
 
+        if (isPremium) {
+            val diasRestantes = userPrefs.obterDiasRestantesTrial()
+            binding.cardTrialStatus.visibility = View.VISIBLE
+            if (diasRestantes > 0) {
+                binding.tvTrialTitle.text = "Finly Premium (Teste Grátis)"
+                binding.tvTrialDaysLeft.text = "Restam $diasRestantes dia(s) de teste gratuito."
+            } else {
+                binding.tvTrialTitle.text = "Finly Premium Ativo 🌟"
+                binding.tvTrialDaysLeft.text = "Subscrição Premium em vigor."
+            }
+        } else {
+            binding.cardTrialStatus.visibility = View.GONE
+        }
+
         val notifAtivas = if (isGuest) false else prefs.getBoolean("NOTIFICATIONS", false)
         binding.switchNotifications.setOnCheckedChangeListener(null)
         binding.switchNotifications.isChecked = notifAtivas

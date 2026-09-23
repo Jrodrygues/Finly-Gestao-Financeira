@@ -761,8 +761,15 @@ class ResumoActivity : AppCompatActivity() {
         val ivCloud = headerView.findViewById<ImageView>(R.id.ivCloudStatus)
         val tvPremiumBadge = headerView.findViewById<TextView>(R.id.tvNavHeaderPremiumBadge)
 
-        val isPremium = UserPreferencesManager(this).isPremium()
-        tvPremiumBadge?.visibility = if (isPremium) View.VISIBLE else View.GONE
+        val userPrefs = UserPreferencesManager(this)
+        val isPremium = userPrefs.isPremium()
+        if (isPremium) {
+            val dias = userPrefs.obterDiasRestantesTrial()
+            tvPremiumBadge?.visibility = View.VISIBLE
+            tvPremiumBadge?.text = if (dias > 0) "TESTE (${dias}d) 🌟" else "PREMIUM 🌟"
+        } else {
+            tvPremiumBadge?.visibility = View.GONE
+        }
 
         val email = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString("EMAIL", "") ?: ""
         val emailClean = email.trim().lowercase()
