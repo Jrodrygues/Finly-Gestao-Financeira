@@ -601,16 +601,16 @@
     <!-- Paywall Strings -->
     <string name="paywall_header">FINLY PREMIUM</string>
     <string name="paywall_titulo">Desbloqueie o Poder Total das Suas Finanças</string>
-    <string name="paywall_subtitulo">Aceda a recursos analíticos avançados para planejar o seu futuro financeiro sem limites.</string>
-    <string name="paywall_feat1_titulo">Tetos Orçamentais &amp; Categorias Ilimitadas</string>
-    <string name="paywall_feat1_desc">Crie quantos limites de gastos e categorias personalizadas quiser.</string>
-    <string name="paywall_feat2_titulo">Relatórios Ilimitados em PDF &amp; CSV</string>
-    <string name="paywall_feat2_desc">Exporte relatórios completos em PDF vetorial ou planilhas para Excel.</string>
-    <string name="paywall_feat3_titulo">Projeção Financeira Futura (+12 Meses)</string>
-    <string name="paywall_feat3_desc">Estime o seu saldo acumulado a longo prazo para planejamento.</string>
-    <string name="paywall_feat4_titulo">Backup Encriptado (.finly) &amp; Biometria</string>
-    <string name="paywall_feat4_desc">Guarde cópias de segurança encriptadas e proteja por impressão digital.</string>
-    <string name="paywall_popular_badge">O MAIS POPULAR — ECONOMIZE 45%</string>
+    <string name="paywall_subtitulo">Aceda a recursos analíticos avançados para planear o seu futuro financeiro sem limites.</string>
+    <string name="paywall_feat1_titulo">Tetos &amp; Categorias Ilimitadas</string>
+    <string name="paywall_feat1_desc">Sem restrições para organizar o seu orçamento.</string>
+    <string name="paywall_feat2_titulo">Exportação Ilimitada (PDF &amp; CSV)</string>
+    <string name="paywall_feat2_desc">Gere relatórios completos para Excel a qualquer momento.</string>
+    <string name="paywall_feat3_titulo">Projeção Futura (+12 Meses)</string>
+    <string name="paywall_feat3_desc">Antecipe o saldo e despesas do próximo ano.</string>
+    <string name="paywall_feat4_titulo">Anexo de Faturas na Nuvem</string>
+    <string name="paywall_feat4_desc">Guarde fotos de recibos e faturas em segurança.</string>
+    <string name="paywall_popular_badge">O MAIS POPULAR — POUPE 45%</string>
     <string name="paywall_plano_anual_titulo">Plano Anual</string>
     <string name="paywall_plano_anual_desc">19,99 € / ano (apenas 1,66 € / mês)</string>
     <string name="paywall_plano_mensal_titulo">Plano Mensal</string>
