@@ -26,6 +26,10 @@
                 android:icon="@drawable/ic_person"
                 android:title="@string/menu_perfil" />
             <item
+                android:id="@+id/nav_premium"
+                android:icon="@drawable/ic_poupanca"
+                android:title="Finly Premium 🌟" />
+            <item
                 android:id="@+id/nav_gerir_categorias"
                 android:icon="@drawable/ic_edit"
                 android:title="@string/titulo_gerir_categorias" />

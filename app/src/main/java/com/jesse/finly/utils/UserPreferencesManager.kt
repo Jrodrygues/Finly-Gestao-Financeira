@@ -150,4 +150,14 @@ class UserPreferencesManager(private val context: Context) {
     fun obterMinutoNotificacao(): Int {
         return prefs.getInt("NOTIF_MINUTO", 0)
     }
+
+    fun salvarIsPremium(isPremium: Boolean) {
+        prefs.edit {
+            putBoolean("IS_PREMIUM", isPremium)
+        }
+    }
+
+    fun isPremium(): Boolean {
+        return prefs.getBoolean("IS_PREMIUM", false)
+    }
 }

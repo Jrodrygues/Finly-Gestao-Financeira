@@ -84,6 +84,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Finly" />
 
+        <activity
+            android:name=".PaywallActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Finly" />
+
 
         <provider
             android:name="androidx.core.content.FileProvider"

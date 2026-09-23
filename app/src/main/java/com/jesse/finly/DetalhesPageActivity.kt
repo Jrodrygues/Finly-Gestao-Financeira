@@ -347,6 +347,10 @@ class DetalhesPageActivity : AppCompatActivity() {
             confirmarEliminacaoTransacao()
         }
 
+        binding.btnFinlyPremium.setOnClickListener {
+            PaywallActivity.abrir(this)
+        }
+
         binding.btnEditarPerfil.setOnClickListener {
             irParaEdicaoPerfil()
         }

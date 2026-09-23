@@ -471,6 +471,9 @@ class ResumoActivity : AppCompatActivity() {
                 R.id.nav_evolucao -> {
                     startActivity(Intent(this@ResumoActivity, EvolucaoAnualActivity::class.java))
                 }
+                R.id.nav_premium -> {
+                    PaywallActivity.abrir(this@ResumoActivity)
+                }
                 R.id.nav_gerir_categorias -> {
                     mostrarBottomSheetGerirCategorias()
                 }

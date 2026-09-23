@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation("androidx.work:work-runtime-ktx:2.9.1")
     implementation("androidx.biometric:biometric:1.1.0")
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
     implementation(libs.androidx.core.splashscreen)
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation(libs.coil.kt)
