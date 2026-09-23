@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import com.jesse.finly.utils.FinanceiroUtils
+import com.jesse.finly.utils.ToastHelper
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -218,7 +219,16 @@ class EvolucaoAnualActivity : AppCompatActivity() {
                     if (e != null) {
                         val index = e.x.toInt()
                         if (index in 0..11) {
-                            atualizarCardDetalheMes(index)
+                            val userPrefs = UserPreferencesManager(this@EvolucaoAnualActivity)
+                            val mesAtualIndex = Calendar.getInstance()[Calendar.MONTH]
+                            val indexMinimoGratis = (mesAtualIndex - 2).coerceAtLeast(0)
+
+                            if (!userPrefs.isPremium() && index < indexMinimoGratis) {
+                                ToastHelper.showCustomToast(this@EvolucaoAnualActivity, "Histórico dos 12 meses no Finly Premium 🌟")
+                                PaywallActivity.abrir(this@EvolucaoAnualActivity)
+                            } else {
+                                atualizarCardDetalheMes(index)
+                            }
                         }
                     }
                 }
