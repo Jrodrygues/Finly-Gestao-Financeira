@@ -113,7 +113,7 @@ class PaywallActivity : AppCompatActivity() {
             val iniciado = billingManager.iniciarCompraAssinatura(this, productId)
             if (!iniciado) {
                 UserPreferencesManager(this).salvarIsPremium(true)
-                ToastHelper.showCustomToast(this, "Finly Premium ativado!")
+                ToastHelper.showCustomToast(this, getString(R.string.paywall_toast_ativado))
                 finish()
             }
         }
@@ -121,7 +121,7 @@ class PaywallActivity : AppCompatActivity() {
         binding.btnRestaurarCompras.setOnClickListener { view ->
             FinanceiroUtils.dispararHapticFeedback(view)
             billingManager.verificarAssinaturasAtivas()
-            ToastHelper.showCustomToast(this, "A verificar subscrições ativas na Google Play...")
+            ToastHelper.showCustomToast(this, getString(R.string.paywall_toast_restaurando))
         }
 
         binding.btnTermosPaywall.setOnClickListener {

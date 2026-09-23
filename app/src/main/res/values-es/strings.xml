@@ -595,4 +595,28 @@
     <string name="trial_card_subtitulo_ultimo_dia">Último día de prueba gratuita • Activar ahora</string>
     <string name="premium_ativo_titulo">Finly Premium Activo 🌟</string>
     <string name="premium_ativo_subtitulo">Suscripción Premium en vigor.</string>
+
+    <!-- Paywall Strings -->
+    <string name="paywall_header">FINLY PREMIUM</string>
+    <string name="paywall_titulo">Desbloquee todo el poder de sus finanzas</string>
+    <string name="paywall_subtitulo">Acceda a funciones analíticas avanzadas para planificar su futuro financiero sin límites.</string>
+    <string name="paywall_feat1_titulo">Límites de Presupuesto &amp; Categorías Ilimitadas</string>
+    <string name="paywall_feat1_desc">Cree todos los límites de gasto y categorías personalizadas que desee.</string>
+    <string name="paywall_feat2_titulo">Informes Ilimitados en PDF &amp; CSV</string>
+    <string name="paywall_feat2_desc">Exporte informes completos en PDF vectorial o hojas de cálculo para Excel.</string>
+    <string name="paywall_feat3_titulo">Proyección Financiera Futura (+12 Meses)</string>
+    <string name="paywall_feat3_desc">Estime su saldo acumulado a largo plazo para la planificación.</string>
+    <string name="paywall_feat4_titulo">Copia de Seguridad Encriptada (.finly) &amp; Biometría</string>
+    <string name="paywall_feat4_desc">Guarde copias de seguridad encriptadas y proteja con huella digital.</string>
+    <string name="paywall_popular_badge">EL MÁS POPULAR — AHORRA UN 45%</string>
+    <string name="paywall_plano_anual_titulo">Plan Anual</string>
+    <string name="paywall_plano_anual_desc">19,99 € / año (solo 1,66 € / mes)</string>
+    <string name="paywall_plano_mensal_titulo">Plan Mensual</string>
+    <string name="paywall_plano_mensal_desc">2,99 € / mes</string>
+    <string name="paywall_btn_testar">Probar 7 Días Gratis</string>
+    <string name="paywall_cobranca_aviso">Cancele cuando quiera en Google Play. Sin cargos hoy.</string>
+    <string name="paywall_restaurar_compras">Restaurar Compras</string>
+    <string name="paywall_termos_privacidade">Términos &amp; Privacidad</string>
+    <string name="paywall_toast_ativado">¡Finly Premium activado!</string>
+    <string name="paywall_toast_restaurando">Verificando suscripciones activas en Google Play...</string>
 </resources>

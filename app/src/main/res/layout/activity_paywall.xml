@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="FINLY PREMIUM"
+                android:text="@string/paywall_header"
                 android:textColor="@color/colorPrimary"
                 android:textSize="13sp"
                 android:textStyle="bold"
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:text="Desbloqueie o Poder Total das Suas Finanças"
+                android:text="@string/paywall_titulo"
                 android:textColor="@color/textColorPrimary"
                 android:textSize="22sp"
                 android:textStyle="bold" />
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:gravity="center"
-                android:text="Acesse recursos analíticos avançados para planejar o seu futuro financeiro sem limites."
+                android:text="@string/paywall_subtitulo"
                 android:textColor="@color/textColorSecondary"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -111,7 +111,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tetos Orçamentais &amp; Categorias Ilimitadas"
+                        android:text="@string/paywall_feat1_titulo"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -119,7 +119,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Crie quantos limites de gastos e categorias personalizadas quiser."
+                        android:text="@string/paywall_feat1_desc"
                         android:textColor="@color/textColorSecondary"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -149,7 +149,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Relatórios Ilimitados em PDF &amp; CSV"
+                        android:text="@string/paywall_feat2_titulo"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -157,7 +157,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Exporte relatórios completos em PDF vetorial ou planilhas para Excel."
+                        android:text="@string/paywall_feat2_desc"
                         android:textColor="@color/textColorSecondary"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -187,7 +187,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Projeção Financeira Futura (+12 Meses)"
+                        android:text="@string/paywall_feat3_titulo"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -195,7 +195,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Estime o seu saldo acumulado a longo prazo para planejamento."
+                        android:text="@string/paywall_feat3_desc"
                         android:textColor="@color/textColorSecondary"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -225,7 +225,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Backup Encriptado (.finly) &amp; Biometria"
+                        android:text="@string/paywall_feat4_titulo"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -233,7 +233,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Guarde cópias de segurança encriptadas e proteja por impressão digital."
+                        android:text="@string/paywall_feat4_desc"
                         android:textColor="@color/textColorSecondary"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -272,7 +272,7 @@
                         android:background="@drawable/badge_rounded_green"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="3dp"
-                        android:text="O MAIS POPULAR — ECONOMIZE 45%"
+                        android:text="@string/paywall_popular_badge"
                         android:textColor="@color/white"
                         android:textSize="10sp"
                         android:textStyle="bold" />
@@ -300,7 +300,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Plano Anual"
+                                android:text="@string/paywall_plano_anual_titulo"
                                 android:textColor="@color/textColorPrimary"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -308,7 +308,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="19,99 € / ano (apenas 1,66 € / mês)"
+                                android:text="@string/paywall_plano_anual_desc"
                                 android:textColor="@color/textColorSecondary"
                                 android:textSize="13sp" />
                         </LinearLayout>
@@ -348,7 +348,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Plano Mensal"
+                            android:text="@string/paywall_plano_mensal_titulo"
                             android:textColor="@color/textColorPrimary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -356,7 +356,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="2,99 € / mês"
+                            android:text="@string/paywall_plano_mensal_desc"
                             android:textColor="@color/textColorSecondary"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -378,7 +378,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:backgroundTint="@color/colorPrimary"
-                android:text="Testar 7 Dias Grátis"
+                android:text="@string/paywall_btn_testar"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"
@@ -391,7 +391,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:text="Cancele quando quiser na Google Play. Nenhuma cobrança hoje."
+                android:text="@string/paywall_cobranca_aviso"
                 android:textColor="@color/textColorSecondary"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -409,7 +409,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="Restaurar Compras"
+                android:text="@string/paywall_restaurar_compras"
                 android:textColor="@color/colorPrimary"
                 android:textSize="12sp" />
 
@@ -425,7 +425,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="Termos &amp; Privacidade"
+                android:text="@string/paywall_termos_privacidade"
                 android:textColor="@color/colorPrimary"
                 android:textSize="12sp" />
         </LinearLayout>
