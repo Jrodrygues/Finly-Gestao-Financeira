@@ -607,8 +607,8 @@
     <string name="paywall_feat2_desc">Generate complete reports for Excel at any time.</string>
     <string name="paywall_feat3_titulo">Future Projection (+12 Months)</string>
     <string name="paywall_feat3_desc">Anticipate next year\'s balance and expenses.</string>
-    <string name="paywall_feat4_titulo">Cloud Invoice Attachments</string>
-    <string name="paywall_feat4_desc">Save photos of receipts and invoices securely.</string>
+    <string name="paywall_feat4_titulo">Annual Evolution &amp; Full History</string>
+    <string name="paywall_feat4_desc">Track performance for every month with comparative charts.</string>
     <string name="paywall_popular_badge">MOST POPULAR — SAVE 45%</string>
     <string name="paywall_plano_anual_titulo">Annual Plan</string>
     <string name="paywall_plano_anual_desc">19.99 € / year (only 1.66 € / month)</string>

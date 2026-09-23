@@ -606,8 +606,8 @@
     <string name="paywall_feat2_desc">Genere informes completos para Excel en cualquier momento.</string>
     <string name="paywall_feat3_titulo">Proyección Futura (+12 Meses)</string>
     <string name="paywall_feat3_desc">Anticipe el saldo y los gastos del próximo año.</string>
-    <string name="paywall_feat4_titulo">Anexo de Facturas en la Nube</string>
-    <string name="paywall_feat4_desc">Guarde fotos de recibos y facturas con seguridad.</string>
+    <string name="paywall_feat4_titulo">Evolución Anual y Historial Completo</string>
+    <string name="paywall_feat4_desc">Siga el rendimiento de todos los meses con gráficos comparativos.</string>
     <string name="paywall_popular_badge">EL MÁS POPULAR — AHORRA UN 45%</string>
     <string name="paywall_plano_anual_titulo">Plan Anual</string>
     <string name="paywall_plano_anual_desc">19,99 € / año (solo 1,66 € / mes)</string>

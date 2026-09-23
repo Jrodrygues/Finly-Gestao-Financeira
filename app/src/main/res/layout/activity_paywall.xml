@@ -212,7 +212,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_lock"
+                    android:src="@drawable/ic_calendar"
                     app:tint="@color/colorPrimary" />
 
                 <LinearLayout
