@@ -173,7 +173,7 @@ class EditarCategoriaBottomSheet : BottomSheetDialogFragment() {
             val limiteAtual = prefsManager.obterLimiteCategoria(nome)
             val tetosAtivos = prefsManager.obterQuantidadeTetosConfigurados()
             if (limiteAtual <= 0.0 && tetosAtivos >= 2) {
-                ToastHelper.showCustomToast(requireContext(), "Limite de 2 tetos no plano Grátis. Seja Finly Premium!")
+                ToastHelper.showCustomToast(requireContext(), "Limite de 2 tetos no plano Grátis 🌟")
                 PaywallActivity.abrir(requireContext())
                 return
             }

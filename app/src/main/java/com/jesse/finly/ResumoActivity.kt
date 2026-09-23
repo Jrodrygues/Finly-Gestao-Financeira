@@ -477,7 +477,7 @@ class ResumoActivity : AppCompatActivity() {
                     if (isPremium) {
                         startActivity(Intent(this@ResumoActivity, EvolucaoAnualActivity::class.java))
                     } else {
-                        ToastHelper.showCustomToast(this@ResumoActivity, "Evolução Anual é exclusiva do Finly Premium 🌟")
+                        ToastHelper.showCustomToast(this@ResumoActivity, getString(R.string.toast_evolucao_premium))
                         PaywallActivity.abrir(this@ResumoActivity)
                     }
                 }
@@ -542,7 +542,7 @@ class ResumoActivity : AppCompatActivity() {
 
         val userPrefs = UserPreferencesManager(this)
         if (!userPrefs.isPremium() && customSet.size >= 3 && !customSet.contains(catClean)) {
-            showToast("Limite de 3 categorias personalizadas no plano Grátis. Seja Finly Premium!")
+            showToast("Limite de 3 categorias no plano Grátis 🌟")
             PaywallActivity.abrir(this)
             return
         }

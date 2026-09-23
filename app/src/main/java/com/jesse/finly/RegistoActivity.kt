@@ -271,7 +271,7 @@ class RegistoActivity : AppCompatActivity() {
         
         val userPrefs = UserPreferencesManager(this)
         if (!userPrefs.isPremium() && customSet.size >= 3 && !customSet.contains(catClean)) {
-            showToast("Limite de 3 categorias personalizadas no plano Grátis. Seja Finly Premium!")
+            showToast("Limite de 3 categorias no plano Grátis 🌟")
             PaywallActivity.abrir(this)
             return
         }

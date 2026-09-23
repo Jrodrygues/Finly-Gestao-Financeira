@@ -31,7 +31,7 @@ class PaywallActivity : AppCompatActivity() {
 
         billingManager = BillingManager(this) { isPremium ->
             if (isPremium) {
-                ToastHelper.showCustomToast(this, "Subscrição Finly Premium ativada com sucesso! 🌟")
+                ToastHelper.showCustomToast(this, "Finly Premium ativado! 🌟")
                 finish()
             }
         }

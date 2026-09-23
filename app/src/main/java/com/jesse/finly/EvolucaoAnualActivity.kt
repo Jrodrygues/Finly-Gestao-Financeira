@@ -74,7 +74,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
 
         prefsManager = UserPreferencesManager(this)
         if (!prefsManager.isPremium()) {
-            ToastHelper.showCustomToast(this, "Evolução Anual é exclusiva do Finly Premium 🌟")
+            ToastHelper.showCustomToast(this, getString(R.string.toast_evolucao_premium))
             PaywallActivity.abrir(this)
             finish()
             return
@@ -232,7 +232,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
                             val indexMinimoGratis = (mesAtualIndex - 2).coerceAtLeast(0)
 
                             if (!userPrefs.isPremium() && index < indexMinimoGratis) {
-                                ToastHelper.showCustomToast(this@EvolucaoAnualActivity, "Histórico dos 12 meses no Finly Premium 🌟")
+                                ToastHelper.showCustomToast(this@EvolucaoAnualActivity, "Histórico 12 meses (Finly Premium) 🌟")
                                 PaywallActivity.abrir(this@EvolucaoAnualActivity)
                             } else {
                                 atualizarCardDetalheMes(index)

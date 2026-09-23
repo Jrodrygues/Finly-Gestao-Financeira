@@ -619,4 +619,5 @@
     <string name="paywall_termos_privacidade">Términos &amp; Privacidad</string>
     <string name="paywall_toast_ativado">¡Finly Premium activado!</string>
     <string name="paywall_toast_restaurando">Verificando suscripciones activas en Google Play...</string>
+    <string name="toast_evolucao_premium">Evolución Anual (Finly Premium) 🌟</string>
 </resources>
