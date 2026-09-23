@@ -456,6 +456,9 @@ class DetalhesPageActivity : AppCompatActivity() {
         binding.switchDarkMode.setOnCheckedChangeListener(darkModeListener)
 
         val userPrefs = UserPreferencesManager(this)
+        val isPremium = userPrefs.isPremium()
+        binding.btnFinlyPremium.visibility = if (isPremium) View.GONE else View.VISIBLE
+
         val notifAtivas = if (isGuest) false else prefs.getBoolean("NOTIFICATIONS", false)
         binding.switchNotifications.setOnCheckedChangeListener(null)
         binding.switchNotifications.isChecked = notifAtivas

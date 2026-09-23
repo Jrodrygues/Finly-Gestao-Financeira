@@ -415,6 +415,10 @@ class ResumoActivity : AppCompatActivity() {
         binding.navigationView.itemIconTintList = null
         binding.navigationView.itemTextColor = null
 
+        // Se o utilizador for Premium, oculta a opção "Finly Premium 🌟" do menu lateral
+        val isPremium = UserPreferencesManager(this).isPremium()
+        menu.findItem(R.id.nav_premium)?.isVisible = !isPremium
+
         val checkedId = R.id.nav_resumo
         binding.navigationView.setCheckedItem(checkedId)
 
