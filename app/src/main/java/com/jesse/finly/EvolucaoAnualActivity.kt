@@ -178,6 +178,17 @@ class EvolucaoAnualActivity : AppCompatActivity() {
             binding.barChartAnual.alpha = 1.0f
             binding.cardResumoAnual.alpha = 1.0f
             binding.cardDetalheMes.alpha = 1.0f
+
+            // Remove os listeners de Paywall dos cards
+            binding.cardResumoAnual.setOnClickListener(null)
+            binding.cardDetalheMes.setOnClickListener(null)
+
+            // Restaura o balão marcador no gráfico caso tenha sido anulado
+            if (binding.barChartAnual.marker == null) {
+                val marker = ChartMarkerView(this@EvolucaoAnualActivity)
+                marker.chartView = binding.barChartAnual
+                binding.barChartAnual.marker = marker
+            }
         }
     }
 

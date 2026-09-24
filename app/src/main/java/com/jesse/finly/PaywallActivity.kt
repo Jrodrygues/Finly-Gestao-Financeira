@@ -31,6 +31,7 @@ class PaywallActivity : AppCompatActivity() {
 
         billingManager = BillingManager(this) { isPremium ->
             if (isPremium) {
+                UserPreferencesManager(this).salvarIsPremium(true)
                 ToastHelper.showCustomToast(this, "Finly Premium ativado! 🌟")
                 finish()
             }
