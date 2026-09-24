@@ -598,6 +598,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:gravity="center"
+                        android:includeFontPadding="false"
                         android:text="🌟"
                         android:textSize="22sp" />
 
