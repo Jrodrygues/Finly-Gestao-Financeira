@@ -4,64 +4,195 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Política de Privacidade - Finly</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1E1E1E;
+            --surface-card: #252525;
+            --primary-color: #009688;
+            --primary-light: #00BFA5;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0BEC5;
+            --border-color: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 24px;
-            background-color: #f9f9f9;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.7;
+            padding-bottom: 60px;
         }
+
+        a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 40px;
+        }
+
+        .logo-title {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00BFA5 0%, #64FFDA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-voltar {
+            background-color: var(--surface-card);
+            color: var(--text-primary);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+        }
+
         .container {
-            background-color: #ffffff;
-            padding: 32px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 0 24px;
         }
-        h1 { color: #009688; border-bottom: 2px solid #E0F2F1; padding-bottom: 8px; }
-        h2 { color: #00796B; margin-top: 24px; }
-        ul { padding-left: 20px; }
-        li { margin-bottom: 8px; }
-        .footer { margin-top: 32px; font-size: 0.9em; color: #666; border-top: 1px solid #eee; padding-top: 16px; }
+
+        .card-policy {
+            background-color: var(--surface-color);
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary-light);
+            margin-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .update-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-light);
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+
+        p, ul {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        ul {
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .contact-box {
+            margin-top: 40px;
+            padding: 24px;
+            background-color: var(--surface-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .contact-box p {
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
     </style>
 </head>
 <body>
+
+    <header class="header">
+        <span class="logo-title">Finly</span>
+        <a href="index.html" class="btn-voltar">← Voltar ao Início</a>
+    </header>
+
     <div class="container">
-        <h1>Política de Privacidade - Finly 🔒</h1>
-        <p><strong>Última atualização:</strong> 25 de Fevereiro de 2026</p>
+        <div class="card-policy">
+            <h1>Política de Privacidade 🔒</h1>
+            <div class="update-date"><strong>Última atualização:</strong> 25 de Fevereiro de 2026</div>
 
-        <p>A sua privacidade é fundamental para nós. Esta Política de Privacidade explica como o aplicativo <strong>Finly</strong> ("nós", "nosso") recolhe, utiliza, armazena e protege os dados dos utilizadores ("você", "utilizador"), em conformidade com o Regulamento Geral sobre a Proteção de Dados (<strong>RGPD / GDPR</strong>) da União Europeia e a Lei Geral de Proteção de Dados (<strong>LGPD</strong>) do Brasil.</p>
+            <p>A sua privacidade é fundamental para nós. Esta Política de Privacidade explica como o aplicativo <strong>Finly</strong> ("nós", "nosso") recolhe, utiliza, armazena e protege os dados dos utilizadores ("você", "utilizador"), em conformidade com o Regulamento Geral sobre a Proteção de Dados (<strong>RGPD / GDPR</strong>) da União Europeia e a Lei Geral de Proteção de Dados (<strong>LGPD</strong>) do Brasil.</p>
 
-        <h2>1. Informações que Recolhemos</h2>
-        <ul>
-            <li><strong>Informações de Conta:</strong> Endereço de e-mail e nome fornecidos na autenticação via Google Firebase Auth.</li>
-            <li><strong>Dados Financeiros Pessoais:</strong> Transações registadas (rendas, despesas, categorias, datas de vencimento, valores e metas de poupança).</li>
-            <li><strong>Preferências do Aplicativo:</strong> Moeda selecionada (€ EUR ou R$ BRL), modo de tema (Escuro/Claro), configurações de notificações e biometria.</li>
-            <li><strong>Modo Convidado:</strong> No Modo Convidado, nenhum dado é enviado para a nuvem; os dados ficam exclusivamente na memória local do dispositivo.</li>
-        </ul>
+            <h2>1. Informações que Recolhemos</h2>
+            <ul>
+                <li><strong>Informações de Conta:</strong> Endereço de e-mail e nome fornecidos na autenticação via Google Firebase Auth.</li>
+                <li><strong>Dados Financeiros Pessoais:</strong> Transações registadas (rendas, despesas, categorias, datas de vencimento, valores e metas de poupança).</li>
+                <li><strong>Preferências do Aplicativo:</strong> Moeda selecionada (€ EUR ou R$ BRL), modo de tema (Escuro/Claro), configurações de notificações e biometria.</li>
+                <li><strong>Modo Convidado:</strong> No Modo Convidado, nenhum dado é enviado para a nuvem; os dados ficam exclusivamente na memória local do dispositivo.</li>
+            </ul>
 
-        <h2>2. Como Utilizamos as Suas Informações</h2>
-        <ul>
-            <li>Permitir o acesso seguro e sincronizar as suas finanças pessoais entre os seus dispositivos.</li>
-            <li>Calcular saldos, estatísticas, gráficos e projeções financeiras.</li>
-            <li>Agendar lembretes locais sobre contas próximas do vencimento.</li>
-            <li>Processar a gestão de subscrições através da Google Play Billing API.</li>
-        </ul>
+            <h2>2. Como Utilizamos as Suas Informações</h2>
+            <ul>
+                <li>Permitir o acesso seguro e sincronizar as suas finanças pessoais entre os seus dispositivos.</li>
+                <li>Calcular saldos, estatísticas, gráficos e projeções financeiras.</li>
+                <li>Agendar lembretes locais sobre contas próximas do vencimento.</li>
+                <li>Processar a gestão de subscrições através da Google Play Billing API.</li>
+            </ul>
 
-        <h2>3. Armazenamento e Segurança dos Dados</h2>
-        <p>Os dados da sua conta são armazenados de forma encriptada na infraestrutura de nuvem do <strong>Google Firebase Firestore</strong> (região europe-west3). Toda a comunicação é protegida através de protocolos encriptados HTTPS/TLS.</p>
+            <h2>3. Armazenamento e Segurança dos Dados</h2>
+            <p>Os dados da sua conta são armazenados de forma encriptada na infraestrutura de nuvem do <strong>Google Firebase Firestore</strong> (região europe-west3). Toda a comunicação é protegida através de protocolos encriptados HTTPS/TLS 1.3.</p>
 
-        <h2>4. Partilha de Dados com Terceiros</h2>
-        <p><strong>NÃO vendemos, alugamos ou comercializamos os seus dados pessoais ou financeiros com terceiros.</strong> Partilhamos dados apenas com fornecedores de infraestrutura essenciais (Google Firebase e Google Play Services).</p>
+            <h2>4. Partilha de Dados com Terceiros</h2>
+            <p><strong>NÃO vendemos, alugamos ou comercializamos os seus dados pessoais ou financeiros com terceiros.</strong> Partilhamos dados apenas com fornecedores de infraestrutura essenciais (Google Firebase e Google Play Services).</p>
 
-        <h2>5. Eliminação de Dados e Seus Direitos (RGPD / LGPD)</h2>
-        <p>Você pode apagar permanentemente a sua conta e todos os dados associados a qualquer momento no aplicativo em <strong>Perfil &gt; Excluir Conta (Ação Irreversível)</strong>.</p>
+            <h2>5. Exclusão de Conta e Direitos do Utilizador (RGPD / LGPD)</h2>
+            <p>Você pode apagar permanentemente a sua conta e todos os dados associados a qualquer momento no aplicativo em <strong>Perfil &gt; Eliminar Conta (Ação Irreversível)</strong>.</p>
+            <p>Alternativamente, você pode solicitar a exclusão manual dos seus dados enviando um e-mail para <a href="mailto:jesserodrygues.pt@gmail.com">jesserodrygues.pt@gmail.com</a>.</p>
+
+            <div class="contact-box">
+                <p><strong>Desenvolvedor:</strong> Jessé Rodrigues</p>
+                <p><strong>Contacto de Suporte:</strong> <a href="mailto:jesserodrygues.pt@gmail.com">jesserodrygues.pt@gmail.com</a></p>
+                <p><strong>Aplicação:</strong> Finly - Gestão Financeira Inteligente</p>
+            </div>
+        </div>
 
         <div class="footer">
-            <p><strong>Contacto:</strong> jesserodrigues@gmail.com | <strong>Desenvolvedor:</strong> Jesse Rodrigues | <strong>Aplicação:</strong> Finly - Gestão Financeira Inteligente</p>
+            <p>&copy; 2026 Finly. Todos os direitos reservados.</p>
         </div>
     </div>
+
 </body>
 </html>

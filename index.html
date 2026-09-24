@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finly - Gestão Financeira Pessoal Inteligente</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1E1E1E;
+            --surface-card: #252525;
+            --primary-color: #009688;
+            --primary-light: #00BFA5;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0BEC5;
+            --border-color: #333333;
+            --positive-color: #4CAF50;
+            --negative-color: #FF5252;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: var(--primary-light);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        a:hover {
+            color: #64FFDA;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            background-color: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-img {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+        }
+
+        .logo-title {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #00BFA5 0%, #64FFDA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .btn-header {
+            background-color: var(--primary-color);
+            color: #FFFFFF !important;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 4px 14px rgba(0, 150, 136, 0.3);
+        }
+
+        .btn-header:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 8% 60px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(0, 150, 136, 0.15);
+            color: var(--primary-light);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            border: 1px solid rgba(0, 191, 165, 0.3);
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 36px;
+            font-weight: 500;
+        }
+
+        .hero-cta {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-playstore {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background-color: #FFFFFF;
+            color: #121212 !important;
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 16px;
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-playstore:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 30px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--surface-color);
+            color: var(--text-primary) !important;
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-3px);
+        }
+
+        .gallery-section {
+            padding: 40px 5%;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .screenshot-card {
+            background-color: var(--surface-color);
+            border-radius: 20px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .screenshot-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary-color);
+            box-shadow: 0 12px 30px rgba(0, 150, 136, 0.2);
+        }
+
+        .screenshot-img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            display: block;
+        }
+
+        .screenshot-caption {
+            margin-top: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .features-section {
+            padding: 80px 8%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background-color: var(--surface-card);
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-icon {
+            font-size: 36px;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-light);
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .footer {
+            padding: 40px 8%;
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 32px; }
+            .hero-subtitle { font-size: 15px; }
+            .header { padding: 16px 5%; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <header class="header">
+        <div class="logo-container">
+            <img src="screenshots/01_login.jpg" alt="Finly Logo" class="logo-img" style="object-fit: cover; object-position: top;">
+            <span class="logo-title">Finly</span>
+        </div>
+        <nav class="nav-links">
+            <a href="#recursos" class="nav-link">Recursos</a>
+            <a href="#capturas" class="nav-link">Capturas de Ecrã</a>
+            <a href="privacy_policy.html" class="nav-link">Política de Privacidade</a>
+        </nav>
+        <a href="privacy_policy.html" class="btn-header">Privacidade & Termos</a>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-badge">🌟 Finly - Gestão Financeira Pessoal</div>
+        <h1 class="hero-title">O controlo total do seu dinheiro, simples, rápido e seguro.</h1>
+        <p class="hero-subtitle">Acompanhe receitas, despesas, orçamentos e metas de poupança com relatórios inteligentes e sincronização na nuvem em tempo real.</p>
+
+        <div class="hero-cta">
+            <a href="https://play.google.com/store/apps/details?id=com.jesse.finly" class="btn-playstore" target="_blank">
+                📱 Disponível na Google Play
+            </a>
+            <a href="privacy_policy.html" class="btn-secondary">
+                🔒 Política de Privacidade
+            </a>
+        </div>
+    </section>
+
+    <!-- Galeria de Capturas de Ecrã -->
+    <section class="gallery-section" id="capturas">
+        <h2 class="section-title">Conheça a Interface do Finly</h2>
+        <p class="section-subtitle">Design moderno M3 com modo escuro nativo e foco na simplicidade.</p>
+
+        <div class="gallery-grid">
+            <div class="screenshot-card">
+                <img src="screenshots/03_resumo_inicial.jpg" alt="Resumo Financeiro" class="screenshot-img">
+                <div class="screenshot-caption">Resumo Mensal &amp; Metas</div>
+            </div>
+            <div class="screenshot-card">
+                <img src="screenshots/06_listagem.jpg" alt="Listagem de Transações" class="screenshot-img">
+                <div class="screenshot-caption">Listagem Detalhada</div>
+            </div>
+            <div class="screenshot-card">
+                <img src="screenshots/08_evolucao_inicial.jpg" alt="Evolução Anual" class="screenshot-img">
+                <div class="screenshot-caption">Evolução Anual</div>
+            </div>
+            <div class="screenshot-card">
+                <img src="screenshots/04_perfil.jpg" alt="Perfil do Utilizador" class="screenshot-img">
+                <div class="screenshot-caption">Perfil &amp; Status Premium</div>
+            </div>
+            <div class="screenshot-card">
+                <img src="screenshots/07_nova_transacao.jpg" alt="Nova Transação" class="screenshot-img">
+                <div class="screenshot-caption">Lançamento Rápido</div>
+            </div>
+            <div class="screenshot-card">
+                <img src="screenshots/09_Categorias.jpg" alt="Tetos por Categoria" class="screenshot-img">
+                <div class="screenshot-caption">Tetos Orçamentais</div>
+            </div>
+            <div class="screenshot-card">
+                <img src="screenshots/10_Exportar.jpg" alt="Exportação de Relatórios" class="screenshot-img">
+                <div class="screenshot-caption">Relatórios PDF &amp; CSV</div>
+            </div>
+            <div class="screenshot-card">
+                <img src="screenshots/12_Backup.jpg" alt="Backup e Segurança" class="screenshot-img">
+                <div class="screenshot-caption">Backup Local &amp; Nuvem</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recursos Principais -->
+    <section class="features-section" id="recursos">
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">📊</span>
+                <h3 class="feature-title">Rendas &amp; Despesas</h3>
+                <p class="feature-desc">Registe todos os seus movimentos em segundos com categorização inteligente e cálculo automático de saldo.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🎯</span>
+                <h3 class="feature-title">Tetos &amp; Poupança</h3>
+                <p class="feature-desc">Defina limites de gastos por categoria e acompanhe as suas metas de poupança com barras de progresso animadas.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🔒</span>
+                <h3 class="feature-title">Modo Convidado Privado</h3>
+                <p class="feature-desc">Utilize a aplicação 100% offline e localmente sem obrigatoriedade de criar conta ou enviar dados.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">☁️</span>
+                <h3 class="feature-title">Sincronização em Tempo Real</h3>
+                <p class="feature-desc">Mantenha os seus dados protegidos no Google Firebase e aceda de qualquer telemóvel Android com total segurança.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">📄</span>
+                <h3 class="feature-title">Relatórios em PDF &amp; CSV</h3>
+                <p class="feature-desc">Exporte relatórios financeiros mensais em formato PDF para impressão ou CSV para análise no Excel.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🌟</span>
+                <h3 class="feature-title">Finly Premium</h3>
+                <p class="feature-desc">Aceda a categorias ilimitadas, histórico completo de 12 meses, projeção de saldo futuro e muito mais.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="privacy_policy.html">Política de Privacidade</a>
+            <span>•</span>
+            <a href="https://github.com/Jrodrygues/Finly-Gestao-Financeira" target="_blank">GitHub</a>
+            <span>•</span>
+            <a href="mailto:jesserodrygues.pt@gmail.com">Suporte por E-mail</a>
+        </div>
+        <p>&copy; 2026 Finly - Gestão Financeira. Todos os direitos reservados.</p>
+    </footer>
+
+</body>
+</html>
