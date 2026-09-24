@@ -170,9 +170,13 @@ class UserPreferencesManager(private val context: Context) {
         val email = prefs.getString(KEY_EMAIL, "") ?: ""
         if (email.isNotBlank() && !FirebaseManager.isGuestEmail(email)) {
             val userRef = firestore.collection("utilizadores").document(email.trim().lowercase())
-            userRef.set(mapOf("premium" to isPremium), SetOptions.merge())
+            val updates = mapOf(
+                "premium" to isPremium,
+                "isPremium" to isPremium
+            )
+            userRef.set(updates, SetOptions.merge())
                 .addOnFailureListener { e ->
-                    Log.e("UserPreferencesManager", "Erro ao salvar campo 'premium' no Firestore: ${e.message}")
+                    Log.e("UserPreferencesManager", "Erro ao salvar campos 'premium'/'isPremium' no Firestore: ${e.message}")
                 }
         }
     }
