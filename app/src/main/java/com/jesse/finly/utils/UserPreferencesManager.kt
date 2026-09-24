@@ -165,6 +165,16 @@ class UserPreferencesManager(private val context: Context) {
                 remove("TRIAL_START_TIME")
             }
         }
+
+        // Sincronizar o estado Premium em tempo real com a coleção 'utilizadores' no Firestore
+        val email = prefs.getString(KEY_EMAIL, "") ?: ""
+        if (email.isNotBlank() && !FirebaseManager.isGuestEmail(email)) {
+            val userRef = firestore.collection("utilizadores").document(email.trim().lowercase())
+            userRef.set(mapOf("premium" to isPremium), SetOptions.merge())
+                .addOnFailureListener { e ->
+                    Log.e("UserPreferencesManager", "Erro ao salvar campo 'premium' no Firestore: ${e.message}")
+                }
+        }
     }
 
     fun isPremium(): Boolean {

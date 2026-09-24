@@ -315,6 +315,10 @@ class ResumoActivity : AppCompatActivity() {
                     // Se no documento Firestore 'moedaConfigurada' for true OU se já existir moeda gravada
                     val isConfigurado = perfilNuvem.moedaConfigurada || perfilNuvem.moeda.isNotBlank()
 
+                    if (perfilNuvem.premium) {
+                        UserPreferencesManager(this@ResumoActivity).salvarIsPremium(true)
+                    }
+
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit {
                         putBoolean("NOTIFICATIONS", perfilNuvem.notifications)
                         putBoolean("DARK_MODE", perfilNuvem.darkMode)

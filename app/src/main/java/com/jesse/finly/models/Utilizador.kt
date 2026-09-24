@@ -18,5 +18,6 @@ data class Utilizador (
     val biometricAtiva: Boolean = false,
     val moeda: String = "EUR",
     val moedaConfigurada: Boolean = false,
-    @ColumnInfo(name = "custom_categories") val customCategories: String = ""
+    @ColumnInfo(name = "custom_categories") val customCategories: String = "",
+    val premium: Boolean = false
 )

@@ -114,11 +114,23 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         FirebaseManager.monitorarPerfil(email) { perfilNuvem ->
             lifecycleScope.launch(Dispatchers.Main) {
                 val novaMoeda = Moeda.porCodigo(perfilNuvem.moeda)
+                var precisaRecarregar = false
+
                 if (novaMoeda != moedaAtual) {
                     moedaAtual = novaMoeda
                     getSharedPreferences("FinlyAppPrefs", MODE_PRIVATE).edit {
                         putString("MOEDA", novaMoeda.codigo)
                     }
+                    precisaRecarregar = true
+                }
+
+                if (perfilNuvem.premium && !prefsManager.isPremium()) {
+                    prefsManager.salvarIsPremium(true)
+                    configurarEfeitoPremiumOverlay()
+                    precisaRecarregar = true
+                }
+
+                if (precisaRecarregar) {
                     atualizarGraficoFormatters()
                 }
             }
