@@ -227,6 +227,18 @@
         app:layout_constraintBottom_toTopOf="@+id/cardDetalheMes"
         app:layout_constraintTop_toBottomOf="@+id/cardResumoAnual" />
 
+    <!-- Camada de Escurecimento/Dimming do Gráfico para Plano Grátis -->
+    <View
+        android:id="@+id/viewChartDimOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#B3000000"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@+id/barChartAnual"
+        app:layout_constraintBottom_toBottomOf="@+id/barChartAnual"
+        app:layout_constraintStart_toStartOf="@+id/barChartAnual"
+        app:layout_constraintEnd_toEndOf="@+id/barChartAnual" />
+
     <!-- Card Flutuante Teaser Premium de Evolução Anual -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardOverlayPremiumEvolucao"

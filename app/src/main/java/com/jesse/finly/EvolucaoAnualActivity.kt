@@ -148,8 +148,13 @@ class EvolucaoAnualActivity : AppCompatActivity() {
     private fun configurarEfeitoPremiumOverlay() {
         val isPremium = prefsManager.isPremium()
         if (!isPremium) {
+            binding.viewChartDimOverlay.visibility = View.VISIBLE
             binding.cardOverlayPremiumEvolucao.visibility = View.VISIBLE
-            binding.barChartAnual.alpha = 0.40f
+            binding.barChartAnual.alpha = 0.25f
+
+            // Remove o balão marcador do gráfico para manter o topo do card limpo
+            binding.barChartAnual.marker = null
+            binding.barChartAnual.highlightValues(null)
 
             binding.btnVerPlanosEvolucao.setOnClickListener { view ->
                 FinanceiroUtils.dispararHapticFeedback(view)
@@ -159,9 +164,20 @@ class EvolucaoAnualActivity : AppCompatActivity() {
                 FinanceiroUtils.dispararHapticFeedback(view)
                 PaywallActivity.abrir(this)
             }
+            binding.cardResumoAnual.setOnClickListener { view ->
+                FinanceiroUtils.dispararHapticFeedback(view)
+                PaywallActivity.abrir(this)
+            }
+            binding.cardDetalheMes.setOnClickListener { view ->
+                FinanceiroUtils.dispararHapticFeedback(view)
+                PaywallActivity.abrir(this)
+            }
         } else {
+            binding.viewChartDimOverlay.visibility = View.GONE
             binding.cardOverlayPremiumEvolucao.visibility = View.GONE
             binding.barChartAnual.alpha = 1.0f
+            binding.cardResumoAnual.alpha = 1.0f
+            binding.cardDetalheMes.alpha = 1.0f
         }
     }
 
@@ -399,6 +415,17 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         totalDespesasAno: Double,
         saldoAcumuladoAno: Double
     ) {
+        val isPremium = prefsManager.isPremium()
+        if (!isPremium) {
+            val simboloStr = moedaAtual.simbolo
+            binding.tvTotalRendaAnual.text = "+ •••• $simboloStr"
+            binding.tvTotalDespesaAnual.text = "- •••• $simboloStr"
+            binding.tvSaldoAnual.text = "+ •••• $simboloStr"
+            binding.cardResumoAnual.alpha = 0.50f
+            return
+        }
+
+        binding.cardResumoAnual.alpha = 1.0f
         val corPositivo = ContextCompat.getColor(this, R.color.colorPositive)
         val corNegativo = ContextCompat.getColor(this, R.color.colorNegative)
         val corPadrao = ContextCompat.getColor(this, R.color.textColorSecondary)
@@ -418,6 +445,21 @@ class EvolucaoAnualActivity : AppCompatActivity() {
     private fun atualizarCardDetalheMes(index: Int) {
         if (index !in 0..11) return
         val mesNome = mesesNomes[index]
+        val mesTraduzido = IdiomaUtils.formatarNomeMes(this, mesNome)
+        binding.tvTituloDetalheMes.text = getString(R.string.detalhes_mes_ano_format, mesTraduzido, anoAtualSelecionado)
+
+        val isPremium = prefsManager.isPremium()
+        if (!isPremium) {
+            val simboloStr = moedaAtual.simbolo
+            binding.tvRendaMesDetalhe.text = "+ •••• $simboloStr"
+            binding.tvDespesaMesDetalhe.text = "- •••• $simboloStr"
+            binding.tvSaldoMesDetalhe.text = "+ •••• $simboloStr"
+            binding.cardDetalheMes.alpha = 0.50f
+            binding.barChartAnual.highlightValues(null)
+            return
+        }
+
+        binding.cardDetalheMes.alpha = 1.0f
         val renda = rendaPorMes[index].toDouble()
         val despesa = despesaPorMes[index].toDouble()
         val balanco = renda - despesa
@@ -425,8 +467,6 @@ class EvolucaoAnualActivity : AppCompatActivity() {
         val corPositivo = ContextCompat.getColor(this, R.color.colorPositive)
         val corNegativo = ContextCompat.getColor(this, R.color.colorNegative)
 
-        val mesTraduzido = IdiomaUtils.formatarNomeMes(this, mesNome)
-        binding.tvTituloDetalheMes.text = getString(R.string.detalhes_mes_ano_format, mesTraduzido, anoAtualSelecionado)
         binding.tvRendaMesDetalhe.text = CurrencyFormatter.formatarComSinal(renda, moedaAtual, forcarSinalPositivo = true)
         binding.tvDespesaMesDetalhe.text = CurrencyFormatter.formatarComSinal(-despesa, moedaAtual)
 
