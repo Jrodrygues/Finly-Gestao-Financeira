@@ -81,12 +81,13 @@ class BillingManager(
             .setProductList(productList)
             .build()
 
-        billingClient?.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
+        billingClient?.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                productDetailsList.forEach { details ->
+                val list = productDetailsResult.productDetailsList
+                list?.forEach { details ->
                     productDetailsMap[details.productId] = details
                 }
-                Log.d(TAG, "Produtos da Google Play carregados: ${productDetailsList.size}")
+                Log.d(TAG, "Produtos da Google Play carregados: ${list?.size ?: 0}")
             }
         }
     }
