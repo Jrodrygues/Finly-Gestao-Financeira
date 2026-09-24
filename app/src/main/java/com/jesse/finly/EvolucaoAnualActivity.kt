@@ -97,6 +97,7 @@ class EvolucaoAnualActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        configurarEfeitoPremiumOverlay()
         ativarSincronizacaoTempoReal()
         val novaMoeda = prefsManager.obterMoedaAtual()
         if (novaMoeda != moedaAtual) {
