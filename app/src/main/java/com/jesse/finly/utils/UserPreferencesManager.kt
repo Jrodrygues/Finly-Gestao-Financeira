@@ -151,17 +151,35 @@ class UserPreferencesManager(private val context: Context) {
         return prefs.getInt("NOTIF_MINUTO", 0)
     }
 
-    fun salvarIsPremium(isPremium: Boolean) {
+    fun salvarIsPremium(isPremium: Boolean, isPlayStorePurchase: Boolean = false) {
+        val jaTemTrialTime = prefs.contains("TRIAL_START_TIME")
         prefs.edit {
             putBoolean("IS_PREMIUM", isPremium)
-            if (isPremium && !prefs.contains("TRIAL_START_TIME")) {
-                putLong("TRIAL_START_TIME", System.currentTimeMillis())
+            if (isPremium) {
+                if (isPlayStorePurchase) {
+                    remove("TRIAL_START_TIME")
+                } else if (!jaTemTrialTime) {
+                    putLong("TRIAL_START_TIME", System.currentTimeMillis())
+                }
+            } else {
+                remove("TRIAL_START_TIME")
             }
         }
     }
 
     fun isPremium(): Boolean {
-        return prefs.getBoolean("IS_PREMIUM", false)
+        val isPremiumSaved = prefs.getBoolean("IS_PREMIUM", false)
+        if (!isPremiumSaved) return false
+
+        val startTime = prefs.getLong("TRIAL_START_TIME", 0L)
+        if (startTime > 0L) {
+            val diffMillis = System.currentTimeMillis() - startTime
+            val diasPassados = (diffMillis / (1000 * 60 * 60 * 24)).toInt()
+            if (diasPassados >= 7) {
+                return false
+            }
+        }
+        return true
     }
 
     fun obterDiasRestantesTrial(): Int {

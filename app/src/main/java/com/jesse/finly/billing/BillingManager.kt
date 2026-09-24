@@ -155,7 +155,7 @@ class BillingManager(
 
     private fun salvarStatusPremium(isPremium: Boolean) {
         val prefs = UserPreferencesManager(context)
-        prefs.salvarIsPremium(isPremium)
+        prefs.salvarIsPremium(isPremium, isPlayStorePurchase = true)
         onPremiumStatusChanged?.invoke(isPremium)
     }
 
