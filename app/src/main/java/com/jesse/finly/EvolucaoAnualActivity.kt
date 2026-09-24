@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import android.view.View
-import com.jesse.finly.PaywallActivity
 import com.jesse.finly.utils.FinanceiroUtils
 import com.jesse.finly.utils.ToastHelper
 import androidx.activity.enableEdgeToEdge

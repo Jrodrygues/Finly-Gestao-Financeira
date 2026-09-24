@@ -2233,14 +2233,14 @@ class ResumoActivity : AppCompatActivity() {
         if (isPremiumUser) {
             binding.tvIconLock12.visibility = View.GONE
             binding.ivChevron12.visibility = View.GONE
-            binding.tvProjecao12Titulo.text = "Projeção 12 Meses"
+            binding.tvProjecao12Titulo.text = getString(R.string.label_projecao_12_meses)
             binding.tvProjecao12MesesVal.text = CurrencyFormatter.formatarComSinal(projecao12Meses, moedaAtual, forcarSinalPositivo = true)
             binding.tvProjecao12MesesVal.setTextColor(if (projecao12Meses >= 0) colorPositivo else colorNegativo)
         } else {
             binding.tvIconLock12.visibility = View.VISIBLE
             binding.ivChevron12.visibility = View.VISIBLE
-            binding.tvProjecao12Titulo.text = "Projeção 12 Meses (Finly Premium)"
-            binding.tvProjecao12MesesVal.text = "Desbloquear com o Finly Premium 🌟"
+            binding.tvProjecao12Titulo.text = getString(R.string.label_projecao_12_meses_premium)
+            binding.tvProjecao12MesesVal.text = getString(R.string.desbloquear_finly_premium)
             binding.tvProjecao12MesesVal.setTextColor(colorPrimaryBrand)
         }
     }

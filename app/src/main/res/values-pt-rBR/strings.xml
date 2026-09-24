@@ -475,6 +475,9 @@
     <string name="chart_label_saldo_mensal">Saldo mensal</string>
     <string name="label_projecao_3_meses">Projeção (+3 Meses)</string>
     <string name="label_projecao_6_meses">Projeção (+6 Meses)</string>
+    <string name="label_projecao_12_meses">Projeção (+12 Meses)</string>
+    <string name="label_projecao_12_meses_premium">Projeção 12 Meses (Finly Premium)</string>
+    <string name="desbloquear_finly_premium">Desbloquear com o Finly Premium 🌟</string>
     <string name="comparativo_mes_queda_fmt">↓ %1$d%% vs. %2$s</string>
     <string name="comparativo_mes_alta_fmt">↑ %1$d%% vs. %2$s</string>
     <string name="comparativo_mes_neutro_fmt">0%% vs. %1$s</string>
