@@ -645,7 +645,7 @@
                 android:backgroundTint="@color/colorPrimary"
                 android:textColor="@color/white"
                 app:cornerRadius="28dp"
-                app:icon="@drawable/ic_poupanca"
+                app:icon="@drawable/ic_crown"
                 app:iconTint="@color/white" />
 
             <Button
