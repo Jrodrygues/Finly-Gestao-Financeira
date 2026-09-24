@@ -28,24 +28,29 @@
 ## 📸 Demonstração Visual (Screenshots)
 
 ### 🔐 Autenticação & Entrada
-| Login | Registo de Conta | Modo Convidado |
+| 01. Login | 02. Registo de Conta |
+| :---: | :---: |
+| <img src="screenshots/01_login.jpg" width="230"/> | <img src="screenshots/02_registo.jpg" width="230"/> |
+
+### 📊 Resumo & Perfil
+| 03. Resumo Financeiro & Metas | 04. Perfil & Status Premium | 05. Perfil & Configurações |
 | :---: | :---: | :---: |
-| <img src="screenshots/01_login.png" width="220"/> | <img src="screenshots/02_registo.png" width="220"/> | <img src="screenshots/03_aviso_convidado.png" width="220"/> |
+| <img src="screenshots/03_resumo_inicial.jpg" width="220"/> | <img src="screenshots/04_perfil.jpg" width="220"/> | <img src="screenshots/05_perfil.jpg" width="220"/> |
 
 ### 📝 Gestão & Adição de Transações
-| Listagem Detalhada / Extrato | Nova Transação | Detalhes da Transação |
+| 06. Listagem Detalhada | 07. Nova Transação | 08. Evolução Anual |
 | :---: | :---: | :---: |
-| <img src="screenshots/12_listagem.png" width="220"/> | <img src="screenshots/13_nova_transacao.png" width="220"/> | <img src="screenshots/14_detalhes_item.png" width="220"/> |
+| <img src="screenshots/06_listagem.jpg" width="220"/> | <img src="screenshots/07_nova_transacao.jpg" width="220"/> | <img src="screenshots/08_evolucao_inicial.jpg" width="220"/> |
 
-### ⚙️ Edição & Teto Orçamental
-| Teto Orçamental | Eliminar Item | Eliminar Recorrência |
-| :---: | :---: | :---: |
-| <img src="screenshots/15_editar_item.png" width="220"/> | <img src="screenshots/16_dialog_eliminar_item.png" width="220"/> | <img src="screenshots/17_dialog_eliminar_recorrencia.png" width="220"/> |
+### 🎯 Tetos, Relatórios & Backup
+| 09. Tetos por Categoria | 10. Relatórios PDF & CSV | 11. Edição de Perfil | 12. Backup & Segurança |
+| :---: | :---: | :---: | :---: |
+| <img src="screenshots/09_Categorias.jpg" width="180"/> | <img src="screenshots/10_Exportar.jpg" width="180"/> | <img src="screenshots/11_editar_perfil.jpg" width="180"/> | <img src="screenshots/12_Backup.jpg" width="180"/> |
 
-### 📊 Dashboards & Relatórios
-| Resumo com Gráfico | Lista por Categorias | Evolução Anual (Barras) |
-| :---: | :---: | :---: |
-| <img src="screenshots/08_resumo_grafico.png" width="220"/> | <img src="screenshots/10_resumo_categorias.png" width="220"/> | <img src="screenshots/09_evolucao_grafico.png" width="220"/> |
+### ⚙️ Detalhes & Edição de Itens
+| 13. Detalhes da Transação | 14. Editar Transação | 15. Diálogo Recorrência | 16. Diálogo Eliminar |
+| :---: | :---: | :---: | :---: |
+| <img src="screenshots/13_detalhes_item.jpg" width="180"/> | <img src="screenshots/14_editar_item.jpg" width="180"/> | <img src="screenshots/15_dialog_eliminar_recorrencia.jpg" width="180"/> | <img src="screenshots/16_dialog_eliminar_item.jpg" width="180"/> |
 
 ---
 
