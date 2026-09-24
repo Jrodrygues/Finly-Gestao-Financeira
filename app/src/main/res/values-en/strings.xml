@@ -615,7 +615,9 @@
     <string name="paywall_plano_mensal_titulo">Monthly Plan</string>
     <string name="paywall_plano_mensal_desc">2.99 € / month</string>
     <string name="paywall_btn_testar">Start 7-Day Free Trial</string>
+    <string name="paywall_btn_subscrever_agora">Subscribe Now</string>
     <string name="paywall_cobranca_aviso">Cancel anytime on Google Play. No charge today.</string>
+    <string name="paywall_ja_em_teste_aviso">You are already in the Finly Premium free trial period.</string>
     <string name="paywall_restaurar_compras">Restore Purchases</string>
     <string name="paywall_termos_privacidade">Terms &amp; Privacy</string>
     <string name="paywall_toast_ativado">Finly Premium activated!</string>

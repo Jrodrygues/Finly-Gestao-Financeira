@@ -40,6 +40,18 @@ class PaywallActivity : AppCompatActivity() {
         configurarInsets()
         configurarSelecaoPlanos()
         configurarAcoes()
+        atualizarEstadoTextosAssinatura()
+    }
+
+    private fun atualizarEstadoTextosAssinatura() {
+        val userPrefs = UserPreferencesManager(this)
+        if (userPrefs.isPremium()) {
+            binding.btnStartFreeTrial.text = getString(R.string.paywall_btn_subscrever_agora)
+            binding.tvCobrancaAviso.text = getString(R.string.paywall_ja_em_teste_aviso)
+        } else {
+            binding.btnStartFreeTrial.text = getString(R.string.paywall_btn_testar)
+            binding.tvCobrancaAviso.text = getString(R.string.paywall_cobranca_aviso)
+        }
     }
 
     private fun configurarInsets() {
