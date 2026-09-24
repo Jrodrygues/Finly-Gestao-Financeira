@@ -589,11 +589,11 @@
     <!-- Premium & Trial Strings -->
     <string name="trial_badge_dias">TESTE • %1$d DIAS 🌟</string>
     <string name="trial_badge_singular">TESTE • 1 DIA 🌟</string>
-    <string name="premium_badge">PREMIUM 🌟</string>
+    <string name="premium_badge">👑 PREMIUM</string>
     <string name="trial_card_titulo">Finly Premium • Período de Teste</string>
     <string name="trial_card_subtitulo_plural">Você tem %1$d dias de acesso total gratuito</string>
     <string name="trial_card_subtitulo_ultimo_dia">Último dia de teste gratuito • Ativar agora</string>
-    <string name="premium_ativo_titulo">Finly Premium Ativo 🌟</string>
+    <string name="premium_ativo_titulo">Finly Premium Ativo 👑</string>
     <string name="premium_ativo_subtitulo">Assinatura Premium em vigor.</string>
 
     <!-- Paywall Strings -->
