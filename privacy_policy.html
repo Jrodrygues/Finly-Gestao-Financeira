@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <meta name="description" content="Política de Privacidade e Proteção de Dados da aplicação Finly - Gestão Financeira Pessoal.">
     <title>Política de Privacidade - Finly</title>
-    <link rel="icon" type="image/svg+xml" href="screenshots/ic_logo_finly_transp.png">
+
+    <!-- Favicons corrigidos -->
+    <link rel="icon" type="image/png" href="screenshots/ic_logo_finly_transp.png">
     <link rel="apple-touch-icon" href="screenshots/ic_logo_finly_transp.png">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --bg-color: #121212;
@@ -38,9 +44,11 @@
         a {
             color: var(--primary-light);
             text-decoration: none;
+            transition: color 0.2s ease;
         }
 
         a:hover {
+            color: #64FFDA;
             text-decoration: underline;
         }
 
@@ -52,6 +60,19 @@
             background-color: var(--surface-color);
             border-bottom: 1px solid var(--border-color);
             margin-bottom: 40px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-img {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            object-fit: contain;
         }
 
         .logo-title {
@@ -70,6 +91,13 @@
             font-size: 14px;
             font-weight: 600;
             border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .btn-voltar:hover {
+            border-color: var(--primary-light);
+            text-decoration: none;
+            color: var(--primary-light);
         }
 
         .container {
@@ -87,7 +115,7 @@
         }
 
         h1 {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: 800;
             color: var(--primary-light);
             margin-bottom: 8px;
@@ -98,15 +126,18 @@
         .update-date {
             font-size: 13px;
             color: var(--text-secondary);
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         h2 {
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 700;
-            color: var(--primary-light);
+            color: var(--text-primary);
             margin-top: 32px;
             margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         p, ul {
@@ -123,6 +154,19 @@
             margin-bottom: 8px;
         }
 
+        strong {
+            color: var(--text-primary);
+        }
+
+        .alert-card {
+            background-color: rgba(0, 150, 136, 0.1);
+            border-left: 4px solid var(--primary-light);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
         .contact-box {
             margin-top: 40px;
             padding: 24px;
@@ -132,8 +176,13 @@
         }
 
         .contact-box p {
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .contact-box p:last-child {
+            margin-bottom: 0;
         }
 
         .footer {
@@ -142,62 +191,88 @@
             font-size: 13px;
             color: var(--text-secondary);
         }
+
+        @media (max-width: 600px) {
+            .card-policy {
+                padding: 24px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .header {
+                padding: 16px 5%;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <img src="screenshots/ic_logo_finly.png" alt="Finly Logo" style="width: 38px; height: 38px; border-radius: 10px; object-fit: contain;">
-            <span class="logo-title">Finly</span>
-        </div>
-        <a href="index.html" class="btn-voltar">← Voltar ao Início</a>
-    </header>
-
-    <div class="container">
-        <div class="card-policy">
-            <h1>Política de Privacidade 🔒</h1>
-            <div class="update-date"><strong>Última atualização:</strong> 25 de Fevereiro de 2026</div>
-
-            <p>A sua privacidade é fundamental para nós. Esta Política de Privacidade explica como o aplicativo <strong>Finly</strong> ("nós", "nosso") recolhe, utiliza, armazena e protege os dados dos utilizadores ("você", "utilizador"), em conformidade com o Regulamento Geral sobre a Proteção de Dados (<strong>RGPD / GDPR</strong>) da União Europeia e a Lei Geral de Proteção de Dados (<strong>LGPD</strong>) do Brasil.</p>
-
-            <h2>1. Informações que Recolhemos</h2>
-            <ul>
-                <li><strong>Informações de Conta:</strong> Endereço de e-mail e nome fornecidos na autenticação via Google Firebase Auth.</li>
-                <li><strong>Dados Financeiros Pessoais:</strong> Transações registadas (rendas, despesas, categorias, datas de vencimento, valores e metas de poupança).</li>
-                <li><strong>Preferências do Aplicativo:</strong> Moeda selecionada (€ EUR ou R$ BRL), modo de tema (Escuro/Claro), configurações de notificações e biometria.</li>
-                <li><strong>Modo Convidado:</strong> No Modo Convidado, nenhum dado é enviado para a nuvem; os dados ficam exclusivamente na memória local do dispositivo.</li>
-            </ul>
-
-            <h2>2. Como Utilizamos as Suas Informações</h2>
-            <ul>
-                <li>Permitir o acesso seguro e sincronizar as suas finanças pessoais entre os seus dispositivos.</li>
-                <li>Calcular saldos, estatísticas, gráficos e projeções financeiras.</li>
-                <li>Agendar lembretes locais sobre contas próximas do vencimento.</li>
-                <li>Processar a gestão de subscrições através da Google Play Billing API.</li>
-            </ul>
-
-            <h2>3. Armazenamento e Segurança dos Dados</h2>
-            <p>Os dados da sua conta são armazenados de forma encriptada na infraestrutura de nuvem do <strong>Google Firebase Firestore</strong> (região europe-west3). Toda a comunicação é protegida através de protocolos encriptados HTTPS/TLS 1.3.</p>
-
-            <h2>4. Partilha de Dados com Terceiros</h2>
-            <p><strong>NÃO vendemos, alugamos ou comercializamos os seus dados pessoais ou financeiros com terceiros.</strong> Partilhamos dados apenas com fornecedores de infraestrutura essenciais (Google Firebase e Google Play Services).</p>
-
-            <h2>5. Exclusão de Conta e Direitos do Utilizador (RGPD / LGPD)</h2>
-            <p>Você pode apagar permanentemente a sua conta e todos os dados associados a qualquer momento no aplicativo em <strong>Perfil &gt; Eliminar Conta (Ação Irreversível)</strong>.</p>
-            <p>Alternativamente, você pode solicitar a exclusão manual dos seus dados enviando um e-mail para <a href="mailto:jesserodrygues.pt@gmail.com">jesserodrygues.pt@gmail.com</a>.</p>
-
-            <div class="contact-box">
-                <p><strong>Desenvolvedor:</strong> Jessé Rodrigues</p>
-                <p><strong>Contacto de Suporte:</strong> <a href="mailto:jesserodrygues.pt@gmail.com">jesserodrygues.pt@gmail.com</a></p>
-                <p><strong>Aplicação:</strong> Finly - Gestão Financeira Inteligente</p>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p>&copy; 2026 Finly. Todos os direitos reservados.</p>
-        </div>
+<header class="header">
+    <div class="logo-container">
+        <img src="screenshots/ic_logo_finly.png" alt="Finly Logo" class="logo-img">
+        <span class="logo-title">Finly</span>
     </div>
+    <a href="index.html" class="btn-voltar">← Voltar ao Início</a>
+</header>
+
+<main class="container">
+    <article class="card-policy">
+        <h1>Política de Privacidade 🔒</h1>
+        <div class="update-date"><strong>Última atualização:</strong> 25 de Fevereiro de 2026</div>
+
+        <p>A sua privacidade e a segurança das suas finanças são a nossa prioridade. Esta Política de Privacidade explica de forma transparente como o aplicativo <strong>Finly</strong> ("nós", "nosso") recolhe, utiliza, armazena e protege os dados dos utilizadores ("você"), em integral conformidade com o Regulamento Geral sobre a Proteção de Dados (<strong>RGPD / GDPR</strong>) da União Europeia e a Lei Geral de Proteção de Dados (<strong>LGPD</strong>) do Brasil.</p>
+
+        <h2>1. Informações que Recolhemos</h2>
+        <ul>
+            <li><strong>Informações de Autenticação:</strong> Endereço de e-mail e identificador único gerado pelo serviço Google Firebase Auth ao criar a sua conta.</li>
+            <li><strong>Dados Financeiros Pessoais:</strong> Lançamentos inseridos ativamente por si (receitas, despesas, categorias, datas de vencimento, valores e metas de poupança estipuladas).</li>
+            <li><strong>Preferências da Aplicação:</strong> Moeda configurada (€ EUR ou R$ BRL), modo de tema e definições de notificações agendadas.</li>
+            <li><strong>Diagnóstico e Integridade da Aplicação:</strong> Identificadores de sessão anônimos e metadados de integridade do dispositivo estritamente necessários para prevenção contra fraudes e segurança da API (Firebase App Check).</li>
+        </ul>
+
+        <div class="alert-card">
+            <strong>Modo Convidado (Utilização Offline):</strong> Quando utiliza o Finly em Modo Convidado, nenhum dado financeiro ou pessoal é transmitido para os nossos servidores ou para a nuvem. Toda a informação é mantida em base de dados local cifrada no próprio dispositivo.
+        </div>
+
+        <h2>2. Finalidade do Tratamento de Dados</h2>
+        <ul>
+            <li>Autenticar a sua identidade e sincronizar os lançamentos em tempo real entre dispositivos autorizados.</li>
+            <li>Gerar resumos analíticos, gráficos mensais e relatórios exportáveis solicitados pelo utilizador.</li>
+            <li>Enviar alertas locais de lembrete de contas a pagar (sem transmissão externa das suas notificações).</li>
+            <li>Gerir o estado de subscrições ativas via Google Play Billing API.</li>
+        </ul>
+
+        <h2>3. Armazenamento, Segurança e Localização</h2>
+        <p>Os dados sincronizados são guardados na infraestrutura de nuvem segura do <strong>Google Cloud / Firebase Firestore</strong> com alojamento em centro de dados na União Europeia (região <code>europe-west3</code>). Todas as comunicações entre o aplicativo e a nuvem são obrigatoriamente encriptadas por protocolos <strong>HTTPS / TLS 1.3</strong> de nível industrial.</p>
+
+        <h2>4. Partilha de Dados com Terceiros</h2>
+        <p><strong>Não comercializamos, alugamos nem partilhamos os seus dados pessoais ou financeiros com terceiros</strong> para efeitos de marketing ou publicidade. A partilha de dados restringe-se estritamente aos parceiros técnicos indispensáveis à operacionalização do serviço:</p>
+        <ul>
+            <li><strong>Google Firebase:</strong> Infraestrutura de base de dados em nuvem, gestão de autenticação e validação de integridade.</li>
+            <li><strong>Google Play Store:</strong> Processamento seguro de pagamentos e verificação de licença do Finly Premium.</li>
+        </ul>
+
+        <h2>5. Privacidade de Menores</h2>
+        <p>O Finly não se destina nem recolhe intencionalmente dados pessoais de crianças ou menores de 13 anos (ou a idade mínima estipulada na legislação do seu país). Caso tome conhecimento de que uma criança nos forneceu dados pessoais, eliminaremos prontamente essas informações dos nossos servidores.</p>
+
+        <h2>6. Exclusão de Dados e Direitos do Titular (RGPD &amp; LGPD)</h2>
+        <p>Em conformidade com a legislação em vigor, tem o direito irrevogável de aceder, retificar, exportar ou eliminar definitivamente a sua conta e os seus registos a qualquer momento:</p>
+        <ul>
+            <li><strong>Eliminação Imediata no Aplicativo:</strong> Aceda a <em>Perfil &gt; Eliminar Conta (Ação Irreversível)</em>. A conta, dados da base de dados e credenciais de login serão permanentemente destruídos.</li>
+            <li><strong>Solicitação por E-mail:</strong> Pode requerer a exclusão manual ou o envio de uma cópia dos seus dados escrevendo para <a href="mailto:jesserodrygues.pt@gmail.com">jesserodrygues.pt@gmail.com</a> a partir do mesmo e-mail registado na conta. O pedido será processado no prazo máximo de 15 dias úteis.</li>
+        </ul>
+
+        <div class="contact-box">
+            <p><strong>Responsável pelo Tratamento:</strong> Jessé Rodrigues</p>
+            <p><strong>Aplicação:</strong> Finly - Gestão Financeira Pessoal</p>
+            <p><strong>Encarregado de Proteção de Dados / Suporte:</strong> <a href="mailto:jesserodrygues.pt@gmail.com">jesserodrygues.pt@gmail.com</a></p>
+        </div>
+    </article>
+
+    <footer class="footer">
+        <p>&copy; 2026 Finly. Todos os direitos reservados.</p>
+    </footer>
+</main>
 
 </body>
 </html>
